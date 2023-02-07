@@ -16,7 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import ru.skypro.homework.dto.RegisterReq;
+import ru.skypro.homework.dto.RegisterReqDto;
 
 import javax.validation.Valid;
 
@@ -36,7 +36,7 @@ public interface RegisterApi {
     @RequestMapping(value = "/register",
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<Void> register(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody RegisterReq body);
+    ResponseEntity<Void> register(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody RegisterReqDto body);
 
 }
 

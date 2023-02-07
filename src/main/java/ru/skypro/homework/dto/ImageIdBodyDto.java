@@ -15,11 +15,11 @@ import javax.validation.constraints.*;
 @javax.annotation.Generated(value = "ru.skypro.homeworkcodegen.v3.generators.java.SpringCodegen", date = "2023-02-06T18:24:36.081075022Z[GMT]")
 
 
-public class ImageIdBody   {
+public class ImageIdBodyDto {
   @JsonProperty("image")
   private Resource image = null;
 
-  public ImageIdBody image(Resource image) {
+  public ImageIdBodyDto image(Resource image) {
     this.image = image;
     return this;
   }
@@ -49,7 +49,7 @@ public class ImageIdBody   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ImageIdBody imageIdBody = (ImageIdBody) o;
+    ImageIdBodyDto imageIdBody = (ImageIdBodyDto) o;
     return Objects.equals(this.image, imageIdBody.image);
   }
 

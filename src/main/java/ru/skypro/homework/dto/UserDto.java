@@ -12,7 +12,7 @@ import org.springframework.validation.annotation.Validated;
 @javax.annotation.Generated(value = "ru.skypro.homeworkcodegen.v3.generators.java.SpringCodegen", date = "2023-02-06T18:24:36.081075022Z[GMT]")
 
 
-public class User   {
+public class UserDto {
   @JsonProperty("email")
   private String email = null;
 
@@ -37,7 +37,7 @@ public class User   {
   @JsonProperty("image")
   private String image = null;
 
-  public User email(String email) {
+  public UserDto email(String email) {
     this.email = email;
     return this;
   }
@@ -56,7 +56,7 @@ public class User   {
     this.email = email;
   }
 
-  public User firstName(String firstName) {
+  public UserDto firstName(String firstName) {
     this.firstName = firstName;
     return this;
   }
@@ -75,7 +75,7 @@ public class User   {
     this.firstName = firstName;
   }
 
-  public User id(Integer id) {
+  public UserDto id(Integer id) {
     this.id = id;
     return this;
   }
@@ -94,7 +94,7 @@ public class User   {
     this.id = id;
   }
 
-  public User lastName(String lastName) {
+  public UserDto lastName(String lastName) {
     this.lastName = lastName;
     return this;
   }
@@ -113,7 +113,7 @@ public class User   {
     this.lastName = lastName;
   }
 
-  public User phone(String phone) {
+  public UserDto phone(String phone) {
     this.phone = phone;
     return this;
   }
@@ -132,7 +132,7 @@ public class User   {
     this.phone = phone;
   }
 
-  public User regDate(String regDate) {
+  public UserDto regDate(String regDate) {
     this.regDate = regDate;
     return this;
   }
@@ -151,7 +151,7 @@ public class User   {
     this.regDate = regDate;
   }
 
-  public User city(String city) {
+  public UserDto city(String city) {
     this.city = city;
     return this;
   }
@@ -170,7 +170,7 @@ public class User   {
     this.city = city;
   }
 
-  public User image(String image) {
+  public UserDto image(String image) {
     this.image = image;
     return this;
   }
@@ -198,7 +198,7 @@ public class User   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    User user = (User) o;
+    UserDto user = (UserDto) o;
     return Objects.equals(this.email, user.email) &&
         Objects.equals(this.firstName, user.firstName) &&
         Objects.equals(this.id, user.id) &&

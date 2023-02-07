@@ -17,7 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import ru.skypro.homework.dto.LoginReq;
+import ru.skypro.homework.dto.LoginReqDto;
 
 import javax.validation.Valid;
 
@@ -38,7 +38,7 @@ public interface LoginApi {
         produces = { "*/*" }, 
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<Object> login(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody LoginReq body);
+    ResponseEntity<Object> login(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody LoginReqDto body);
 
 }
 
