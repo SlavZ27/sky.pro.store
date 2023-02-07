@@ -16,7 +16,7 @@ import javax.validation.Valid;
 @javax.annotation.Generated(value = "ru.skypro.homeworkcodegen.v3.generators.java.SpringCodegen", date = "2023-02-06T18:24:36.081075022Z[GMT]")
 
 
-public class Ads   {
+public class AdsDto {
   @JsonProperty("author")
   private Integer author = null;
 
@@ -33,7 +33,7 @@ public class Ads   {
   @JsonProperty("title")
   private String title = null;
 
-  public Ads author(Integer author) {
+  public AdsDto author(Integer author) {
     this.author = author;
     return this;
   }
@@ -52,12 +52,12 @@ public class Ads   {
     this.author = author;
   }
 
-  public Ads image(List<String> image) {
+  public AdsDto image(List<String> image) {
     this.image = image;
     return this;
   }
 
-  public Ads addImageItem(String imageItem) {
+  public AdsDto addImageItem(String imageItem) {
     if (this.image == null) {
       this.image = new ArrayList<String>();
     }
@@ -79,7 +79,7 @@ public class Ads   {
     this.image = image;
   }
 
-  public Ads pk(Integer pk) {
+  public AdsDto pk(Integer pk) {
     this.pk = pk;
     return this;
   }
@@ -98,7 +98,7 @@ public class Ads   {
     this.pk = pk;
   }
 
-  public Ads price(Integer price) {
+  public AdsDto price(Integer price) {
     this.price = price;
     return this;
   }
@@ -117,7 +117,7 @@ public class Ads   {
     this.price = price;
   }
 
-  public Ads title(String title) {
+  public AdsDto title(String title) {
     this.title = title;
     return this;
   }
@@ -145,7 +145,7 @@ public class Ads   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Ads ads = (Ads) o;
+    AdsDto ads = (AdsDto) o;
     return Objects.equals(this.author, ads.author) &&
         Objects.equals(this.image, ads.image) &&
         Objects.equals(this.pk, ads.pk) &&

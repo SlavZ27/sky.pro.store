@@ -12,7 +12,7 @@ import org.springframework.validation.annotation.Validated;
 @javax.annotation.Generated(value = "ru.skypro.homeworkcodegen.v3.generators.java.SpringCodegen", date = "2023-02-06T18:24:36.081075022Z[GMT]")
 
 
-public class Comment   {
+public class CommentDto {
   @JsonProperty("author")
   private Integer author = null;
 
@@ -25,7 +25,7 @@ public class Comment   {
   @JsonProperty("text")
   private String text = null;
 
-  public Comment author(Integer author) {
+  public CommentDto author(Integer author) {
     this.author = author;
     return this;
   }
@@ -44,7 +44,7 @@ public class Comment   {
     this.author = author;
   }
 
-  public Comment createdAt(String createdAt) {
+  public CommentDto createdAt(String createdAt) {
     this.createdAt = createdAt;
     return this;
   }
@@ -63,7 +63,7 @@ public class Comment   {
     this.createdAt = createdAt;
   }
 
-  public Comment pk(Integer pk) {
+  public CommentDto pk(Integer pk) {
     this.pk = pk;
     return this;
   }
@@ -82,7 +82,7 @@ public class Comment   {
     this.pk = pk;
   }
 
-  public Comment text(String text) {
+  public CommentDto text(String text) {
     this.text = text;
     return this;
   }
@@ -110,7 +110,7 @@ public class Comment   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Comment comment = (Comment) o;
+    CommentDto comment = (CommentDto) o;
     return Objects.equals(this.author, comment.author) &&
         Objects.equals(this.createdAt, comment.createdAt) &&
         Objects.equals(this.pk, comment.pk) &&

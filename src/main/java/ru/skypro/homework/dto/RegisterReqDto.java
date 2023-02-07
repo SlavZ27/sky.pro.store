@@ -12,7 +12,7 @@ import org.springframework.validation.annotation.Validated;
 @javax.annotation.Generated(value = "ru.skypro.homeworkcodegen.v3.generators.java.SpringCodegen", date = "2023-02-06T18:24:36.081075022Z[GMT]")
 
 
-public class RegisterReq   {
+public class RegisterReqDto {
   @JsonProperty("username")
   private String username = null;
 
@@ -31,7 +31,7 @@ public class RegisterReq   {
   private Role role;
 
 
-  public RegisterReq username(String username) {
+  public RegisterReqDto username(String username) {
     this.username = username;
     return this;
   }
@@ -54,7 +54,7 @@ public class RegisterReq   {
     this.username = username;
   }
 
-  public RegisterReq password(String password) {
+  public RegisterReqDto password(String password) {
     this.password = password;
     return this;
   }
@@ -73,7 +73,7 @@ public class RegisterReq   {
     this.password = password;
   }
 
-  public RegisterReq firstName(String firstName) {
+  public RegisterReqDto firstName(String firstName) {
     this.firstName = firstName;
     return this;
   }
@@ -92,7 +92,7 @@ public class RegisterReq   {
     this.firstName = firstName;
   }
 
-  public RegisterReq lastName(String lastName) {
+  public RegisterReqDto lastName(String lastName) {
     this.lastName = lastName;
     return this;
   }
@@ -111,7 +111,7 @@ public class RegisterReq   {
     this.lastName = lastName;
   }
 
-  public RegisterReq phone(String phone) {
+  public RegisterReqDto phone(String phone) {
     this.phone = phone;
     return this;
   }
@@ -142,7 +142,7 @@ public class RegisterReq   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    RegisterReq registerReq = (RegisterReq) o;
+    RegisterReqDto registerReq = (RegisterReqDto) o;
     return Objects.equals(this.username, registerReq.username) &&
         Objects.equals(this.password, registerReq.password) &&
         Objects.equals(this.firstName, registerReq.firstName) &&

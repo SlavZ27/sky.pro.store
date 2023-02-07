@@ -3,8 +3,6 @@ package ru.skypro.homework.controller;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import ru.skypro.homework.controller.api.LoginApi;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,12 +12,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
-import ru.skypro.homework.dto.LoginReq;
+import ru.skypro.homework.dto.LoginReqDto;
 import ru.skypro.homework.service.AuthService;
 
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 
 @javax.annotation.Generated(value = "ru.skypro.homeworkcodegen.v3.generators.java.SpringCodegen", date = "2023-02-06T18:24:36.081075022Z[GMT]")
 @RestController("login")
@@ -40,7 +37,7 @@ public class LoginApiController implements LoginApi {
         this.authService = authService;
     }
 
-    public ResponseEntity<Object> login(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody LoginReq body) {
+    public ResponseEntity<Object> login(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody LoginReqDto body) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             if (authService.login(body.getUsername(), body.getPassword())) {

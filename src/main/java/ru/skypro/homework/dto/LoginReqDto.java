@@ -12,14 +12,14 @@ import org.springframework.validation.annotation.Validated;
 @javax.annotation.Generated(value = "ru.skypro.homeworkcodegen.v3.generators.java.SpringCodegen", date = "2023-02-06T18:24:36.081075022Z[GMT]")
 
 
-public class LoginReq   {
+public class LoginReqDto {
   @JsonProperty("password")
   private String password = null;
 
   @JsonProperty("username")
   private String username = null;
 
-  public LoginReq password(String password) {
+  public LoginReqDto password(String password) {
     this.password = password;
     return this;
   }
@@ -38,7 +38,7 @@ public class LoginReq   {
     this.password = password;
   }
 
-  public LoginReq username(String username) {
+  public LoginReqDto username(String username) {
     this.username = username;
     return this;
   }
@@ -66,7 +66,7 @@ public class LoginReq   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    LoginReq loginReq = (LoginReq) o;
+    LoginReqDto loginReq = (LoginReqDto) o;
     return Objects.equals(this.password, loginReq.password) &&
         Objects.equals(this.username, loginReq.username);
   }

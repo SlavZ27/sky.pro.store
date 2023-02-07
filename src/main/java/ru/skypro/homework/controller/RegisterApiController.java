@@ -1,7 +1,5 @@
 package ru.skypro.homework.controller;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import ru.skypro.homework.controller.api.RegisterApi;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,7 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
-import ru.skypro.homework.dto.RegisterReq;
+import ru.skypro.homework.dto.RegisterReqDto;
 import ru.skypro.homework.dto.Role;
 import ru.skypro.homework.service.AuthService;
 
@@ -41,7 +39,7 @@ public class RegisterApiController implements RegisterApi {
         this.authService = authService;
     }
 
-    public ResponseEntity<Void> register(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody RegisterReq body) {
+    public ResponseEntity<Void> register(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody RegisterReqDto body) {
         String accept = request.getHeader("Accept");
         Role role = body.getRole() == null ? USER : body.getRole();
         if (authService.register(body, role)) {

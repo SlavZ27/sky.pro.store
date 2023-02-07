@@ -13,7 +13,7 @@ import javax.validation.constraints.*;
 @javax.annotation.Generated(value = "ru.skypro.homeworkcodegen.v3.generators.java.SpringCodegen", date = "2023-02-06T18:24:36.081075022Z[GMT]")
 
 
-public class CreateAds   {
+public class CreateAdsDto {
   @JsonProperty("description")
   private String description = null;
 
@@ -23,7 +23,7 @@ public class CreateAds   {
   @JsonProperty("title")
   private String title = null;
 
-  public CreateAds description(String description) {
+  public CreateAdsDto description(String description) {
     this.description = description;
     return this;
   }
@@ -43,7 +43,7 @@ public class CreateAds   {
     this.description = description;
   }
 
-  public CreateAds price(Integer price) {
+  public CreateAdsDto price(Integer price) {
     this.price = price;
     return this;
   }
@@ -63,7 +63,7 @@ public class CreateAds   {
     this.price = price;
   }
 
-  public CreateAds title(String title) {
+  public CreateAdsDto title(String title) {
     this.title = title;
     return this;
   }
@@ -92,7 +92,7 @@ public class CreateAds   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    CreateAds createAds = (CreateAds) o;
+    CreateAdsDto createAds = (CreateAdsDto) o;
     return Objects.equals(this.description, createAds.description) &&
         Objects.equals(this.price, createAds.price) &&
         Objects.equals(this.title, createAds.title);
