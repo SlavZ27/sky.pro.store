@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.controller.api.AdsApi;
-import ru.skypro.homework.model.*;
+import ru.skypro.homework.dto.*;
 
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
@@ -29,7 +29,6 @@ public class AdsApiController implements AdsApi {
 
     private final HttpServletRequest request;
 
-    @org.springframework.beans.factory.annotation.Autowired
     public AdsApiController(ObjectMapper objectMapper, HttpServletRequest request) {
         this.objectMapper = objectMapper;
         this.request = request;
@@ -79,7 +78,6 @@ public class AdsApiController implements AdsApi {
                 return new ResponseEntity<ResponseWrapperAds>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
-
         return new ResponseEntity<ResponseWrapperAds>(HttpStatus.NOT_IMPLEMENTED);
     }
 

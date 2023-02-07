@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
-import ru.skypro.homework.model.NewPassword;
-import ru.skypro.homework.model.User;
+import ru.skypro.homework.dto.NewPassword;
+import ru.skypro.homework.dto.User;
 
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
