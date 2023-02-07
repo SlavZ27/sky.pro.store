@@ -1,4 +1,4 @@
-package ru.skypro.homework.model;
+package ru.skypro.homework.dto;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,17 +9,17 @@ import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * ImageIdBody
+ * MeImageBody
  */
 @Validated
 @javax.annotation.Generated(value = "ru.skypro.homeworkcodegen.v3.generators.java.SpringCodegen", date = "2023-02-06T18:24:36.081075022Z[GMT]")
 
 
-public class ImageIdBody   {
+public class MeImageBody   {
   @JsonProperty("image")
   private Resource image = null;
 
-  public ImageIdBody image(Resource image) {
+  public MeImageBody image(Resource image) {
     this.image = image;
     return this;
   }
@@ -49,8 +49,8 @@ public class ImageIdBody   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ImageIdBody imageIdBody = (ImageIdBody) o;
-    return Objects.equals(this.image, imageIdBody.image);
+    MeImageBody meImageBody = (MeImageBody) o;
+    return Objects.equals(this.image, meImageBody.image);
   }
 
   @Override
@@ -61,7 +61,7 @@ public class ImageIdBody   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ImageIdBody {\n");
+    sb.append("class MeImageBody {\n");
     
     sb.append("    image: ").append(toIndentedString(image)).append("\n");
     sb.append("}");

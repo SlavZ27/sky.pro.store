@@ -1,4 +1,4 @@
-package ru.skypro.homework.model;
+package ru.skypro.homework.dto;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;

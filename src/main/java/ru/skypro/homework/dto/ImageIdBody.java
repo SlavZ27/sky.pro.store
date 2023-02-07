@@ -1,4 +1,4 @@
-package ru.skypro.homework.model;
+package ru.skypro.homework.dto;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,41 +9,17 @@ import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * AdsBody
+ * ImageIdBody
  */
 @Validated
 @javax.annotation.Generated(value = "ru.skypro.homeworkcodegen.v3.generators.java.SpringCodegen", date = "2023-02-06T18:24:36.081075022Z[GMT]")
 
 
-public class AdsBody   {
-  @JsonProperty("properties")
-  private CreateAds properties = null;
-
+public class ImageIdBody   {
   @JsonProperty("image")
   private Resource image = null;
 
-  public AdsBody properties(CreateAds properties) {
-    this.properties = properties;
-    return this;
-  }
-
-  /**
-   * Get properties
-   * @return properties
-   **/
-  @Schema(required = true, description = "")
-      @NotNull
-
-    @Valid
-    public CreateAds getProperties() {
-    return properties;
-  }
-
-  public void setProperties(CreateAds properties) {
-    this.properties = properties;
-  }
-
-  public AdsBody image(Resource image) {
+  public ImageIdBody image(Resource image) {
     this.image = image;
     return this;
   }
@@ -73,22 +49,20 @@ public class AdsBody   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    AdsBody adsBody = (AdsBody) o;
-    return Objects.equals(this.properties, adsBody.properties) &&
-        Objects.equals(this.image, adsBody.image);
+    ImageIdBody imageIdBody = (ImageIdBody) o;
+    return Objects.equals(this.image, imageIdBody.image);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(properties, image);
+    return Objects.hash(image);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class AdsBody {\n");
+    sb.append("class ImageIdBody {\n");
     
-    sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
     sb.append("    image: ").append(toIndentedString(image)).append("\n");
     sb.append("}");
     return sb.toString();

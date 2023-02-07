@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
-import ru.skypro.homework.model.*;
+import ru.skypro.homework.dto.*;
 
 import javax.validation.Valid;
 
@@ -42,7 +42,7 @@ public interface AdsApi {
         produces = { "*/*" }, 
         consumes = { "multipart/form-data" }, 
         method = RequestMethod.POST)
-    ResponseEntity<Ads> addAds(@Parameter(in = ParameterIn.DEFAULT, description = "",schema=@Schema()) @RequestParam(value="properties", required=false)  CreateAds properties, @Parameter(description = "file detail") @Valid @RequestPart("file") MultipartFile image);
+    ResponseEntity<Ads> addAds(@Parameter(in = ParameterIn.DEFAULT, description = "",schema=@Schema()) @RequestParam(value="properties", required=false) CreateAds properties, @Parameter(description = "file detail") @Valid @RequestPart("file") MultipartFile image);
 
 
     @Operation(summary = "addComments", description = "", tags={ "Объявления" })
