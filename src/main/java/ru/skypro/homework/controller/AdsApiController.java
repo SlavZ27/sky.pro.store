@@ -44,7 +44,6 @@ public class AdsApiController implements AdsApi {
                 return new ResponseEntity<AdsDto>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
-
         return new ResponseEntity<AdsDto>(HttpStatus.NOT_IMPLEMENTED);
     }
 
