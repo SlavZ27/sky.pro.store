@@ -28,7 +28,7 @@ public interface AuthApi {
             produces = {"*/*"},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     ResponseEntity<Object> login(@Parameter(
-            in = ParameterIn.DEFAULT, description = "Login", required = true, schema = @Schema(
+            in = ParameterIn.QUERY, description = "Login", required = true, schema = @Schema(
             implementation = LoginReqDto.class))
                                  @Valid @RequestBody LoginReqDto body);
 
@@ -41,7 +41,7 @@ public interface AuthApi {
     @PostMapping(value = "/register",
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     ResponseEntity<Void> register(@Parameter(
-            in = ParameterIn.DEFAULT, description = "register", required = true, schema = @Schema(
+            in = ParameterIn.QUERY, description = "register", required = true, schema = @Schema(
             implementation = RegisterReqDto.class))
                                   @Valid @RequestBody RegisterReqDto body);
 }

@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,151 +30,155 @@ import javax.validation.Valid;
 @Validated
 public interface AdsApi {
 
-    @Operation(summary = "addAds", description = "", tags={ "Объявления" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "201", description = "Created", content = @Content(mediaType = "*/*", schema = @Schema(implementation = AdsDto.class))),
-        
-        @ApiResponse(responseCode = "401", description = "Unauthorized"),
-        
-        @ApiResponse(responseCode = "403", description = "Forbidden"),
-        
-        @ApiResponse(responseCode = "404", description = "Not Found") })
+    @Operation(summary = "addAds", description = "", tags = {"Объявления"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Created", content = @Content(mediaType = "*/*", schema = @Schema(implementation = AdsDto.class))),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Not Found")})
     @RequestMapping(value = "/ads",
-        produces = { "*/*" }, 
-        consumes = { "multipart/form-data" }, 
-        method = RequestMethod.POST)
-    ResponseEntity<AdsDto> addAds(@Parameter(in = ParameterIn.DEFAULT, description = "",schema=@Schema()) @RequestParam(value="properties", required=false) CreateAdsDto properties, @Parameter(description = "file detail") @Valid @RequestPart("file") MultipartFile image);
+            produces = {"*/*"},
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE},
+            method = RequestMethod.POST)
+    ResponseEntity<AdsDto> addAds(
+            @Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @RequestParam(value = "properties", required = false) CreateAdsDto properties,
+            @Parameter(description = "file detail") @Valid @RequestPart("file") MultipartFile image);
 
 
-    @Operation(summary = "addComments", description = "", tags={ "Объявления" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "*/*", schema = @Schema(implementation = CommentDto.class))),
-        
-        @ApiResponse(responseCode = "401", description = "Unauthorized"),
-        
-        @ApiResponse(responseCode = "403", description = "Forbidden"),
-        
-        @ApiResponse(responseCode = "404", description = "Not Found") })
+    @Operation(summary = "addComments", description = "", tags = {"Объявления"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "*/*", schema = @Schema(implementation = CommentDto.class))),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Not Found")})
     @RequestMapping(value = "/ads/{ad_pk}/comments",
-        produces = { "*/*" }, 
-        consumes = { "application/json" }, 
-        method = RequestMethod.POST)
-    ResponseEntity<CommentDto> addComments(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("ad_pk") String adPk, @Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody CommentDto body);
+            produces = {"*/*"},
+            consumes = {"application/json"},
+            method = RequestMethod.POST)
+    ResponseEntity<CommentDto> addComments(
+            @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("ad_pk") String adPk,
+            @Parameter(in = ParameterIn.DEFAULT, description = "", required = true, schema = @Schema()) @Valid @RequestBody CommentDto body);
 
 
-    @Operation(summary = "deleteComments", description = "", tags={ "Объявления" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "OK"),
-        
-        @ApiResponse(responseCode = "401", description = "Unauthorized"),
-        
-        @ApiResponse(responseCode = "403", description = "Forbidden"),
-        
-        @ApiResponse(responseCode = "404", description = "Not Found") })
+    @Operation(summary = "deleteComments", description = "", tags = {"Объявления"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Not Found")})
     @RequestMapping(value = "/ads/{ad_pk}/comments/{id}",
-        method = RequestMethod.DELETE)
-    ResponseEntity<Void> deleteComments(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("ad_pk") String adPk, @Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") Integer id);
+            method = RequestMethod.DELETE)
+    ResponseEntity<Void> deleteComments(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("ad_pk") String adPk, @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("id") Integer id);
 
 
-    @Operation(summary = "", description = "", tags={ "Объявления" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "*/*", schema = @Schema(implementation = ResponseWrapperAdsDto.class))) })
+    @Operation(summary = "", description = "", tags = {"Объявления"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "*/*", schema = @Schema(implementation = ResponseWrapperAdsDto.class)))})
     @RequestMapping(value = "/ads",
-        produces = { "*/*" }, 
-        method = RequestMethod.GET)
+            produces = {"*/*"},
+            method = RequestMethod.GET)
     ResponseEntity<ResponseWrapperAdsDto> getALLAds();
 
 
-    @Operation(summary = "getFullAd", description = "", tags={ "Объявления" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "*/*", schema = @Schema(implementation = FullAdsDto.class))),
-        
-        @ApiResponse(responseCode = "404", description = "Not Found") })
+    @Operation(summary = "getFullAd", description = "", tags = {"Объявления"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "*/*", schema = @Schema(implementation = FullAdsDto.class))),
+
+            @ApiResponse(responseCode = "404", description = "Not Found")})
     @RequestMapping(value = "/ads/{id}",
-        produces = { "*/*" }, 
-        method = RequestMethod.GET)
-    ResponseEntity<FullAdsDto> getAds(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") Integer id);
+            produces = {"*/*"},
+            method = RequestMethod.GET)
+    ResponseEntity<FullAdsDto> getAds(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("id") Integer id);
 
 
-    @Operation(summary = "getAdsMe", description = "", tags={ "Объявления" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "*/*", schema = @Schema(implementation = ResponseWrapperAdsDto.class))),
-        
-        @ApiResponse(responseCode = "401", description = "Unauthorized"),
-        
-        @ApiResponse(responseCode = "403", description = "Forbidden"),
-        
-        @ApiResponse(responseCode = "404", description = "Not Found") })
+    @Operation(summary = "getAdsMe", description = "", tags = {"Объявления"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "*/*", schema = @Schema(implementation = ResponseWrapperAdsDto.class))),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Not Found")})
     @RequestMapping(value = "/ads/me",
-        produces = { "*/*" }, 
-        method = RequestMethod.GET)
-    ResponseEntity<ResponseWrapperAdsDto> getAdsMeUsingGET(@Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "authenticated", required = false) Boolean authenticated, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "authorities[0].authority", required = false) String authorities0Authority, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "credentials", required = false) Object credentials, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "details", required = false) Object details, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "principal", required = false) Object principal);
+            produces = {"*/*"},
+            method = RequestMethod.GET)
+    ResponseEntity<ResponseWrapperAdsDto> getAdsMeUsingGET(@Parameter(in = ParameterIn.QUERY, description = "", schema = @Schema()) @Valid @RequestParam(value = "authenticated", required = false) Boolean authenticated, @Parameter(in = ParameterIn.QUERY, description = "", schema = @Schema()) @Valid @RequestParam(value = "authorities[0].authority", required = false) String authorities0Authority, @Parameter(in = ParameterIn.QUERY, description = "", schema = @Schema()) @Valid @RequestParam(value = "credentials", required = false) Object credentials, @Parameter(in = ParameterIn.QUERY, description = "", schema = @Schema()) @Valid @RequestParam(value = "details", required = false) Object details, @Parameter(in = ParameterIn.QUERY, description = "", schema = @Schema()) @Valid @RequestParam(value = "principal", required = false) Object principal);
 
 
-    @Operation(summary = "getComments", description = "", tags={ "Объявления" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "*/*", schema = @Schema(implementation = ResponseWrapperCommentDto.class))),
-        
-        @ApiResponse(responseCode = "404", description = "Not Found") })
+    @Operation(summary = "getComments", description = "", tags = {"Объявления"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "*/*", schema = @Schema(implementation = ResponseWrapperCommentDto.class))),
+
+            @ApiResponse(responseCode = "404", description = "Not Found")})
     @RequestMapping(value = "/ads/{ad_pk}/comments",
-        produces = { "*/*" }, 
-        method = RequestMethod.GET)
-    ResponseEntity<ResponseWrapperCommentDto> getComments(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("ad_pk") String adPk);
+            produces = {"*/*"},
+            method = RequestMethod.GET)
+    ResponseEntity<ResponseWrapperCommentDto> getComments(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("ad_pk") String adPk);
 
 
-    @Operation(summary = "getComments", description = "", tags={ "Объявления" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "*/*", schema = @Schema(implementation = CommentDto.class))),
-        
-        @ApiResponse(responseCode = "404", description = "Not Found") })
+    @Operation(summary = "getComments", description = "", tags = {"Объявления"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "*/*", schema = @Schema(implementation = CommentDto.class))),
+
+            @ApiResponse(responseCode = "404", description = "Not Found")})
     @RequestMapping(value = "/ads/{ad_pk}/comments/{id}",
-        produces = { "*/*" }, 
-        method = RequestMethod.GET)
-    ResponseEntity<CommentDto> getComments1(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("ad_pk") String adPk, @Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") Integer id);
+            produces = {"*/*"},
+            method = RequestMethod.GET)
+    ResponseEntity<CommentDto> getComments1(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("ad_pk") String adPk, @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("id") Integer id);
 
 
-    @Operation(summary = "removeAds", description = "", tags={ "Объявления" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "204", description = "No Content"),
-        
-        @ApiResponse(responseCode = "401", description = "Unauthorized"),
-        
-        @ApiResponse(responseCode = "403", description = "Forbidden") })
+    @Operation(summary = "removeAds", description = "", tags = {"Объявления"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "No Content"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden")})
     @RequestMapping(value = "/ads/{id}",
-        method = RequestMethod.DELETE)
-    ResponseEntity<Void> removeAds(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") Integer id);
+            method = RequestMethod.DELETE)
+    ResponseEntity<Void> removeAds(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("id") Integer id);
 
 
-    @Operation(summary = "updateAds", description = "", tags={ "Объявления" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "*/*", schema = @Schema(implementation = AdsDto.class))),
-        
-        @ApiResponse(responseCode = "401", description = "Unauthorized"),
-        
-        @ApiResponse(responseCode = "403", description = "Forbidden"),
-        
-        @ApiResponse(responseCode = "404", description = "Not Found") })
+    @Operation(summary = "updateAds", description = "", tags = {"Объявления"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "*/*", schema = @Schema(implementation = AdsDto.class))),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Not Found")})
     @RequestMapping(value = "/ads/{id}",
-        produces = { "*/*" }, 
-        consumes = { "application/json" }, 
-        method = RequestMethod.PATCH)
-    ResponseEntity<AdsDto> updateAds(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") Integer id, @Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody CreateAdsDto body);
+            produces = {"*/*"},
+            consumes = {"application/json"},
+            method = RequestMethod.PATCH)
+    ResponseEntity<AdsDto> updateAds(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("id") Integer id, @Parameter(in = ParameterIn.DEFAULT, description = "", required = true, schema = @Schema()) @Valid @RequestBody CreateAdsDto body);
 
 
-    @Operation(summary = "updateComments", description = "", tags={ "Объявления" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "*/*", schema = @Schema(implementation = CommentDto.class))),
-        
-        @ApiResponse(responseCode = "401", description = "Unauthorized"),
-        
-        @ApiResponse(responseCode = "403", description = "Forbidden"),
-        
-        @ApiResponse(responseCode = "404", description = "Not Found") })
+    @Operation(summary = "updateComments", description = "", tags = {"Объявления"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "*/*", schema = @Schema(implementation = CommentDto.class))),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Not Found")})
     @RequestMapping(value = "/ads/{ad_pk}/comments/{id}",
-        produces = { "*/*" }, 
-        consumes = { "application/json" }, 
-        method = RequestMethod.PATCH)
-    ResponseEntity<CommentDto> updateComments(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("ad_pk") String adPk, @Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") Integer id, @Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody CommentDto body);
+            produces = {"*/*"},
+            consumes = {"application/json"},
+            method = RequestMethod.PATCH)
+    ResponseEntity<CommentDto> updateComments(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("ad_pk") String adPk, @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("id") Integer id, @Parameter(in = ParameterIn.DEFAULT, description = "", required = true, schema = @Schema()) @Valid @RequestBody CommentDto body);
 
 }
 

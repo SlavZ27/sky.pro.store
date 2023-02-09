@@ -34,7 +34,8 @@ public class AdsApiController implements AdsApi {
         this.request = request;
     }
 
-    public ResponseEntity<AdsDto> addAds(@Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @RequestParam(value = "properties", required = false) CreateAdsDto properties, @Parameter(description = "file detail") @Valid @RequestPart("file") MultipartFile image) {
+    public ResponseEntity<AdsDto> addAds(@Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @RequestParam(value = "properties", required = false) CreateAdsDto properties,
+                                         @Parameter(description = "file detail") @Valid @RequestPart("file") MultipartFile image) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
