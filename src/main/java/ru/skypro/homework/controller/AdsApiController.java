@@ -119,7 +119,7 @@ public class AdsApiController implements AdsApi {
         return new ResponseEntity<AdsDto>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<CommentDto> getComments1(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("ad_pk") String adPk, @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("id") Integer id) {
+    public ResponseEntity<CommentDto> getComments(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("ad_pk") String adPk, @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("id") Integer id) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains(MediaType.APPLICATION_JSON_VALUE)) {
             try {

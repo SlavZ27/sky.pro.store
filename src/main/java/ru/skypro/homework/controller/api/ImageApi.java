@@ -30,9 +30,9 @@ public interface ImageApi {
         @ApiResponse(responseCode = "404", description = "Not Found") })
     @RequestMapping(value = "/image/{id}",
         produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE },
-        consumes = { MediaType.MULTIPART_FORM_DATA_VALUE },
+        consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE },
         method = RequestMethod.PATCH)
-    ResponseEntity<List<byte[]>> updateImage(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") Integer id, @Parameter(description = "file detail") @Valid @RequestPart("image") MultipartFile image);
+    ResponseEntity<List<byte[]>> updateImage(@Parameter(in = ParameterIn.PATH, description = "id of ads", required=true) @PathVariable("id") Integer id, @Parameter(description = "file detail") @Valid @RequestPart("image") MultipartFile image);
 
 }
 
