@@ -10,21 +10,21 @@ import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 
 /**
- * ResponseWrapperAds
+ * ResponseWrapperComment
  */
 @Validated
 @javax.annotation.Generated(value = "ru.skypro.homeworkcodegen.v3.generators.java.SpringCodegen", date = "2023-02-06T18:24:36.081075022Z[GMT]")
 
 
-public class ResponseWrapperAds   {
+public class ResponseWrapperCommentDto {
   @JsonProperty("count")
   private Integer count = null;
 
   @JsonProperty("results")
   @Valid
-  private List<Ads> results = null;
+  private List<CommentDto> results = null;
 
-  public ResponseWrapperAds count(Integer count) {
+  public ResponseWrapperCommentDto count(Integer count) {
     this.count = count;
     return this;
   }
@@ -43,14 +43,14 @@ public class ResponseWrapperAds   {
     this.count = count;
   }
 
-  public ResponseWrapperAds results(List<Ads> results) {
+  public ResponseWrapperCommentDto results(List<CommentDto> results) {
     this.results = results;
     return this;
   }
 
-  public ResponseWrapperAds addResultsItem(Ads resultsItem) {
+  public ResponseWrapperCommentDto addResultsItem(CommentDto resultsItem) {
     if (this.results == null) {
-      this.results = new ArrayList<Ads>();
+      this.results = new ArrayList<CommentDto>();
     }
     this.results.add(resultsItem);
     return this;
@@ -62,11 +62,11 @@ public class ResponseWrapperAds   {
    **/
   @Schema(description = "")
       @Valid
-    public List<Ads> getResults() {
+    public List<CommentDto> getResults() {
     return results;
   }
 
-  public void setResults(List<Ads> results) {
+  public void setResults(List<CommentDto> results) {
     this.results = results;
   }
 
@@ -79,9 +79,9 @@ public class ResponseWrapperAds   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ResponseWrapperAds responseWrapperAds = (ResponseWrapperAds) o;
-    return Objects.equals(this.count, responseWrapperAds.count) &&
-        Objects.equals(this.results, responseWrapperAds.results);
+    ResponseWrapperCommentDto responseWrapperComment = (ResponseWrapperCommentDto) o;
+    return Objects.equals(this.count, responseWrapperComment.count) &&
+        Objects.equals(this.results, responseWrapperComment.results);
   }
 
   @Override
@@ -92,7 +92,7 @@ public class ResponseWrapperAds   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ResponseWrapperAds {\n");
+    sb.append("class ResponseWrapperComment {\n");
     
     sb.append("    count: ").append(toIndentedString(count)).append("\n");
     sb.append("    results: ").append(toIndentedString(results)).append("\n");
