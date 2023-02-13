@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.skypro.homework.controller.api.UsersApi;
@@ -25,6 +26,7 @@ import java.io.IOException;
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
 @RequiredArgsConstructor
+@PreAuthorize("hasAnyAuthority('ADMIN','USER')")
 public class UsersApiController implements UsersApi {
     private final ObjectMapper objectMapper;
     private final HttpServletRequest request;
@@ -68,7 +70,7 @@ public class UsersApiController implements UsersApi {
                 return new ResponseEntity<NewPasswordDto>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
-
+ 
         return new ResponseEntity<NewPasswordDto>(HttpStatus.NOT_IMPLEMENTED);
     }
 

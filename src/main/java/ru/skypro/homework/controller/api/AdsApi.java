@@ -78,7 +78,9 @@ public interface AdsApi {
 
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
 
-            @ApiResponse(responseCode = "403", description = "Forbidden")})
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            //@ApiResponse(responseCode = "404", description = "Not Found")  was not in the specification
+            @ApiResponse(responseCode = "404", description = "Not Found")})
     @DeleteMapping(value = "/{id}")
     ResponseEntity<Void> removeAds(@Parameter(in = ParameterIn.PATH, description = "", required = true) @PathVariable("id") Integer id);
 

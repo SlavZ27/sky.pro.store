@@ -51,7 +51,7 @@ public interface UsersApi {
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     ResponseEntity<NewPasswordDto> setPassword(@Parameter(
-            in = ParameterIn.QUERY, description = "", required = true,
+            in = ParameterIn.DEFAULT, description = "", required = true,
             schema = @Schema(implementation = NewPasswordDto.class)) @Valid @RequestBody NewPasswordDto body);
 
 
@@ -59,15 +59,14 @@ public interface UsersApi {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(
                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = NewPasswordDto.class))),
+                    schema = @Schema(implementation = UserDto.class))),
             @ApiResponse(responseCode = "204", description = "No Content"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @PatchMapping(value = "me",
-            produces = {MediaType.APPLICATION_JSON_VALUE},
-            consumes = {MediaType.APPLICATION_JSON_VALUE})
-    ResponseEntity<UserDto> updateUser(@Parameter(name = "", in = ParameterIn.QUERY, description = "", required = true,
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    ResponseEntity<UserDto> updateUser(@Parameter(in = ParameterIn.DEFAULT, description = "", required = true,
             schema = @Schema(implementation = UserDto.class)) @Valid @RequestBody UserDto body);
 
 
