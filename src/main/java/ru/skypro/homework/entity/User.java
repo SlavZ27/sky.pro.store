@@ -12,6 +12,7 @@ import java.util.Objects;
 @ToString
 @RequiredArgsConstructor
 @Entity
+@Table(name = "users")
 public class User {
 
     @Id
@@ -29,9 +30,6 @@ public class User {
     @Column(name = "reg_date")
     private LocalDate regDate;
     @OneToOne
-    @JoinColumn(name = "id_city")
-    private City city;
-    @OneToOne
     @JoinColumn(name = "id_avatar")
     private Avatar avatar;
     @Column(name = "password")
@@ -39,6 +37,7 @@ public class User {
     @Column(name = "username")
     private String username;
     @Column(name = "role")
+    @Enumerated(EnumType.STRING)
     private Role role;
 
     @Override
