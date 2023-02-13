@@ -20,6 +20,9 @@ public class Comment {
     @OneToOne
     @JoinColumn(name = "id_author")
     private User author;
+    @OneToOne
+    @JoinColumn(name = "id_ads")
+    private Ads ads;
     @Column(name = "text")
     private String text;
     @Column(name = "date_time")
