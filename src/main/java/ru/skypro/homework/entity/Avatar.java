@@ -16,9 +16,6 @@ public class Avatar {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
-    @OneToOne
-    @JoinColumn(name = "id_author")
-    private User author;
     @Column(name = "path")
     private String path;
 
