@@ -25,9 +25,6 @@ public class UserDto {
     @JsonProperty("regDate")
     private String regDate = null;
 
-    @JsonProperty("city")
-    private String city = null;
-
     @JsonProperty("image")
     private String image = null;
 
@@ -110,19 +107,6 @@ public class UserDto {
         this.regDate = regDate;
     }
 
-    public UserDto city(String city) {
-        this.city = city;
-        return this;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
     public UserDto image(String image) {
         this.image = image;
         return this;
@@ -138,27 +122,16 @@ public class UserDto {
 
 
     @Override
-    public boolean equals(java.lang.Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        UserDto user = (UserDto) o;
-        return Objects.equals(this.email, user.email) &&
-                Objects.equals(this.firstName, user.firstName) &&
-                Objects.equals(this.id, user.id) &&
-                Objects.equals(this.lastName, user.lastName) &&
-                Objects.equals(this.phone, user.phone) &&
-                Objects.equals(this.regDate, user.regDate) &&
-                Objects.equals(this.city, user.city) &&
-                Objects.equals(this.image, user.image);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserDto userDto = (UserDto) o;
+        return Objects.equals(email, userDto.email) && Objects.equals(firstName, userDto.firstName) && Objects.equals(id, userDto.id) && Objects.equals(lastName, userDto.lastName) && Objects.equals(phone, userDto.phone) && Objects.equals(regDate, userDto.regDate) && Objects.equals(image, userDto.image);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(email, firstName, id, lastName, phone, regDate, city, image);
+        return Objects.hash(email, firstName, id, lastName, phone, regDate, image);
     }
 
     @Override
@@ -172,7 +145,6 @@ public class UserDto {
         sb.append("    lastName: ").append(toIndentedString(lastName)).append("\n");
         sb.append("    phone: ").append(toIndentedString(phone)).append("\n");
         sb.append("    regDate: ").append(toIndentedString(regDate)).append("\n");
-        sb.append("    city: ").append(toIndentedString(city)).append("\n");
         sb.append("    image: ").append(toIndentedString(image)).append("\n");
         sb.append("}");
         return sb.toString();

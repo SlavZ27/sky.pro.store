@@ -46,5 +46,7 @@ CREATE TABLE ads
     description TEXT    NOT NULL
 );
 
-
+-- changeSet evnag:2
+ALTER TABLE ads ALTER COLUMN price TYPE INTEGER;
+ALTER TABLE ads ALTER COLUMN price SET NOT NULL;
 

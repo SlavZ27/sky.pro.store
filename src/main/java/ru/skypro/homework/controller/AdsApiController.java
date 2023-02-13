@@ -36,7 +36,7 @@ public class AdsApiController implements AdsApi {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains(MediaType.APPLICATION_JSON_VALUE)) {
             try {
-                return new ResponseEntity<ResponseWrapperAdsDto>(objectMapper.readValue("{\"count\":1,\"results\":[{\"author\":123,\"image\":[\"string\"],\"pk\":123,\"price\":5555,\"title\":\"God bless Bizin\"}]}", ResponseWrapperAdsDto.class), HttpStatus.NOT_IMPLEMENTED);
+                return new ResponseEntity<ResponseWrapperAdsDto>(objectMapper.readValue("{\"count\":1,\"results\":[{\"author\":123,\"image\":[\"string\"],\"pk\":123,\"price\":5555,\"title\":\"Some string\"}]}", ResponseWrapperAdsDto.class), HttpStatus.OK);
             } catch (IOException e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<ResponseWrapperAdsDto>(HttpStatus.INTERNAL_SERVER_ERROR);
