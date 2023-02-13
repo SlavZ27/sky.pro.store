@@ -41,10 +41,19 @@ CREATE TABLE ads
 (
     id          SERIAL  NOT NULL PRIMARY KEY,
     id_author   INTEGER NOT NULL,
-    price       NUMERIC   NOT NULL,
+    price       NUMERIC NOT NULL,
     title       TEXT    NOT NULL,
     description TEXT    NOT NULL
 );
 
-
+-- changeSet nadillustrator:2
+DROP TABLE comment;
+CREATE TABLE comment
+(
+    id        SERIAL    NOT NULL PRIMARY KEY,
+    id_author INTEGER   NOT NULL,
+    id_ads    INTEGER   NOT NULL,
+    text      TEXT      NOT NULL,
+    date_time TIMESTAMP NOT NULL
+);
 
