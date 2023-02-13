@@ -3,6 +3,7 @@ package ru.skypro.homework.entity;
 import lombok.*;
 import org.hibernate.Hibernate;
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Getter
@@ -11,7 +12,6 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Entity
 public class Avatar {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)

@@ -18,7 +18,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = {
@@ -26,11 +28,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 })
 public class CommentMapperTest {
 
-    @Spy
-    private CommentMapper commentMapper = Mappers.getMapper(CommentMapper.class);
+//    @Spy
+//    private CommentMapper commentMapper = Mappers.getMapper(CommentMapper.class);
 
     @InjectMocks
-    private CommentMapperImpl commentMapperTest ;
+    private CommentMapperImpl commentMapperTest;
 
     @Mock
     private UsersRepository usersRepository;
@@ -51,10 +53,16 @@ public class CommentMapperTest {
         comment.setAuthor(user);
 
         CommentDto commentDto = commentMapperTest.commentToDto(comment);
+        when(usersRepository.findById(111)).thenReturn(Optional.of(user));
+        Comment comment2 = commentMapperTest.dtoToComment(commentDto);
+
         assertEquals(commentDto.getPk(), 111);
         assertEquals(commentDto.getText(), "Test text");
         assertEquals(commentDto.getCreatedAt(), "2023-02-11 15:00");
         assertEquals(commentDto.getAuthor(), 111);
+        assertThat(comment)
+                .usingRecursiveComparison().ignoringFields("id")
+                .isEqualTo(comment2);
     }
 
     @Test
@@ -66,7 +74,7 @@ public class CommentMapperTest {
 
         User user = new User();
         user.setId(111);
-        Mockito.when(usersRepository.findById(111)).thenReturn(Optional.of(user));
+        when(usersRepository.findById(111)).thenReturn(Optional.of(user));
         commentDto.setAuthor(user.getId());
 
         Comment comment = commentMapperTest.dtoToComment(commentDto);
@@ -74,6 +82,5 @@ public class CommentMapperTest {
         assertEquals(comment.getText(), "Test text");
         assertEquals(comment.getDateTime(), LocalDateTime.parse("2023-02-11 15:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
         assertEquals(comment.getAuthor(), user);
-
     }
 }

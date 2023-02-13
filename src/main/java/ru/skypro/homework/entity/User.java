@@ -4,6 +4,7 @@ import lombok.*;
 import org.hibernate.Hibernate;
 import ru.skypro.homework.dto.Role;
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.Objects;
 
