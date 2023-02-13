@@ -3,7 +3,6 @@ package ru.skypro.homework.entity;
 import lombok.*;
 import org.hibernate.Hibernate;
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
@@ -22,7 +21,7 @@ public class Ads {
     @JoinColumn(name = "id_author")
     private User author;
     @Column(name = "price")
-    private BigDecimal price;
+    private Integer price;
     @Column(name = "title")
     private String title;
     @OneToMany(mappedBy="ads", fetch=FetchType.EAGER)

@@ -41,7 +41,7 @@ CREATE TABLE ads
 (
     id          SERIAL  NOT NULL PRIMARY KEY,
     id_author   INTEGER NOT NULL,
-    price       NUMERIC NOT NULL,
+    price       NUMERIC   NOT NULL,
     title       TEXT    NOT NULL,
     description TEXT    NOT NULL
 );
@@ -56,4 +56,7 @@ CREATE TABLE comment
     text      TEXT      NOT NULL,
     date_time TIMESTAMP NOT NULL
 );
+-- changeSet evnag:3
+ALTER TABLE ads ALTER COLUMN price TYPE INTEGER;
+ALTER TABLE ads ALTER COLUMN price SET NOT NULL;
 
