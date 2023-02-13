@@ -46,7 +46,17 @@ CREATE TABLE ads
     description TEXT    NOT NULL
 );
 
--- changeSet evnag:2
+-- changeSet nadillustrator:2
+DROP TABLE comment;
+CREATE TABLE comment
+(
+    id        SERIAL    NOT NULL PRIMARY KEY,
+    id_author INTEGER   NOT NULL,
+    id_ads    INTEGER   NOT NULL,
+    text      TEXT      NOT NULL,
+    date_time TIMESTAMP NOT NULL
+);
+-- changeSet evnag:3
 ALTER TABLE ads ALTER COLUMN price TYPE INTEGER;
 ALTER TABLE ads ALTER COLUMN price SET NOT NULL;
 
