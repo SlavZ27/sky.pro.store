@@ -14,16 +14,16 @@ import org.springframework.validation.annotation.Validated;
 
 public class CommentDto {
   @JsonProperty("author")
-  private Integer author = null;
+  private Integer author;
 
   @JsonProperty("createdAt")
-  private String createdAt = null;
+  private String createdAt;
 
   @JsonProperty("pk")
-  private Integer pk = null;
+  private Integer pk;
 
   @JsonProperty("text")
-  private String text = null;
+  private String text;
 
   public CommentDto author(Integer author) {
     this.author = author;
