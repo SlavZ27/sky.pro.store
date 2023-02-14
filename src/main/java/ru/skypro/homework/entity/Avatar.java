@@ -2,6 +2,7 @@ package ru.skypro.homework.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
+
 import javax.persistence.*;
 import java.util.Objects;
 
@@ -9,6 +10,7 @@ import java.util.Objects;
 @Setter
 @ToString
 @RequiredArgsConstructor
+@NoArgsConstructor
 @Entity
 public class Avatar {
 
@@ -18,6 +20,10 @@ public class Avatar {
     private Integer id;
     @Column(name = "path")
     private String path;
+
+    public Avatar(String path) {
+        this.path = path;
+    }
 
     @Override
     public boolean equals(Object o) {
