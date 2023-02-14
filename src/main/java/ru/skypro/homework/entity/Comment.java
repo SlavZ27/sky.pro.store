@@ -2,6 +2,7 @@ package ru.skypro.homework.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import java.util.Objects;
 @Setter
 @ToString
 @RequiredArgsConstructor
+@NoArgsConstructor
 @Entity
 public class Comment {
 
@@ -28,6 +30,13 @@ public class Comment {
     private String text;
     @Column(name = "date_time")
     private LocalDateTime dateTime;
+
+    public Comment(User author, Ads ads, String text, LocalDateTime dateTime) {
+        this.author = author;
+        this.ads = ads;
+        this.text = text;
+        this.dateTime = dateTime;
+    }
 
     @Override
     public boolean equals(Object o) {

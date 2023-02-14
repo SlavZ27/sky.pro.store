@@ -3,6 +3,7 @@ package ru.skypro.homework.entity;
 import lombok.*;
 import org.hibernate.Hibernate;
 import ru.skypro.homework.dto.Role;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -12,6 +13,7 @@ import java.util.Objects;
 @Setter
 @ToString
 @RequiredArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "users")
 public class User {
@@ -40,6 +42,26 @@ public class User {
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    public User(String email,
+                String firstName,
+                String lastName,
+                String phone,
+                LocalDate regDate,
+                Avatar avatar,
+                String password,
+                String username,
+                Role role) {
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phone = phone;
+        this.regDate = regDate;
+        this.avatar = avatar;
+        this.password = password;
+        this.username = username;
+        this.role = role;
+    }
 
     @Override
     public boolean equals(Object o) {
