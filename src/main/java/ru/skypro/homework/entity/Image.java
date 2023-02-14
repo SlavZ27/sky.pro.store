@@ -2,6 +2,7 @@ package ru.skypro.homework.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
@@ -22,6 +23,11 @@ public class Image {
     private Ads ads;
     @Column(name = "path")
     private String path;
+
+    public Image(Ads ads, String path) {
+        this.ads = ads;
+        this.path = path;
+    }
 
     @Override
     public boolean equals(Object o) {

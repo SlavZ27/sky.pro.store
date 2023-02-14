@@ -2,6 +2,7 @@ package ru.skypro.homework.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -25,10 +26,23 @@ public class Ads {
     private Integer price;
     @Column(name = "title")
     private String title;
-    @OneToMany(mappedBy="ads", fetch=FetchType.EAGER)
+    @ToString.Exclude
+    @OneToMany(mappedBy = "ads", fetch = FetchType.EAGER)
     private List<Image> images;
     @Column(name = "description")
     private String description;
+
+    public Ads(User author,
+               Integer price,
+               String title,
+               List<Image> images,
+               String description) {
+        this.author = author;
+        this.price = price;
+        this.title = title;
+        this.images = images;
+        this.description = description;
+    }
 
     @Override
     public boolean equals(Object o) {
