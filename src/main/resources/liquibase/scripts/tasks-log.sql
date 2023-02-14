@@ -60,3 +60,8 @@ CREATE TABLE comment
 ALTER TABLE ads ALTER COLUMN price TYPE INTEGER;
 ALTER TABLE ads ALTER COLUMN price SET NOT NULL;
 
+-- changeSet nadillustrator:4
+ALTER TABLE avatar DROP COLUMN id_author;
+
+
+
