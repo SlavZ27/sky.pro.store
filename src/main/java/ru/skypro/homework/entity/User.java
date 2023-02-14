@@ -13,7 +13,6 @@ import java.util.Objects;
 @Setter
 @ToString
 @RequiredArgsConstructor
-@NoArgsConstructor
 @Entity
 @Table(name = "users")
 public class User {

@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.controller.api.AdsApi;
 import ru.skypro.homework.dto.*;
+import ru.skypro.homework.exception.NotFoundException;
+import ru.skypro.homework.service.impl.AdsServiceImpl;
 
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
@@ -24,13 +26,15 @@ import java.io.IOException;
 public class AdsApiController implements AdsApi {
 
     private final ObjectMapper objectMapper;
-
+    private final AdsServiceImpl adsServiceImpl;
     private final HttpServletRequest request;
 
-    public AdsApiController(ObjectMapper objectMapper, HttpServletRequest request) {
+    public AdsApiController(ObjectMapper objectMapper, AdsServiceImpl adsServiceImpl, HttpServletRequest request) {
         this.objectMapper = objectMapper;
+        this.adsServiceImpl = adsServiceImpl;
         this.request = request;
     }
+
 
     public ResponseEntity<ResponseWrapperAdsDto> getALLAds() {
         String accept = request.getHeader("Accept");
@@ -101,9 +105,15 @@ public class AdsApiController implements AdsApi {
         return new ResponseEntity<FullAdsDto>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<Void> removeAds(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("id") Integer id) {
+    @DeleteMapping(path ="{id_ads}")
+    public ResponseEntity<Void> removeAds(@PathVariable("id_ads") Integer id) {
         String accept = request.getHeader("Accept");
-        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
+        try {
+            adsServiceImpl.removeAds(id);
+        } catch (NotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok().build();
     }
 
     public ResponseEntity<AdsDto> updateAds(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("id") Integer id, @Parameter(in = ParameterIn.DEFAULT, description = "", required = true, schema = @Schema()) @Valid @RequestBody CreateAdsDto body) {
