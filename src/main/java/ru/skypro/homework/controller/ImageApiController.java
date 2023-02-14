@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.controller.api.ImageApi;
+import ru.skypro.homework.service.impl.ImageServiceImpl;
 
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
@@ -25,27 +27,28 @@ import java.util.List;
 @CrossOrigin(value = "http://localhost:3000")
 public class ImageApiController implements ImageApi {
 
-    private final ObjectMapper objectMapper;
+    private final ImageServiceImpl imageService;
 
-    private final HttpServletRequest request;
-
-    public ImageApiController(ObjectMapper objectMapper, HttpServletRequest request) {
-        this.objectMapper = objectMapper;
-        this.request = request;
+    public ImageApiController(ImageServiceImpl imageService) {
+        this.imageService = imageService;
     }
 
-    public ResponseEntity<List<byte[]>> updateImage(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("id") Integer id, @Parameter(description = "file detail") @Valid @RequestPart("image") MultipartFile image) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains(MediaType.APPLICATION_JSON_VALUE)) {
-            try {
-                return new ResponseEntity<List<byte[]>>(objectMapper.readValue("[ \"\", \"\" ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<List<byte[]>>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
+    @Override
+    public ResponseEntity<List<byte[]>> updateImage(Integer id, MultipartFile image) {
+        return ResponseEntity.ok(imageService.updateImage(id, image));
 
-        return new ResponseEntity<List<byte[]>>(HttpStatus.NOT_IMPLEMENTED);
     }
 
+    @Override
+    public ResponseEntity<byte[]> getImage(Integer idImage) {
+        Pair<byte[], String> pair = imageService.getImage(idImage);
+        return read(pair);
+    }
+
+    private ResponseEntity<byte[]> read(Pair<byte[], String> pair) {
+        return ResponseEntity.ok()
+                .contentLength(pair.getFirst().length)
+                .contentType(MediaType.parseMediaType(pair.getSecond()))
+                .body(pair.getFirst());
+    }
 }
