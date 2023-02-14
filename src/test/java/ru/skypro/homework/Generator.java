@@ -5,12 +5,16 @@ import liquibase.license.LicenseService;
 import ru.skypro.homework.dto.Role;
 import ru.skypro.homework.entity.*;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class Generator {
     private final Faker faker = new Faker();
@@ -163,11 +167,24 @@ public class Generator {
         return avatar;
     }
 
-    public Image generateImageIfNull(Image image, Ads ads) {
+    private List<String> getPathsOfFiles(String pathDir) {
+        File dir = new File(pathDir);
+        File[] files = dir.listFiles();
+        assert files != null;
+        return Arrays.stream(files).map(file -> pathDir + "/" + file.getName()).collect(Collectors.toList());
+    }
+
+    public Image generateImageIfNull(Image image, String dirForImages, Ads ads) {
+
         if (image == null) {
             image = new Image();
             image.setId(genInt());
-            image.setPath(faker.file().fileName());
+            if (dirForImages == null || dirForImages.length() == 0) {
+                image.setPath(faker.file().fileName());
+            } else {
+                List<String> pathsOfFiles = getPathsOfFiles(dirForImages);
+                image.setPath(pathsOfFiles.get(random.nextInt(pathsOfFiles.size())));
+            }
             image.setAds(ads);
         }
         return image;

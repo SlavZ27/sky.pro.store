@@ -8,29 +8,38 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import ru.skypro.homework.Generator;
 import ru.skypro.homework.entity.Ads;
 import ru.skypro.homework.entity.Avatar;
+import ru.skypro.homework.entity.Image;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.repository.*;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class AdsApiControllerTest {
+class ImageApiControllerTest {
     @LocalServerPort
     private int port;
-    private final static String REQUEST_MAPPING_STRING = "ads";
-    private final static String REQUEST_MAPPING_STRING_COMMENT = "comment";
+    private final static String REQUEST_MAPPING_STRING = "image";
     private final String dirForImages;
     @Autowired
-    private AdsApiController adsApiController;
+    private ImageApiController imageApiController;
     @Autowired
     private AdsRepository adsRepository;
     @Autowired
@@ -46,7 +55,7 @@ class AdsApiControllerTest {
     private final Generator generator = new Generator();
     private final Random random = new Random();
 
-    AdsApiControllerTest(@Value("${path.to.materials.folder}") String dirForImages) {
+    ImageApiControllerTest(@Value("${path.to.materials.folder}") String dirForImages) {
         this.dirForImages = dirForImages;
     }
 
@@ -121,7 +130,7 @@ class AdsApiControllerTest {
 
     @Test
     void contextLoads() {
-        assertThat(adsApiController).isNotNull();
+        assertThat(imageApiController).isNotNull();
         assertThat(adsRepository).isNotNull();
         assertThat(avatarRepository).isNotNull();
         assertThat(commentRepository).isNotNull();
@@ -130,5 +139,50 @@ class AdsApiControllerTest {
         assertThat(testRestTemplate).isNotNull();
     }
 
+    @Test
+    void getImageTest() throws IOException {
+        Image actualImage = imageRepository.findAll().stream().findAny().orElse(null);
+        assert actualImage != null;
 
+        ResponseEntity<byte[]> result = testRestTemplate.exchange(
+                "http://localhost:" + port + "/" + REQUEST_MAPPING_STRING + "/" + actualImage.getId(),
+                HttpMethod.GET,
+                null,
+                byte[].class);
+
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(result.getBody())
+                .isEqualTo(Files.readAllBytes(Paths.get(actualImage.getPath())));
+        assertThat(result.getBody().length)
+                .isEqualTo(Files.readAllBytes(Paths.get(actualImage.getPath())).length);
+    }
+
+    @Test
+    void getImageNegativeTest() {
+        Image actualImage = imageRepository.findAll().stream().findAny().orElse(null);
+        assert actualImage != null;
+        actualImage.setPath("null");
+        actualImage = imageRepository.save(actualImage);
+        ResponseEntity<byte[]> result = testRestTemplate.exchange(
+                "http://localhost:" + port + "/" + REQUEST_MAPPING_STRING + "/" + actualImage.getId(),
+                HttpMethod.GET,
+                null,
+                byte[].class);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        actualImage.setPath(null);
+        actualImage = imageRepository.save(actualImage);
+        result = testRestTemplate.exchange(
+                "http://localhost:" + port + "/" + REQUEST_MAPPING_STRING + "/" + actualImage.getId(),
+                HttpMethod.GET,
+                null,
+                byte[].class);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        imageRepository.delete(actualImage);
+        result = testRestTemplate.exchange(
+                "http://localhost:" + port + "/" + REQUEST_MAPPING_STRING + "/" + actualImage.getId(),
+                HttpMethod.GET,
+                null,
+                byte[].class);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
 }

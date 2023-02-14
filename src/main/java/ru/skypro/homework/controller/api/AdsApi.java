@@ -37,8 +37,13 @@ public interface AdsApi {
 
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @PostMapping(produces = {MediaType.APPLICATION_JSON_VALUE},
-            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    ResponseEntity<AdsDto> addAds(@Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema(implementation = CreateAdsDto.class)) @RequestParam(value = "properties", required = false) CreateAdsDto properties, @Parameter(description = "file detail") @Valid @RequestPart("image") MultipartFile image);
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    ResponseEntity<AdsDto> addAds(
+            @Parameter(
+                    in = ParameterIn.DEFAULT, description = "",
+                    schema = @Schema(implementation = CreateAdsDto.class)) @RequestPart(
+                    value = "properties", required = false) CreateAdsDto properties,
+            @Parameter(description = "file detail") @Valid @RequestPart("image") MultipartFile image);
 
     @Operation(summary = "getComments", description = "", tags = {"Объявления"})
     @ApiResponses(value = {
