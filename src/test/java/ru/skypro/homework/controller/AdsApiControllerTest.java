@@ -8,13 +8,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import ru.skypro.homework.Generator;
-import ru.skypro.homework.entity.Ads;
-import ru.skypro.homework.entity.Avatar;
-import ru.skypro.homework.entity.User;
+import ru.skypro.homework.entity.*;
 import ru.skypro.homework.repository.*;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -128,6 +133,78 @@ class AdsApiControllerTest {
         assertThat(imageRepository).isNotNull();
         assertThat(usersRepository).isNotNull();
         assertThat(testRestTemplate).isNotNull();
+    }
+
+    @Test
+    void removeAdsTest() throws IOException {
+        //actualAds With Image And Comment
+        Ads actualAds = adsRepository.findAll().stream()
+                .filter(ads -> commentRepository.findAllByIdAds(ads.getId()).size() > 0 &&
+                        imageRepository.findAllByIdAds(ads.getId()).size() > 0)
+                .findAny().orElse(null);
+        assert actualAds != null;
+        //get image of actualAds
+        List<Image> imageList = imageRepository.findAllByIdAds(actualAds.getId());
+        //create file and set pathStr to images
+        String pathStr = dirForImages + "/" + "file_for_removeAdsTest" + ".jpg";
+        Path path = Path.of(pathStr);
+        if (!Files.exists(path)) {
+            Files.createFile(path);
+        }
+        for (Image image : imageList) {
+            image.setPath(pathStr);
+            imageRepository.save(image);
+        }
+        //get comment of actualAds
+        List<Comment> commentList = commentRepository.findAllByIdAds(actualAds.getId());
+        //remember counts of repositories
+        int countAds = adsRepository.findAll().size();
+        int countImage = imageRepository.findAll().size();
+        int countComment = commentRepository.findAll().size();
+
+        String url = "http://localhost:" + port + "/" + REQUEST_MAPPING_STRING + "/" + actualAds.getId();
+        ResponseEntity<Void> result = testRestTemplate.exchange(
+                url,
+                HttpMethod.DELETE,
+                null,
+                Void.class);
+
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(Files.exists(path)).isFalse();
+        assertThat(adsRepository.findAll().size()).isEqualTo(countAds - 1);
+        assertThat(imageRepository.findAll().size()).isEqualTo(countImage - imageList.size());
+        assertThat(commentRepository.findAll().size()).isEqualTo(countComment - commentList.size());
+    }
+
+    @Test
+    void removeAdsNegativeTest() {
+        //actualAds With Image And Comment
+        Ads actualAds = adsRepository.findAll().stream()
+                .filter(ads -> commentRepository.findAllByIdAds(ads.getId()).size() > 0 &&
+                        imageRepository.findAllByIdAds(ads.getId()).size() > 0)
+                .findAny().orElse(null);
+        assert actualAds != null;
+        //delete image and comment of actualAds
+        imageRepository.deleteAll(imageRepository.findAllByIdAds(actualAds.getId()));
+        commentRepository.deleteAll(commentRepository.findAllByIdAds(actualAds.getId()));
+        actualAds = adsRepository.findById(actualAds.getId()).orElse(null);
+        adsRepository.delete(actualAds);
+        //remember counts of repositories
+        int countAds = adsRepository.findAll().size();
+        int countImage = imageRepository.findAll().size();
+        int countComment = commentRepository.findAll().size();
+
+        String url = "http://localhost:" + port + "/" + REQUEST_MAPPING_STRING + "/" + actualAds.getId();
+        ResponseEntity<Void> result = testRestTemplate.exchange(
+                url,
+                HttpMethod.DELETE,
+                null,
+                Void.class);
+
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(adsRepository.findAll().size()).isEqualTo(countAds);
+        assertThat(imageRepository.findAll().size()).isEqualTo(countImage);
+        assertThat(commentRepository.findAll().size()).isEqualTo(countComment);
     }
 
 

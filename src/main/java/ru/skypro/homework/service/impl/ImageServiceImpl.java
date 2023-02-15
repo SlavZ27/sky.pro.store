@@ -11,6 +11,7 @@ import ru.skypro.homework.repository.ImageRepository;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -33,9 +34,29 @@ public class ImageServiceImpl {
         byte[] bytes;
         try {
             bytes = Files.readAllBytes(Paths.get(image.getPath()));
-        } catch (IOException | NullPointerException e){
+        } catch (IOException | NullPointerException e) {
             throw new ImageNotFoundException(idImage);
         }
         return Pair.of(bytes, MediaType.IMAGE_JPEG_VALUE);
     }
+
+    public void removeImageWithFile(Image image) {
+        try {
+            Files.deleteIfExists(Path.of(image.getPath()));
+        } catch (IOException ignored) {
+        }
+        imageRepository.delete(image);
+    }
+
+    public void removeAllImagesOfAds(Integer idAds) {
+        List<Image> imageList = getAllByIdAds(idAds);
+        for (Image image : imageList) {
+            removeImageWithFile(image);
+        }
+    }
+
+    public List<Image> getAllByIdAds(Integer idAds) {
+        return imageRepository.findAllByIdAds(idAds);
+    }
+
 }

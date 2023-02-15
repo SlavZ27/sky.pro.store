@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.controller.api.AdsApi;
 import ru.skypro.homework.dto.*;
-import ru.skypro.homework.exception.NotFoundException;
 import ru.skypro.homework.service.impl.AdsServiceImpl;
 
 import javax.validation.Valid;
@@ -107,15 +106,8 @@ public class AdsApiController implements AdsApi {
         return new ResponseEntity<FullAdsDto>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    @DeleteMapping(path ="{id_ads}")
-    public ResponseEntity<Void> removeAds(@PathVariable("id_ads") Integer id) {
-        String accept = request.getHeader("Accept");
-        try {
-            adsServiceImpl.removeAds(id);
-        } catch (NotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> removeAds(@PathVariable("id_ads") Integer idAds) {
+        return adsServiceImpl.removeAds(idAds);
     }
 
     public ResponseEntity<AdsDto> updateAds(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("id") Integer id, @Parameter(in = ParameterIn.DEFAULT, description = "", required = true, schema = @Schema()) @Valid @RequestBody CreateAdsDto body) {
