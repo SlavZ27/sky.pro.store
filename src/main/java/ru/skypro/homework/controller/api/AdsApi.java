@@ -130,7 +130,7 @@ public interface AdsApi {
             @ApiResponse(responseCode = "403", description = "Forbidden"),
 
             @ApiResponse(responseCode = "404", description = "Not Found")})
-    @PostMapping(value = "/{ad_pk}/comments/{id}",
+    @PatchMapping(value = "/{ad_pk}/comments/{id}",
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     ResponseEntity<CommentDto> updateComments(@Parameter(in = ParameterIn.PATH, description = "", required = true) @PathVariable("ad_pk") String adPk, @Parameter(in = ParameterIn.PATH, description = "", required = true) @PathVariable("id") Integer id, @Parameter(in = ParameterIn.DEFAULT, description = "", required = true, schema = @Schema(implementation = CommentDto.class)) @Valid @RequestBody CommentDto body);

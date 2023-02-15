@@ -4,10 +4,13 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.skypro.homework.dto.CommentDto;
+import ru.skypro.homework.dto.ResponseWrapperCommentDto;
 import ru.skypro.homework.entity.Comment;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.AuthorNotFoundException;
 import ru.skypro.homework.repository.UsersRepository;
+
+import java.util.List;
 
 @Mapper(componentModel = "spring")
 public abstract class CommentMapper {
@@ -40,4 +43,14 @@ public abstract class CommentMapper {
         }
         return author;
     }
+
+    @Mapping(target = "results", source = "commentDtoList")
+    public abstract ResponseWrapperCommentDto mapListOfCommentDtoToResponseWrapper(Integer count, List<CommentDto> commentDtoList);
+
+    ResponseWrapperCommentDto mapListToWrapper(List<CommentDto> commentDtoList) {
+        return mapListOfCommentDtoToResponseWrapper(commentDtoList.size(), commentDtoList);
+    }
+
+    public abstract List<CommentDto> mapListOfCommentToListDto(List<Comment> commentList);
+
 }

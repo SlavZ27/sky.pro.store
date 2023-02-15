@@ -8,7 +8,7 @@ import ru.skypro.homework.entity.Ads;
 import ru.skypro.homework.entity.Image;
 
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface FullAdsMapper {
 
     FullAdsMapper INSTANCE = Mappers.getMapper(FullAdsMapper.class);

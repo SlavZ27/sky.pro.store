@@ -1,5 +1,6 @@
 package ru.skypro.homework.controller;
 
+import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,18 +9,26 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
 import ru.skypro.homework.Generator;
+import ru.skypro.homework.dto.AdsDto;
+import ru.skypro.homework.dto.CommentDto;
+import ru.skypro.homework.dto.CreateAdsDto;
 import ru.skypro.homework.entity.*;
+import ru.skypro.homework.mapper.AdsMapper;
+import ru.skypro.homework.mapper.CommentMapper;
 import ru.skypro.homework.repository.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -48,11 +57,21 @@ class AdsApiControllerTest {
     private UsersRepository usersRepository;
     @Autowired
     private TestRestTemplate testRestTemplate;
+    @Autowired
+    private AdsMapper adsMapper;
+    @Autowired
+    private CommentMapper commentMapper;
+
     private final Generator generator = new Generator();
     private final Random random = new Random();
 
     AdsApiControllerTest(@Value("${path.to.materials.folder}") String dirForImages) {
         this.dirForImages = dirForImages;
+    }
+
+    @Before("")
+    public void setup() {
+        testRestTemplate.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
     }
 
     @BeforeEach
@@ -207,5 +226,97 @@ class AdsApiControllerTest {
         assertThat(commentRepository.findAll().size()).isEqualTo(countComment);
     }
 
+    @Test
+    public void updateAdsTest() {
+        //actualAds With Image And Comment
+        Ads actualAds = adsRepository.findAll().stream()
+                .filter(ads -> commentRepository.findAllByIdAds(ads.getId()).size() > 0 &&
+                        imageRepository.findAllByIdAds(ads.getId()).size() > 0)
+                .findAny().orElse(null);
+        assert actualAds != null;
+
+        AdsDto adsDto = adsMapper.adsToAdsDto(actualAds);
+
+        String url = "http://localhost:" + port + "/" + REQUEST_MAPPING_STRING + "/" + adsDto.getPk();
+        ResponseEntity<AdsDto> getForEntityResponse = testRestTemplate.getForEntity(url, AdsDto.class, adsDto.getPk());
+        assertThat(getForEntityResponse.getBody()).isNotNull();
+
+        CreateAdsDto createAdsDto = new CreateAdsDto();
+        createAdsDto.setDescription("Updated description");
+        createAdsDto.setPrice(15_000);
+        createAdsDto.setTitle("Updated Title");
+
+        actualAds.setDescription(createAdsDto.getDescription());
+        actualAds.setPrice(createAdsDto.getPrice());
+        actualAds.setTitle(createAdsDto.getTitle());
+
+        adsDto = adsMapper.adsToAdsDto(actualAds);
+
+        ResponseEntity<AdsDto> result = testRestTemplate.exchange(
+                url,
+                HttpMethod.PATCH,
+                new HttpEntity<>(adsDto),
+                AdsDto.class
+        );
+
+
+        assertThat(result.getBody()).usingRecursiveComparison().isEqualTo(adsDto);
+        assertThat(result.getBody().getTitle()).isEqualTo(createAdsDto.getTitle());
+        assertThat(result.getBody().getPrice()).isEqualTo(createAdsDto.getPrice());
+        assertThat(result.getBody().getAuthor()).usingRecursiveComparison().isEqualTo(actualAds.getAuthor().getId());
+    }
+
+    @Test
+    public void updateCommentsTest() {
+//actualAds With Image And Comment
+        Ads actualAds = adsRepository.findAll().stream()
+                .filter(ads -> commentRepository.findAllByIdAds(ads.getId()).size() > 0 &&
+                        imageRepository.findAllByIdAds(ads.getId()).size() > 0)
+                .findAny().orElse(null);
+        assert actualAds != null;
+
+        AdsDto adsDto = adsMapper.adsToAdsDto(actualAds);
+
+        CommentDto commentToPatch = new CommentDto();
+        commentToPatch.setCreatedAt("2023-02-15 16:20");
+        commentToPatch.setText("Text to patch");
+        commentToPatch.setPk(1);
+
+        Comment comment = commentRepository.findAllByIdAds(actualAds.getId()).stream()
+                .findAny().orElse(null);
+        assert comment != null;
+
+        comment.setAds(actualAds);
+        comment.setAuthor(actualAds.getAuthor());
+        comment.setText(commentToPatch.getText());
+        comment.setDateTime(LocalDateTime.parse(commentToPatch.getCreatedAt(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+
+        String url = "http://localhost:" + port + "/" + REQUEST_MAPPING_STRING + "/" + adsDto.getPk() + "/" + REQUEST_MAPPING_STRING_COMMENT + "/" + comment.getId();
+        ResponseEntity<Comment> getForEntityResponse = testRestTemplate.getForEntity(url, Comment.class, comment.getId());
+//        assertThat(getForEntityResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(getForEntityResponse.getBody()).isNotNull();
+
+//        comment.setAds(actualAds);
+//        comment.setAuthor(actualAds.getAuthor());
+//        comment.setText(commentToPatch.getText());
+//        comment.setDateTime(LocalDateTime.parse(commentToPatch.getCreatedAt(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+
+        CommentDto newCommentDto = commentMapper.commentToDto(comment);
+
+        ResponseEntity<CommentDto> result = testRestTemplate.exchange(
+                url,
+                HttpMethod.PATCH,
+                new HttpEntity<>(newCommentDto),
+                CommentDto.class
+        );
+
+//        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(result.getBody()).isNotNull();
+        assertThat(result.getBody()).usingRecursiveComparison().isEqualTo(newCommentDto);
+        assertThat(result.getBody().getPk()).isEqualTo(newCommentDto.getPk());
+        assertThat(result.getBody().getText()).isEqualTo(newCommentDto.getText());
+        assertThat(result.getBody().getAuthor()).usingRecursiveComparison().isEqualTo(actualAds.getAuthor().getId());
+        assertThat(result.getBody().getCreatedAt()).isEqualTo(newCommentDto.getCreatedAt());
+    }
 
 }
