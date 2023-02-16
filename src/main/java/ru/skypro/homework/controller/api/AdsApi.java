@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.*;
 
 import javax.validation.Valid;
+import java.io.IOException;
 
 @Validated
 @RequestMapping(value = "ads")
@@ -36,14 +38,15 @@ public interface AdsApi {
             @ApiResponse(responseCode = "403", description = "Forbidden"),
 
             @ApiResponse(responseCode = "404", description = "Not Found")})
-    @PostMapping(produces = {MediaType.APPLICATION_JSON_VALUE},
-            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
+    produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<AdsDto> addAds(
             @Parameter(
                     in = ParameterIn.DEFAULT, description = "",
                     schema = @Schema(implementation = CreateAdsDto.class)) @RequestPart(
                     value = "properties", required = false) CreateAdsDto properties,
-            @Parameter(description = "file detail") @Valid @RequestPart("image") MultipartFile image);
+            @Parameter(description = "file detail") @Valid @RequestPart("image") MultipartFile image) throws IOException;
 
     @Operation(summary = "getComments", description = "", tags = {"Объявления"})
     @ApiResponses(value = {
@@ -52,7 +55,7 @@ public interface AdsApi {
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @GetMapping(value = "/{ad_pk}/comments",
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    ResponseEntity<ResponseWrapperCommentDto> getComments(@Parameter(in = ParameterIn.PATH, description = "", required = true) @PathVariable("ad_pk") String adPk);
+    ResponseEntity<ResponseWrapperCommentDto> getComments(@Parameter(in = ParameterIn.PATH, description = "", required = true) @PathVariable("ad_pk") Integer adPk);
 
     @Operation(summary = "addComments", description = "", tags = {"Объявления"})
     @ApiResponses(value = {
@@ -66,7 +69,7 @@ public interface AdsApi {
     @PostMapping(value = "/{ad_pk}/comments",
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
-    ResponseEntity<CommentDto> addComments(@Parameter(in = ParameterIn.PATH, description = "", required = true) @PathVariable("ad_pk") String adPk, @Parameter(in = ParameterIn.DEFAULT, description = "", required = true, schema = @Schema(implementation = CommentDto.class)) @Valid @RequestBody CommentDto body);
+    ResponseEntity<CommentDto> addComments(@Parameter(in = ParameterIn.PATH, description = "", required = true) @PathVariable("ad_pk") Integer adPk, @Parameter(in = ParameterIn.DEFAULT, description = "", required = true, schema = @Schema(implementation = CommentDto.class)) @Valid @RequestBody CommentDto body);
 
     @Operation(summary = "getFullAd", description = "", tags = {"Объявления"})
     @ApiResponses(value = {
@@ -107,7 +110,7 @@ public interface AdsApi {
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @GetMapping(value = "/{ad_pk}/comments/{id}",
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    ResponseEntity<CommentDto> getComments(@Parameter(in = ParameterIn.PATH, description = "", required = true) @PathVariable("ad_pk") String adPk, @Parameter(in = ParameterIn.PATH, description = "", required = true) @PathVariable("id") Integer id);
+    ResponseEntity<CommentDto> getComments(@Parameter(in = ParameterIn.PATH, description = "", required = true) @PathVariable("ad_pk") Integer adPk, @Parameter(in = ParameterIn.PATH, description = "", required = true) @PathVariable("id") Integer id);
 
     @Operation(summary = "deleteComments", description = "", tags = {"Объявления"})
     @ApiResponses(value = {
@@ -133,7 +136,7 @@ public interface AdsApi {
     @PatchMapping(value = "/{ad_pk}/comments/{id}",
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
-    ResponseEntity<CommentDto> updateComments(@Parameter(in = ParameterIn.PATH, description = "", required = true) @PathVariable("ad_pk") String adPk, @Parameter(in = ParameterIn.PATH, description = "", required = true) @PathVariable("id") Integer id, @Parameter(in = ParameterIn.DEFAULT, description = "", required = true, schema = @Schema(implementation = CommentDto.class)) @Valid @RequestBody CommentDto body);
+    ResponseEntity<CommentDto> updateComments(@Parameter(in = ParameterIn.PATH, description = "", required = true) @PathVariable("ad_pk") Integer adPk, @Parameter(in = ParameterIn.PATH, description = "", required = true) @PathVariable("id") Integer id, @Parameter(in = ParameterIn.DEFAULT, description = "", required = true, schema = @Schema(implementation = CommentDto.class)) @Valid @RequestBody CommentDto body);
 
     @Operation(summary = "getAdsMe", description = "", tags = {"Объявления"})
     @ApiResponses(value = {

@@ -22,7 +22,7 @@ public class AdsDto {
 
   @JsonProperty("image")
   @Valid
-  private List<String> image = null;
+  private List<String> image;
 
   @JsonProperty("pk")
   private Integer pk = null;

@@ -78,11 +78,6 @@ public class CommentServiceImpl {
     }
 
     public Comment getCommentOfAds(Integer adsId, Integer commentId) {
-//        try {
-//            return commentRepository.findAllByIdAndAdsId(adsId, commentId);
-//        } catch (RuntimeException e) {
-//                throw new CommentNotFoundException(commentId);
-//        }
         return commentRepository.findAllByIdAndAdsId(adsId, commentId).orElseThrow(() -> new CommentNotFoundException(commentId));
     }
 
