@@ -23,7 +23,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 @Slf4j
@@ -33,25 +35,31 @@ public class UserServiceImpl {
     private final AvatarServiceImpl avatarService;
     private final UserMapper userMapper;
 
-    public User getDefaultUser() {
+    public User getDefaultUser(boolean random) {
         User user = new User();
-        user.setId(1);
-        user.setEmail("user@gmail.com");
-        user.setPhone("0987654321");
-        user.setFirstName("Jack");
-        user.setLastName("Black");
-        user.setRegDate(LocalDate.now());
-        user.setRole(Role.ADMIN);
-        user.setPassword("password");
+        if (random) {
+            List<User> userList = usersRepository.findAll();
+            Random random1 = new Random();
+            user = userList.get(random1.nextInt(userList.size()));
+        } else {
+            user.setId(1);
+            user.setEmail("user@gmail.com");
+            user.setPhone("0987654321");
+            user.setFirstName("Jack");
+            user.setLastName("Black");
+            user.setRegDate(LocalDate.now());
+            user.setRole(Role.ADMIN);
+            user.setPassword("password");
+        }
         return user;
     }
 
     public UserDto getUser() {
-        return userMapper.userToDto(getDefaultUser());
+        return userMapper.userToDto(getDefaultUser(false));
     }
 
     public NewPasswordDto setPassword(NewPasswordDto body) {
-        User user = getDefaultUser();
+        User user = getDefaultUser(false);
         if (user.getPassword().equals(body.getCurrentPassword())) {
             user.setPassword(body.getNewPassword());
         }
@@ -60,7 +68,7 @@ public class UserServiceImpl {
 
     public UserDto updateUser(UserDto body) {
         User newUser = userMapper.userDtoToUser(body);
-        User oldUser = getDefaultUser();
+        User oldUser = getDefaultUser(false);
         if (newUser.getEmail() != null) {
             oldUser.setEmail(newUser.getEmail());
         }
@@ -80,13 +88,13 @@ public class UserServiceImpl {
     }
 
     public ResponseEntity<Void> updateUserImage(MultipartFile image) throws IOException {
-        User user = getDefaultUser();
+        User user = getDefaultUser(false);
         user.setAvatar(avatarService.addAvatar(image, user.getId()));
         return new ResponseEntity<Void>(HttpStatus.OK);
     }
 
     public Pair<byte[], String> getAvatar() {
-        User user = getDefaultUser();
+        User user = getDefaultUser(true);
         if (user.getAvatar() != null) {
             return avatarService.getAvatarData(user.getAvatar());
         } else {
