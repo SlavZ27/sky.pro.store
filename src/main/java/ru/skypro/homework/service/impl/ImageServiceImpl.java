@@ -90,14 +90,15 @@ public class ImageServiceImpl {
             image = new Image();
             image.setPath(path.toString());
             image.setAds(ads);
-            imageRepository.save(image);
+            image = imageRepository.save(image);
         }
         return image;
     }
 
     public String getLinkOfImageOfAds(Integer idImage) {
         Image image = imageRepository.findById(idImage).orElseThrow(() -> new ImageNotFoundException(idImage));
-        return pathToBackend1 + "image/" + image.getId();
+//        return pathToBackend1 + "image/" + image.getId();
+        return "/image/" + image.getId();
     }
 
 }

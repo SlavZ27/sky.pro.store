@@ -72,6 +72,7 @@ public class AvatarServiceImpl {
     public String getLinkOfImageOfAds(Avatar avatar) {
         avatarRepository.findById(avatar.getId()).orElseThrow(
                 () -> new ImageNotFoundException(avatar.getId()));
-        return pathToBackend1 + "users/me/image";
+//        return pathToBackend1 + "users/me/image";
+        return "/users/me/image";
     }
 }

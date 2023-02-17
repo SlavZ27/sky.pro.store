@@ -32,10 +32,10 @@ public class CommentServiceImpl {
         if (comment != null) {
             newComment = comment;
             newComment.setAds(ads);
+            newComment.setDateTime(LocalDateTime.now());
         } else {
             throw new IllegalArgumentException();
         }
-
         return commentRepository.save(newComment);
     }
 

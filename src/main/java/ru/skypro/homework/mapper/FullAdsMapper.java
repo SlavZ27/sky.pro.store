@@ -8,6 +8,8 @@ import ru.skypro.homework.entity.Ads;
 import ru.skypro.homework.entity.Image;
 import ru.skypro.homework.service.impl.ImageServiceImpl;
 
+import java.util.List;
+
 
 @Mapper(componentModel = "spring")
 public abstract class FullAdsMapper {
@@ -27,10 +29,10 @@ public abstract class FullAdsMapper {
     @Mapping(target = "authorLastName", expression = "java(ads.getAuthor().getLastName())")
     public abstract FullAdsDto adsToFullAdsDto(Ads ads);
 
-     String mapImageToString(Image images) {
+     String mapImageToString(List<Image> images) {
         if (images == null) {
             throw new IllegalArgumentException();
         }
-        return imageService.getLinkOfImageOfAds(images.getId());
+        return imageService.getLinkOfImageOfAds(images.get(0).getId());
     }
 }
