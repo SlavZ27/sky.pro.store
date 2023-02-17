@@ -22,10 +22,12 @@ import java.util.Optional;
 @Service
 public class ImageServiceImpl {
     private final String dirForImages;
+    private final String pathToBackend1;
     private final ImageRepository imageRepository;
 
-    public ImageServiceImpl(@Value("${path.to.materials.folder}") String dirForImages, ImageRepository imageRepository) {
+    public ImageServiceImpl(@Value("${path.to.materials.folder}") String dirForImages, @Value("${path.to.backend1}") String pathToBackend1, ImageRepository imageRepository) {
         this.dirForImages = dirForImages;
+        this.pathToBackend1 = pathToBackend1;
         this.imageRepository = imageRepository;
     }
 
@@ -62,6 +64,13 @@ public class ImageServiceImpl {
     public List<Image> getAllByIdAds(Integer idAds) {
         return imageRepository.findAllByIdAds(idAds);
     }
+    public String getLinkOfImageOfAds(Integer idImage) {
+        Image image = imageRepository.findById(idImage).orElseThrow(() -> new ImageNotFoundException(idImage));
+        String link = pathToBackend1 + "image/" + image.getId();
+        return link;
+    }
+
+
 
     public Image addImage(Ads ads, MultipartFile file) throws IOException {
         byte[] data = file.getBytes();

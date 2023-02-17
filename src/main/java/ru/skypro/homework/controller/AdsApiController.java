@@ -13,11 +13,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.controller.api.AdsApi;
 import ru.skypro.homework.dto.*;
+
 import ru.skypro.homework.service.impl.AdsServiceImpl;
 
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+
 
 @Slf4j
 @RestController
@@ -28,6 +30,7 @@ public class AdsApiController implements AdsApi {
     private final AdsServiceImpl adsServiceImpl;
     private final HttpServletRequest request;
 
+
     public AdsApiController(ObjectMapper objectMapper, AdsServiceImpl adsServiceImpl, HttpServletRequest request) {
         this.objectMapper = objectMapper;
         this.adsServiceImpl = adsServiceImpl;
@@ -35,17 +38,9 @@ public class AdsApiController implements AdsApi {
     }
 
     public ResponseEntity<ResponseWrapperAdsDto> getALLAds() {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains(MediaType.APPLICATION_JSON_VALUE)) {
-            try {
-                return new ResponseEntity<ResponseWrapperAdsDto>(objectMapper.readValue("{\"count\":1,\"results\":[{\"author\":123,\"image\":[\"string\"],\"pk\":123,\"price\":5555,\"title\":\"Some string\"}]}", ResponseWrapperAdsDto.class), HttpStatus.OK);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<ResponseWrapperAdsDto>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-        return new ResponseEntity<ResponseWrapperAdsDto>(HttpStatus.NOT_IMPLEMENTED);
+        return ResponseEntity.ok(adsServiceImpl.getALLAds());
     }
+
 
     public ResponseEntity<AdsDto> addAds(
             @Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @RequestPart(value = "properties", required = false) CreateAdsDto properties,
@@ -62,18 +57,10 @@ public class AdsApiController implements AdsApi {
         return ResponseEntity.ok(commentDto);
     }
 
-    public ResponseEntity<FullAdsDto> getAds(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("id") Integer id) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains(MediaType.APPLICATION_JSON_VALUE)) {
-            try {
-                return new ResponseEntity<FullAdsDto>(objectMapper.readValue("{\n  \"image\" : [ \"image\", \"image\" ],\n  \"authorLastName\" : \"authorLastName\",\n  \"authorFirstName\" : \"authorFirstName\",\n  \"phone\" : \"phone\",\n  \"price\" : 6,\n  \"description\" : \"description\",\n  \"pk\" : 0,\n  \"title\" : \"title\",\n  \"email\" : \"email\"\n}", FullAdsDto.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<FullAdsDto>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
 
-        return new ResponseEntity<FullAdsDto>(HttpStatus.NOT_IMPLEMENTED);
+
+    public ResponseEntity<FullAdsDto> getAds(@PathVariable("id") Integer idAds  ){
+        return ResponseEntity.ok(adsServiceImpl.getAds(idAds));
     }
 
     public ResponseEntity<Void> removeAds(@PathVariable("id_ads") Integer idAds) {
