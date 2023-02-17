@@ -43,6 +43,7 @@ class AdsApiControllerTest {
     private final static String REQUEST_MAPPING_STRING = "ads";
     private final static String REQUEST_MAPPING_STRING_COMMENT = "comment";
     private final String dirForImages;
+    private final String dirForAvatars;
     @Autowired
     private AdsApiController adsApiController;
     @Autowired
@@ -65,8 +66,9 @@ class AdsApiControllerTest {
     private final Generator generator = new Generator();
     private final Random random = new Random();
 
-    AdsApiControllerTest(@Value("${path.to.materials.folder}") String dirForImages) {
+    AdsApiControllerTest(@Value("${path.to.materials.folder}") String dirForImages, @Value("${path.to.avatars.folder}") String dirForAvatars) {
         this.dirForImages = dirForImages;
+        this.dirForAvatars = dirForAvatars;
     }
 
     @Before("")
@@ -88,29 +90,26 @@ class AdsApiControllerTest {
         int countAdsUserMin = 0;
         int countAdsUserMax = 5;
 
-        int countImageForAdsMin = 0;
-        int countImageForAdsMax = 9;
-
         int countCommentForAdsMin = 0;
         int countCommentForAdsMax = 20;
 
         //generate userAdmin
         List<User> userAdminList = new ArrayList<>();
         for (int i = 0; i < countUserAdmin; i++) {
-            Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(null));
-            userAdminList.add(usersRepository.save(generator.generateUserRoleAdmin(avatar)));
+            Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(null, dirForAvatars));
+            userAdminList.add(usersRepository.save(generator.generateUserRoleAdmin(avatar, dirForAvatars)));
         }
         //generate user
         List<User> userList = new ArrayList<>();
         for (int i = 0; i < countUser; i++) {
-            Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(null));
-            userList.add(usersRepository.save(generator.generateUserRoleUser(avatar)));
+            Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(null, dirForAvatars));
+            userList.add(usersRepository.save(generator.generateUserRoleUser(avatar, dirForAvatars)));
         }
         //generate ads
         List<Ads> adsList = new ArrayList<>();
         for (User user : userList) {
             int countAds = generator.genInt(countAdsUserMin, countAdsUserMax);
-            int countImage = generator.genInt(countImageForAdsMin, countImageForAdsMax);
+            int countImage = 1;
             for (int i = 0; i < countAds; i++) {
                 Ads ads = adsRepository.save(generator.generateAdsIfNull(null, user));
                 adsList.add(ads);

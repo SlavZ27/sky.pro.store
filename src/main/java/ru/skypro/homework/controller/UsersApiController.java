@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,78 +18,46 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.NewPasswordDto;
 import ru.skypro.homework.dto.UserDto;
+import ru.skypro.homework.service.impl.UserServiceImpl;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.io.IOException;
+
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
-@RequiredArgsConstructor
-@PreAuthorize("hasAnyAuthority('ADMIN','USER')")
+//@PreAuthorize("hasAnyAuthority('ADMIN','USER')")
 public class UsersApiController implements UsersApi {
-    private final ObjectMapper objectMapper;
-    private final HttpServletRequest request;
+    private final UserServiceImpl userService;
 
+    public UsersApiController(UserServiceImpl userService) {
+        this.userService = userService;
+    }
 
     public ResponseEntity<UserDto> getUser1() {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains(MediaType.APPLICATION_JSON_VALUE)) {
-            try {
-                return new ResponseEntity<UserDto>(objectMapper.readValue(
-                        "{\n" +
-                                "  \"firstName\" : \"firstName\",\n  " +
-                                "\"lastName\" : \"lastName\",\n  " +
-                                "\"image\" : \"image\",\n  " +
-                                "\"phone\" : \"phone\",\n  " +
-                                "\"city\" : \"city\",\n  " +
-                                "\"regDate\" : \"regDate\",\n  " +
-                                "\"id\" : 0,\n  " +
-                                "\"email\" : \"email\"\n" +
-                                "}", UserDto.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<UserDto>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-        return new ResponseEntity<UserDto>(HttpStatus.NOT_IMPLEMENTED);
+        return ResponseEntity.ok(userService.getUser());
+    }
+
+    public ResponseEntity<byte[]> getAvatar() {
+        Pair<byte[], String> pair =userService.getAvatar();
+        return read(pair);
     }
 
     public ResponseEntity<NewPasswordDto> setPassword(NewPasswordDto body) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains(MediaType.APPLICATION_JSON_VALUE)) {
-            try {
-                return new ResponseEntity<NewPasswordDto>(objectMapper.readValue(
-                        "{\n  " +
-                                "\"newPassword\" : \"newPassword\",\n  " +
-                                "\"currentPassword\" : \"currentPassword\"\n" +
-                                "}"
-                        , NewPasswordDto.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<NewPasswordDto>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
- 
-        return new ResponseEntity<NewPasswordDto>(HttpStatus.NOT_IMPLEMENTED);
+        return ResponseEntity.ok(userService.setPassword(body));
     }
 
     public ResponseEntity<UserDto> updateUser(UserDto body) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains(MediaType.APPLICATION_JSON_VALUE)) {
-            try {
-                return new ResponseEntity<UserDto>(objectMapper.readValue("{\n  \"firstName\" : \"firstName\",\n  \"lastName\" : \"lastName\",\n  \"image\" : \"image\",\n  \"phone\" : \"phone\",\n  \"city\" : \"city\",\n  \"regDate\" : \"regDate\",\n  \"id\" : 0,\n  \"email\" : \"email\"\n}", UserDto.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<UserDto>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-        return new ResponseEntity<UserDto>(HttpStatus.NOT_IMPLEMENTED);
+        return ResponseEntity.ok(userService.updateUser(body));
     }
 
-    public ResponseEntity<Void> updateUserImage(MultipartFile image) {
-        String accept = request.getHeader("Accept");
-        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
+    public ResponseEntity<Void> updateUserImage(MultipartFile image) throws IOException {
+        return userService.updateUserImage(image);
+    }
+    private ResponseEntity<byte[]> read(Pair<byte[], String> pair) {
+        return ResponseEntity.ok()
+                .contentLength(pair.getFirst().length)
+                .contentType(MediaType.parseMediaType(pair.getSecond()))
+                .body(pair.getFirst());
     }
 }

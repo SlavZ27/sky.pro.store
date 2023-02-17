@@ -37,11 +37,10 @@ public class AdsServiceImpl {
     private final AdsMapper adsMapper;
     private final CommentMapper commentMapper;
     private final CommentServiceImpl commentService;
-    private final ImageRepository imageRepository;
     private final ImageServiceImpl imageService;
     private final CreateAdsMapper createAdsMapper;
-    private final UsersRepository usersRepository;
     private final FullAdsMapper fullAdsMapper;
+    private final UserServiceImpl userService;
 
 
     public AdsDto updateAds(Integer adsId, CreateAdsDto createAdsDto) {
@@ -109,17 +108,11 @@ public class AdsServiceImpl {
     }
 
     public AdsDto addAds(CreateAdsDto createAdsDto, MultipartFile image) throws IOException {
-//        if(createAdsDto == null)// какие здесь нужны проверки??
+        User user = userService.getDefaultUser();
         Ads ads = createAdsMapper.createAdsDtoToAds(createAdsDto);
-
-        User user = usersRepository.findById(3).orElseThrow(() -> new AdsNotFoundException(ads.getId()));//for test
         ads.setAuthor(user);
-        adsRepository.save(ads);
-
-        List<Image> images = new ArrayList<>();
-        images.add(imageService.addImage(ads, image));
-        ads.setImages(images);
-
+        ads = adsRepository.save(ads);
+        imageService.addImage(ads, image);
         return adsMapper.adsToAdsDto(ads);
     }
 
@@ -131,6 +124,6 @@ public class AdsServiceImpl {
     public ResponseWrapperAdsDto getALLAds() {
         List<Ads> list = adsRepository.findAll();
         List<AdsDto> listDto = adsMapper.mapListOfAdsToListDTO(list);
-        return  adsMapper.mapToResponseWrapperAdsDto(listDto,listDto.size());
+        return adsMapper.mapToResponseWrapperAdsDto(listDto, listDto.size());
     }
 }

@@ -149,7 +149,7 @@ public interface AdsApi {
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @GetMapping(value = "/me",
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    @PostAuthorize("#username == authentication.principal.username")
+//    @PostAuthorize("#username == authentication.principal.username")
     ResponseEntity<ResponseWrapperAdsDto> getAdsMeUsingGET(@Parameter(in = ParameterIn.QUERY, description = "") @Valid @RequestParam(value = "username") String username);
 }
 

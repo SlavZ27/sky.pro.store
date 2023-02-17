@@ -31,8 +31,19 @@ public class ImageServiceImpl {
         this.imageRepository = imageRepository;
     }
 
-    public List<byte[]> updateImage(Integer id, MultipartFile image) {
-        return null;
+    public Pair<byte[], String> updateImage(Integer idImage, MultipartFile image) {
+        Image oldImage = imageRepository.findById(idImage).orElseThrow(() -> new ImageNotFoundException(idImage));
+        byte[] bytes;
+        Path path = Paths.get(oldImage.getPath());
+        try {
+            if (Files.deleteIfExists(path)) {
+                Files.write(path, image.getBytes());
+            }
+            bytes = Files.readAllBytes(path);
+        } catch (IOException | NullPointerException e) {
+            throw new ImageNotFoundException(idImage);
+        }
+        return Pair.of(bytes, MediaType.IMAGE_JPEG_VALUE);
     }
 
     public Pair<byte[], String> getImage(Integer idImage) {
@@ -64,28 +75,29 @@ public class ImageServiceImpl {
     public List<Image> getAllByIdAds(Integer idAds) {
         return imageRepository.findAllByIdAds(idAds);
     }
-    public String getLinkOfImageOfAds(Integer idImage) {
-        Image image = imageRepository.findById(idImage).orElseThrow(() -> new ImageNotFoundException(idImage));
-        String link = pathToBackend1 + "image/" + image.getId();
-        return link;
-    }
-
-
 
     public Image addImage(Ads ads, MultipartFile file) throws IOException {
-        byte[] data = file.getBytes();
-        String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        String extension = Optional.ofNullable(file.getOriginalFilename()).map(fileName -> fileName.substring(file.getOriginalFilename().lastIndexOf('.')))
-                .orElse("");
-
-        Path path = Paths.get(dirForImages).resolve("Ads_" + ads.getId() + "_" + date + extension);
-        Files.write(path, data);
-
-        Image image = new Image();
-        image.setPath(path.toString());
-        image.setAds(ads);
-
-        imageRepository.save(image);
+        Image image = imageRepository.findByIdAds(ads.getId()).orElse(null);
+        if (image != null) {
+            updateImage(ads.getId(), file);
+        } else {
+            byte[] data = file.getBytes();
+            String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            String extension = Optional.ofNullable(file.getOriginalFilename()).map(fileName -> fileName.substring(file.getOriginalFilename().lastIndexOf('.')))
+                    .orElse("");
+            Path path = Paths.get(dirForImages).resolve("Ads_" + ads.getId() + "_" + date + extension);
+            Files.write(path, data);
+            image = new Image();
+            image.setPath(path.toString());
+            image.setAds(ads);
+            imageRepository.save(image);
+        }
         return image;
     }
+
+    public String getLinkOfImageOfAds(Integer idImage) {
+        Image image = imageRepository.findById(idImage).orElseThrow(() -> new ImageNotFoundException(idImage));
+        return pathToBackend1 + "image/" + image.getId();
+    }
+
 }

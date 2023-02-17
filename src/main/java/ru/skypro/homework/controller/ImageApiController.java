@@ -34,9 +34,9 @@ public class ImageApiController implements ImageApi {
     }
 
     @Override
-    public ResponseEntity<List<byte[]>> updateImage(Integer id, MultipartFile image) {
-        return ResponseEntity.ok(imageService.updateImage(id, image));
-
+    public ResponseEntity<byte[]> updateImage(Integer id, MultipartFile image) {
+        Pair<byte[], String> pair = imageService.updateImage(id, image);
+        return read(pair);
     }
 
     @Override
