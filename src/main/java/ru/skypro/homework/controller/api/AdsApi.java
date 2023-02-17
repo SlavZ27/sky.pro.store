@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -122,7 +121,7 @@ public interface AdsApi {
 
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @DeleteMapping(value = "/{ad_pk}/comments/{id}")
-    ResponseEntity<Void> deleteComments(@Parameter(in = ParameterIn.PATH, description = "", required = true) @PathVariable("ad_pk") String adPk, @Parameter(in = ParameterIn.PATH, description = "", required = true) @PathVariable("id") Integer id);
+    ResponseEntity<Void> deleteComments(@Parameter(in = ParameterIn.PATH, description = "", required = true) @PathVariable("ad_pk") Integer adPk, @Parameter(in = ParameterIn.PATH, description = "", required = true) @PathVariable("id") Integer id);
 
     @Operation(summary = "updateComments", description = "", tags = {"Объявления"})
     @ApiResponses(value = {
