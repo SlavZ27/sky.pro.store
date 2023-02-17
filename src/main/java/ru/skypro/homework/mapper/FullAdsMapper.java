@@ -2,16 +2,19 @@ package ru.skypro.homework.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Autowired;
 import ru.skypro.homework.dto.FullAdsDto;
 import ru.skypro.homework.entity.Ads;
 import ru.skypro.homework.entity.Image;
+import ru.skypro.homework.service.impl.ImageServiceImpl;
 
 
 @Mapper(componentModel = "spring")
-public interface FullAdsMapper {
+public abstract class FullAdsMapper {
 
-    FullAdsMapper INSTANCE = Mappers.getMapper(FullAdsMapper.class);
+    @Autowired
+    private ImageServiceImpl imageService;
+
 
     @Mapping(target = "pk", source = "ads.id")
     @Mapping(target = "price", source = "ads.price")
@@ -22,12 +25,12 @@ public interface FullAdsMapper {
     @Mapping(target = "email", expression = "java(ads.getAuthor().getEmail())")
     @Mapping(target = "authorFirstName", expression = "java(ads.getAuthor().getFirstName())")
     @Mapping(target = "authorLastName", expression = "java(ads.getAuthor().getLastName())")
-    FullAdsDto adsToFullAdsDto(Ads ads);
+    public abstract FullAdsDto adsToFullAdsDto(Ads ads);
 
-    default String mapImageToString(Image images) {
+     String mapImageToString(Image images) {
         if (images == null) {
             throw new IllegalArgumentException();
         }
-        return images.getPath();
+        return imageService.getLinkOfImageOfAds(images.getId());
     }
 }

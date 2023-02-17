@@ -6,11 +6,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import ru.skypro.homework.dto.AdsDto;
+import ru.skypro.homework.dto.FullAdsDto;
+import ru.skypro.homework.dto.ResponseWrapperAdsDto;
 import ru.skypro.homework.entity.Ads;
 import ru.skypro.homework.entity.Image;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.AdsNotFoundException;
 import ru.skypro.homework.mapper.CreateAdsMapper;
+import ru.skypro.homework.mapper.FullAdsMapper;
 import ru.skypro.homework.repository.AdsRepository;
 
 import ru.skypro.homework.dto.*;
@@ -18,10 +22,12 @@ import ru.skypro.homework.entity.Comment;
 import ru.skypro.homework.mapper.AdsMapper;
 import ru.skypro.homework.mapper.CommentMapper;
 import ru.skypro.homework.repository.UsersRepository;
+import ru.skypro.homework.repository.ImageRepository;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 
 @Service
 @Slf4j
@@ -31,9 +37,12 @@ public class AdsServiceImpl {
     private final AdsMapper adsMapper;
     private final CommentMapper commentMapper;
     private final CommentServiceImpl commentService;
+    private final ImageRepository imageRepository;
     private final ImageServiceImpl imageService;
     private final CreateAdsMapper createAdsMapper;
     private final UsersRepository usersRepository;
+    private final FullAdsMapper fullAdsMapper;
+
 
     public AdsDto updateAds(Integer adsId, CreateAdsDto createAdsDto) {
         Ads oldAds = adsRepository.findById(adsId).orElseThrow(() -> {
@@ -112,5 +121,16 @@ public class AdsServiceImpl {
         ads.setImages(images);
 
         return adsMapper.adsToAdsDto(ads);
+    }
+
+    public FullAdsDto getAds(Integer idAds) {
+        Ads ads = adsRepository.findById(idAds).orElseThrow(() -> new AdsNotFoundException(idAds));
+        return fullAdsMapper.adsToFullAdsDto(ads);
+    }
+
+    public ResponseWrapperAdsDto getALLAds() {
+        List<Ads> list = adsRepository.findAll();
+        List<AdsDto> listDto = adsMapper.mapListOfAdsToListDTO(list);
+        return  adsMapper.mapToResponseWrapperAdsDto(listDto,listDto.size());
     }
 }

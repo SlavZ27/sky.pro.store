@@ -76,7 +76,7 @@ public interface AdsApi {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = FullAdsDto.class))),
 
             @ApiResponse(responseCode = "404", description = "Not Found")})
-    @GetMapping(value = "/{id}",
+    @GetMapping(value = "{id}",
             produces = {MediaType.APPLICATION_JSON_VALUE})
     ResponseEntity<FullAdsDto> getAds(@Parameter(in = ParameterIn.PATH, description = "", required = true) @PathVariable("id") Integer id);
 
