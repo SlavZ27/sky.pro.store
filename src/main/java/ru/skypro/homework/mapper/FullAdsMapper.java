@@ -21,7 +21,7 @@ public abstract class FullAdsMapper {
     @Mapping(target = "pk", source = "ads.id")
     @Mapping(target = "price", source = "ads.price")
     @Mapping(target = "title", source = "ads.title")
-    @Mapping(target = "image", source = "images") // is called mapImageToString(Image images)
+    @Mapping(target = "image", source = "image") // is called mapImageToString(Image images)
     @Mapping(target = "description", source = "ads.description")
     @Mapping(target = "phone", expression = "java(ads.getAuthor().getPhone())")
     @Mapping(target = "email", expression = "java(ads.getAuthor().getEmail())")
@@ -29,10 +29,10 @@ public abstract class FullAdsMapper {
     @Mapping(target = "authorLastName", expression = "java(ads.getAuthor().getLastName())")
     public abstract FullAdsDto adsToFullAdsDto(Ads ads);
 
-     String mapImageToString(List<Image> images) {
-        if (images == null) {
+     String mapImageToString(Image image) {
+        if (image == null) {
             throw new IllegalArgumentException();
         }
-        return imageService.getLinkOfImageOfAds(images.get(0).getId());
+        return imageService.getLinkOfImageOfAds(image.getId());
     }
 }
