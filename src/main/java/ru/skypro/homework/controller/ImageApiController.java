@@ -1,31 +1,23 @@
 package ru.skypro.homework.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.skypro.homework.controller.api.ImageApi;
 import ru.skypro.homework.service.impl.ImageServiceImpl;
-
-import javax.validation.Valid;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.util.List;
 
 @Slf4j
 @RestController
 @CrossOrigin(value = "http://localhost:3000")
-public class ImageApiController implements ImageApi {
+public class ImageApiController{
 
     private final ImageServiceImpl imageService;
 
@@ -33,13 +25,28 @@ public class ImageApiController implements ImageApi {
         this.imageService = imageService;
     }
 
-    @Override
+    @Operation(summary = "updateAdsImage", description = "", tags = {"Изображения"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(
+                    mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE,
+                    array = @ArraySchema(schema = @Schema(implementation = byte[].class)))),
+            @ApiResponse(responseCode = "404", description = "Not Found")})
+    @PatchMapping(value = "{idAds}",
+            produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE},
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<byte[]> updateImage(Integer id, MultipartFile image) {
         Pair<byte[], String> pair = imageService.updateImage(id, image);
         return read(pair);
     }
 
-    @Override
+    @Operation(summary = "getImage", description = "", tags = {"Изображения"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE,
+                            array = @ArraySchema(schema = @Schema(implementation = byte[].class)))),
+            @ApiResponse(responseCode = "404", description = "Not Found")})
+    @GetMapping(value = "{idImage}",
+            produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
     public ResponseEntity<byte[]> getImage(Integer idImage) {
         Pair<byte[], String> pair = imageService.getImage(idImage);
         return read(pair);
