@@ -8,6 +8,7 @@ package ru.skypro.homework.controller.api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -21,6 +22,7 @@ import ru.skypro.homework.dto.NewPasswordDto;
 import ru.skypro.homework.dto.UserDto;
 
 import javax.validation.Valid;
+import java.io.IOException;
 
 @Validated
 @RequestMapping(value = "users")
@@ -37,6 +39,16 @@ public interface UsersApi {
     @GetMapping(value = "me",
             produces = {MediaType.APPLICATION_JSON_VALUE})
     ResponseEntity<UserDto> getUser1();
+
+    @Operation(summary = "getAvatarOfUser", description = "", tags = {"Пользователи"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(
+                    mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE,
+                    array = @ArraySchema(schema = @Schema(implementation = byte[].class)))),
+            @ApiResponse(responseCode = "404", description = "Not Found")})
+    @GetMapping(value = "me/image",
+            produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
+    ResponseEntity<byte[]> getAvatar()throws IOException;
 
 
     @Operation(summary = "setPassword", description = "", tags = {"Пользователи"})
@@ -78,6 +90,6 @@ public interface UsersApi {
     ResponseEntity<Void> updateUserImage(
             @Parameter(description = "Image of user")
             @Valid @RequestPart("MultipartFile")
-            MultipartFile image);
+            MultipartFile image) throws IOException;
 }
 

@@ -58,7 +58,6 @@ public class AdsApiController implements AdsApi {
     }
 
 
-
     public ResponseEntity<FullAdsDto> getAds(@PathVariable("id") Integer idAds  ){
         return ResponseEntity.ok(adsServiceImpl.getAds(idAds));
     }
@@ -87,17 +86,6 @@ public class AdsApiController implements AdsApi {
     }
 
     public ResponseEntity<ResponseWrapperAdsDto> getAdsMeUsingGET(@Parameter(in = ParameterIn.QUERY, description = "", schema = @Schema()) @Valid @RequestParam(value = "username") String username) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains(MediaType.APPLICATION_JSON_VALUE)) {
-            try {
-                return new ResponseEntity<ResponseWrapperAdsDto>(objectMapper.readValue("{\n  \"count\" : 0,\n  \"results\" : [ {\n    \"image\" : [ \"image\", \"image\" ],\n    \"author\" : 6,\n    \"price\" : 5,\n    \"pk\" : 1,\n    \"title\" : \"title\"\n  }, {\n    \"image\" : [ \"image\", \"image\" ],\n    \"author\" : 6,\n    \"price\" : 5,\n    \"pk\" : 1,\n    \"title\" : \"title\"\n  } ]\n}", ResponseWrapperAdsDto.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<ResponseWrapperAdsDto>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return new ResponseEntity<ResponseWrapperAdsDto>(HttpStatus.NOT_IMPLEMENTED);
+        return ResponseEntity.ok(adsServiceImpl.getALLAds());
     }
-
 }

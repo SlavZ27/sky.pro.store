@@ -89,7 +89,7 @@ public class Generator {
         return tld;
     }
 
-    public User generateUserRoleAdmin(Avatar avatar) {
+    public User generateUserRoleAdmin(Avatar avatar, String dirForAvatars) {
         return generateUser(
                 null,
                 null,
@@ -101,10 +101,11 @@ public class Generator {
                 null,
                 null,
                 Role.ADMIN,
+                dirForAvatars,
                 true);
     }
 
-    public User generateUserRoleUser(Avatar avatar) {
+    public User generateUserRoleUser(Avatar avatar, String dirForAvatars) {
         return generateUser(
                 null,
                 null,
@@ -116,6 +117,7 @@ public class Generator {
                 null,
                 null,
                 Role.USER,
+                dirForAvatars,
                 true);
     }
 
@@ -130,6 +132,7 @@ public class Generator {
             String username,
             String password,
             Role role,
+            String dirForAvatars,
             boolean needGenerate) {
         if (needGenerate) {
             idUser = generateIdIfEmpty(idUser);
@@ -138,7 +141,7 @@ public class Generator {
             email = generateEmailIfEmpty(email);
             phone = generatePhoneIfEmpty(phone);
             regDate = generateDate(true, LocalDate.now());
-            avatar = generateAvatarIfNull(avatar);
+            avatar = generateAvatarIfNull(avatar, dirForAvatars);
             username = generateNameIfEmpty(username);
             password = generateNameIfEmpty(password);
             role = generateRoleIfEmpty(role);
@@ -158,11 +161,15 @@ public class Generator {
         return user;
     }
 
-    public Avatar generateAvatarIfNull(Avatar avatar) {
+    public Avatar generateAvatarIfNull(Avatar avatar, String dirForAvatars) {
         if (avatar == null) {
             avatar = new Avatar();
-            avatar.setId(genInt());
-            avatar.setPath(faker.file().fileName());
+            if (dirForAvatars == null || dirForAvatars.length() == 0) {
+                avatar.setPath(faker.file().fileName());
+            } else {
+                List<String> pathsOfFiles = getPathsOfFiles(dirForAvatars);
+                avatar.setPath(pathsOfFiles.get(random.nextInt(pathsOfFiles.size())));
+            }
         }
         return avatar;
     }
@@ -175,7 +182,6 @@ public class Generator {
     }
 
     public Image generateImageIfNull(Image image, String dirForImages, Ads ads) {
-
         if (image == null) {
             image = new Image();
             image.setId(genInt());

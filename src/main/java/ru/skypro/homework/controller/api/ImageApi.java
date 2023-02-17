@@ -32,7 +32,7 @@ public interface ImageApi {
     @PatchMapping(value = "{idAds}",
             produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE},
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    ResponseEntity<List<byte[]>> updateImage(
+    ResponseEntity<byte[]> updateImage(
             @Parameter(
                     in = ParameterIn.PATH, description = "id of ads", required = true) @PathVariable("idAds")
             Integer idAds,

@@ -8,25 +8,25 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class UserDto {
     @JsonProperty("email")
-    private String email = null;
+    private String email;
 
     @JsonProperty("firstName")
-    private String firstName = null;
+    private String firstName;
 
     @JsonProperty("id")
-    private Integer id = null;
+    private Integer id;
 
     @JsonProperty("lastName")
-    private String lastName = null;
+    private String lastName;
 
     @JsonProperty("phone")
-    private String phone = null;
+    private String phone;
 
     @JsonProperty("regDate")
-    private String regDate = null;
+    private String regDate;
 
     @JsonProperty("image")
-    private String image = null;
+    private String image;
 
     public UserDto email(String email) {
         this.email = email;

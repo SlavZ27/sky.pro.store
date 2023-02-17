@@ -10,7 +10,6 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import ru.skypro.homework.Generator;
@@ -22,12 +21,10 @@ import ru.skypro.homework.repository.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -38,6 +35,8 @@ class ImageApiControllerTest {
     private int port;
     private final static String REQUEST_MAPPING_STRING = "image";
     private final String dirForImages;
+    private final String dirForAvatars;
+
     @Autowired
     private ImageApiController imageApiController;
     @Autowired
@@ -55,8 +54,9 @@ class ImageApiControllerTest {
     private final Generator generator = new Generator();
     private final Random random = new Random();
 
-    ImageApiControllerTest(@Value("${path.to.materials.folder}") String dirForImages) {
+    ImageApiControllerTest(@Value("${path.to.materials.folder}") String dirForImages, @Value("${path.to.avatars.folder}") String dirForAvatars) {
         this.dirForImages = dirForImages;
+        this.dirForAvatars = dirForAvatars;
     }
 
     @BeforeEach
@@ -73,29 +73,26 @@ class ImageApiControllerTest {
         int countAdsUserMin = 0;
         int countAdsUserMax = 5;
 
-        int countImageForAdsMin = 0;
-        int countImageForAdsMax = 9;
-
         int countCommentForAdsMin = 0;
         int countCommentForAdsMax = 20;
 
         //generate userAdmin
         List<User> userAdminList = new ArrayList<>();
         for (int i = 0; i < countUserAdmin; i++) {
-            Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(null));
-            userAdminList.add(usersRepository.save(generator.generateUserRoleAdmin(avatar)));
+            Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(null, dirForAvatars));
+            userAdminList.add(usersRepository.save(generator.generateUserRoleAdmin(avatar, dirForAvatars)));
         }
         //generate user
         List<User> userList = new ArrayList<>();
         for (int i = 0; i < countUser; i++) {
-            Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(null));
-            userList.add(usersRepository.save(generator.generateUserRoleUser(avatar)));
+            Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(null, dirForAvatars));
+            userList.add(usersRepository.save(generator.generateUserRoleUser(avatar, dirForAvatars)));
         }
         //generate ads
         List<Ads> adsList = new ArrayList<>();
         for (User user : userList) {
             int countAds = generator.genInt(countAdsUserMin, countAdsUserMax);
-            int countImage = generator.genInt(countImageForAdsMin, countImageForAdsMax);
+            int countImage = 1;
             for (int i = 0; i < countAds; i++) {
                 Ads ads = adsRepository.save(generator.generateAdsIfNull(null, user));
                 adsList.add(ads);
