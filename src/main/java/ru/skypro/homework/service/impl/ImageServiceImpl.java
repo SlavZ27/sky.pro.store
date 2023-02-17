@@ -5,6 +5,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import ru.skypro.homework.entity.Ads;
 import ru.skypro.homework.entity.Image;
 import ru.skypro.homework.exception.ImageNotFoundException;
 import ru.skypro.homework.repository.ImageRepository;
@@ -13,7 +14,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ImageServiceImpl {
@@ -59,4 +63,20 @@ public class ImageServiceImpl {
         return imageRepository.findAllByIdAds(idAds);
     }
 
+    public Image addImage(Ads ads, MultipartFile file) throws IOException {
+        byte[] data = file.getBytes();
+        String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String extension = Optional.ofNullable(file.getOriginalFilename()).map(fileName -> fileName.substring(file.getOriginalFilename().lastIndexOf('.')))
+                .orElse("");
+
+        Path path = Paths.get(dirForImages).resolve("Ads_" + ads.getId() + "_" + date + extension);
+        Files.write(path, data);
+
+        Image image = new Image();
+        image.setPath(path.toString());
+        image.setAds(ads);
+
+        imageRepository.save(image);
+        return image;
+    }
 }

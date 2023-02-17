@@ -6,7 +6,10 @@ import org.webjars.NotFoundException;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class AdsNotFoundException extends NotFoundException {
-    public AdsNotFoundException(Integer id) {
+    public AdsNotFoundException (Integer id) {
+        super("Ads with id: " + id + " not found");
+    }
+    public AdsNotFoundException (String id) {
         super("Ads with id: " + id + " not found");
     }
 }

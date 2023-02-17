@@ -4,7 +4,6 @@ import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -28,7 +27,7 @@ public class Comment {
     @Column(name = "text")
     private String text;
     @Column(name = "date_time")
-    private LocalDateTime dateTime;
+    private LocalDateTime dateTime; // yyyy-MM-dd HH:mm
 
     public Comment(User author, Ads ads, String text, LocalDateTime dateTime) {
         this.author = author;

@@ -6,7 +6,7 @@ import org.mapstruct.factory.Mappers;
 import ru.skypro.homework.dto.CreateAdsDto;
 import ru.skypro.homework.entity.Ads;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface CreateAdsMapper {
 
     CreateAdsMapper INSTANCE = Mappers.getMapper(CreateAdsMapper.class);
