@@ -37,8 +37,10 @@ public class AdsServiceImpl {
     private final AdsMapper adsMapper;
     private final CommentMapper commentMapper;
     private final CommentServiceImpl commentService;
+    private final ImageRepository imageRepository;
     private final ImageServiceImpl imageService;
     private final CreateAdsMapper createAdsMapper;
+    private final UsersRepository usersRepository;
     private final FullAdsMapper fullAdsMapper;
     private final UserServiceImpl userService;
 
@@ -112,7 +114,11 @@ public class AdsServiceImpl {
         Ads ads = createAdsMapper.createAdsDtoToAds(createAdsDto);
         ads.setAuthor(user);
         ads = adsRepository.save(ads);
-        imageService.addImage(ads, image);
+
+        List<Image> images = new ArrayList<>();
+        images.add(imageService.addImage(ads, image));
+        ads.setImages(images);
+
         return adsMapper.adsToAdsDto(ads);
     }
 
@@ -124,6 +130,15 @@ public class AdsServiceImpl {
     public ResponseWrapperAdsDto getALLAds() {
         List<Ads> list = adsRepository.findAll();
         List<AdsDto> listDto = adsMapper.mapListOfAdsToListDTO(list);
-        return adsMapper.mapToResponseWrapperAdsDto(listDto, listDto.size());
+        return  adsMapper.mapToResponseWrapperAdsDto(listDto,listDto.size());
+    }
+
+    public ResponseEntity<Void> removeCommentsForAds(Integer adPk, Integer commentId) {
+        Ads oldAds = adsRepository.findById(adPk).orElseThrow(() -> {
+            log.error("There is not ads with id = " + adPk);
+            return new AdsNotFoundException(adPk);
+        });
+        commentService.removeCommentForAds(adPk, commentId);
+        return new ResponseEntity<Void>(HttpStatus.OK);
     }
 }

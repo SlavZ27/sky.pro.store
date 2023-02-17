@@ -73,6 +73,11 @@ public class CommentServiceImpl {
         }
     }
 
+    public void removeCommentForAds(Integer adPk, Integer commentId) {
+        Comment comment = commentRepository.findAllByIdAndAdsId(adPk, commentId).orElseThrow(() -> new CommentNotFoundException(commentId));
+        removeComment(comment);
+    }
+
     public List<Comment> getAllByIdAds(Integer idAds) {
         return commentRepository.findAllByIdAds(idAds);
     }
