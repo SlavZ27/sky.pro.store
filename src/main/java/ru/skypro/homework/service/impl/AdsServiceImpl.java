@@ -21,11 +21,8 @@ import ru.skypro.homework.dto.*;
 import ru.skypro.homework.entity.Comment;
 import ru.skypro.homework.mapper.AdsMapper;
 import ru.skypro.homework.mapper.CommentMapper;
-import ru.skypro.homework.repository.UsersRepository;
-import ru.skypro.homework.repository.ImageRepository;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -113,9 +110,8 @@ public class AdsServiceImpl {
         Ads ads = createAdsMapper.createAdsDtoToAds(createAdsDto);
         ads.setAuthor(user);
         ads = adsRepository.save(ads);
-        List<Image> imageList = new ArrayList<>();
-        imageList.add(imageService.addImage(ads, image));
-        ads.setImages(imageList);
+        Image addedImage =imageService.addImage(ads, image);
+        ads.setImage(addedImage);
         ads = adsRepository.save(ads);
         return adsMapper.adsToAdsDto(ads);
     }

@@ -63,5 +63,9 @@ ALTER TABLE ads ALTER COLUMN price SET NOT NULL;
 -- changeSet nadillustrator:4
 ALTER TABLE avatar DROP COLUMN id_author;
 
+-- changeSet nadillustrator:5
+ALTER TABLE image DROP COLUMN id_ads;
+ALTER TABLE ads ADD COLUMN id_image INTEGER;
+
 
 
