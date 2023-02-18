@@ -36,19 +36,21 @@ public class AvatarServiceImpl {
         return null;
     }
 
-    public Pair<byte[], String> getAvatarData(Avatar avatar) {
-        avatarRepository.findById(avatar.getId()).orElseThrow(() ->
-                new AvatarNotFoundException(avatar.getId()));
+    public Pair<byte[], String> getAvatarData(Integer idAvatar) {
+        Avatar avatar = avatarRepository.findById(idAvatar).orElseThrow(() ->
+                new AvatarNotFoundException(idAvatar));
         byte[] bytes;
         try {
             bytes = Files.readAllBytes(Paths.get(avatar.getPath()));
         } catch (IOException | NullPointerException e) {
-            throw new AvatarNotFoundException(avatar.getPath().toString());
+            throw new AvatarNotFoundException(avatar.getPath());
         }
         return Pair.of(bytes, MediaType.IMAGE_JPEG_VALUE);
     }
 
-    public void removeAvatarWithFile(Avatar avatar) {
+    public void removeAvatarWithFile(Integer idAvatar) {
+        Avatar avatar = avatarRepository.findById(idAvatar).orElseThrow(() ->
+                new AvatarNotFoundException(idAvatar));
         try {
             Files.deleteIfExists(Path.of(avatar.getPath()));
         } catch (IOException ignored) {
@@ -69,9 +71,9 @@ public class AvatarServiceImpl {
         return avatar;
     }
 
-    public String getLinkOfImageOfAds(Avatar avatar) {
-        avatarRepository.findById(avatar.getId()).orElseThrow(
-                () -> new ImageNotFoundException(avatar.getId()));
+    public String getLinkOfImageOfAds(Integer idAvatar) {
+        avatarRepository.findById(idAvatar).orElseThrow(
+                () -> new ImageNotFoundException(idAvatar));
 //        return pathToBackend1 + "users/me/image";
         return "/users/me/image";
     }
