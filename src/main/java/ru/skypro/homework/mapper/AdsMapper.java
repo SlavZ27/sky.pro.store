@@ -22,7 +22,7 @@ public abstract class AdsMapper {
     @Mapping(target = "author", expression = "java(ads.getAuthor().getId())")
     @Mapping(target = "price", source = "ads.price")
     @Mapping(target = "title", source = "ads.title")
-    @Mapping(target = "image", source = "image")    //is called mapImageToString()
+    @Mapping(target = "image", source = "ads.image")    //is called mapImageToString()
     public abstract AdsDto adsToAdsDto(Ads ads);
 
     String mapImageToString(Image image) {

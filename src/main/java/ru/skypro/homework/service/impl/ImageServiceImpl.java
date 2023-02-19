@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.entity.Ads;
 import ru.skypro.homework.entity.Image;
+import ru.skypro.homework.exception.AdsNotFoundException;
 import ru.skypro.homework.exception.ImageNotFoundException;
 import ru.skypro.homework.repository.AdsRepository;
 import ru.skypro.homework.repository.ImageRepository;
@@ -63,7 +64,7 @@ public class ImageServiceImpl {
     }
 
     public void removeImageWithFile(Integer idImage) {
-        Image image = imageRepository.getReferenceById(idImage);
+        Image image = imageRepository.findById(idImage).orElseThrow(() -> new ImageNotFoundException(idImage));
         try {
             Files.deleteIfExists(Path.of(image.getPath()));
         } catch (IOException ignored) {
@@ -83,7 +84,7 @@ public class ImageServiceImpl {
     }
 
     public Image addImage(Integer idAds, MultipartFile file) throws IOException {
-        Ads ads = adsRepository.getReferenceById(idAds);
+        Ads ads = adsRepository.findById(idAds).orElseThrow(() -> new AdsNotFoundException(idAds));
         Image image = imageRepository.findByIdAds(ads.getId()).orElse(null);
         if (image != null) {
             updateImage(ads.getId(), file);

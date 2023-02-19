@@ -21,7 +21,7 @@ public abstract class FullAdsMapper {
     @Mapping(target = "pk", source = "ads.id")
     @Mapping(target = "price", source = "ads.price")
     @Mapping(target = "title", source = "ads.title")
-    @Mapping(target = "image", source = "image") // is called mapImageToString(Image images)
+    @Mapping(target = "image", source = "ads.image") // is called mapImageToString(Image images)
     @Mapping(target = "description", source = "ads.description")
     @Mapping(target = "phone", expression = "java(ads.getAuthor().getPhone())")
     @Mapping(target = "email", expression = "java(ads.getAuthor().getEmail())")

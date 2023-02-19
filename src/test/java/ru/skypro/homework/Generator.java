@@ -184,14 +184,14 @@ public class Generator {
     public Image generateImageIfNull(Image image, String dirForImages, Ads ads) {
         if (image == null) {
             image = new Image();
-            image.setId(genInt());
+//            image.setId(genInt());
             if (dirForImages == null || dirForImages.length() == 0) {
                 image.setPath(faker.file().fileName());
             } else {
                 List<String> pathsOfFiles = getPathsOfFiles(dirForImages);
                 image.setPath(pathsOfFiles.get(random.nextInt(pathsOfFiles.size())));
             }
-            image.setAds(ads);
+//            image.setAds(ads);
         }
         return image;
     }
@@ -199,7 +199,7 @@ public class Generator {
     public Comment generateCommentIfNull(Comment comment, Ads ads, User user) {
         if (comment == null) {
             comment = new Comment();
-            comment.setId(genInt());
+//            comment.setId(genInt());
             comment.setText(faker.chuckNorris().fact());
             comment.setDateTime(generateDateTime(true, LocalDateTime.now()));
             comment.setAds(ads);
@@ -211,7 +211,7 @@ public class Generator {
     public Ads generateAdsIfNull(Ads ads, User author) {
         if (ads == null) {
             ads = new Ads();
-            ads.setId(genInt());
+//            ads.setId(genInt());
             ads.setAuthor(author);
             ads.setTitle(faker.commerce().productName());
             ads.setPrice(Integer.valueOf(genInt(50_000)));
