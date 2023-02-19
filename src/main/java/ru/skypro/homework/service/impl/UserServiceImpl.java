@@ -96,7 +96,7 @@ public class UserServiceImpl {
     public Pair<byte[], String> getAvatar() {
         User user = getDefaultUser(true);
         if (user.getAvatar() != null) {
-            return avatarService.getAvatarData(user.getAvatar().getId());
+            return avatarService.getAvatarData(user.getAvatar());
         } else {
             throw new AvatarNotFoundException("");
         }

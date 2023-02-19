@@ -110,7 +110,7 @@ public class AdsServiceImpl {
         Ads ads = createAdsMapper.createAdsDtoToAds(createAdsDto);
         ads.setAuthor(user);
         ads = adsRepository.save(ads);
-        Image addedImage =imageService.addImage(ads.getId(), image);
+        Image addedImage =imageService.addImage(ads, image);
         ads.setImage(addedImage);
         ads = adsRepository.save(ads);
         return adsMapper.adsToAdsDto(ads);

@@ -7,9 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.entity.Ads;
 import ru.skypro.homework.entity.Image;
-import ru.skypro.homework.exception.AdsNotFoundException;
 import ru.skypro.homework.exception.ImageNotFoundException;
-import ru.skypro.homework.repository.AdsRepository;
 import ru.skypro.homework.repository.ImageRepository;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -25,16 +23,13 @@ public class ImageServiceImpl {
     private final String dirForImages;
     private final String pathToBackend1;
     private final ImageRepository imageRepository;
-    private final AdsRepository adsRepository;
 
     public ImageServiceImpl(@Value("${path.to.materials.folder}") String dirForImages,
                             @Value("${path.to.backend1}") String pathToBackend1,
-                            ImageRepository imageRepository,
-                            AdsRepository adsRepository) {
+                            ImageRepository imageRepository) {
         this.dirForImages = dirForImages;
         this.pathToBackend1 = pathToBackend1;
         this.imageRepository = imageRepository;
-        this.adsRepository = adsRepository;
     }
 
     public Pair<byte[], String> updateImage(Integer idImage, MultipartFile image) {
@@ -63,8 +58,7 @@ public class ImageServiceImpl {
         return Pair.of(bytes, MediaType.IMAGE_JPEG_VALUE);
     }
 
-    public void removeImageWithFile(Integer idImage) {
-        Image image = imageRepository.findById(idImage).orElseThrow(() -> new ImageNotFoundException(idImage));
+    public void removeImageWithFile(Image image) {
         try {
             Files.deleteIfExists(Path.of(image.getPath()));
         } catch (IOException ignored) {
@@ -75,7 +69,7 @@ public class ImageServiceImpl {
     public void removeAllImagesOfAds(Integer idAds) {
         List<Image> imageList = getAllByIdAds(idAds);
         for (Image image : imageList) {
-            removeImageWithFile(image.getId());
+            removeImageWithFile(image);
         }
     }
 
@@ -83,8 +77,7 @@ public class ImageServiceImpl {
         return imageRepository.findAllByIdAds(idAds);
     }
 
-    public Image addImage(Integer idAds, MultipartFile file) throws IOException {
-        Ads ads = adsRepository.findById(idAds).orElseThrow(() -> new AdsNotFoundException(idAds));
+    public Image addImage(Ads ads, MultipartFile file) throws IOException {
         Image image = imageRepository.findByIdAds(ads.getId()).orElse(null);
         if (image != null) {
             updateImage(ads.getId(), file);
