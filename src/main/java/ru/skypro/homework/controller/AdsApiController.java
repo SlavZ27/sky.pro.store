@@ -4,11 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.*;
 
 import ru.skypro.homework.service.impl.AdsServiceImpl;
+import ru.skypro.homework.service.impl.ImageServiceImpl;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -29,9 +32,12 @@ import java.io.IOException;
 public class AdsApiController {
 
     private final AdsServiceImpl adsServiceImpl;
+    private final ImageServiceImpl imageService;
 
-    public AdsApiController(AdsServiceImpl adsServiceImpl) {
+    public AdsApiController(AdsServiceImpl adsServiceImpl,
+                            ImageServiceImpl imageService) {
         this.adsServiceImpl = adsServiceImpl;
+        this.imageService = imageService;
     }
 
     @Operation(summary = "", description = "", tags = {"Объявления"})
@@ -190,5 +196,40 @@ public class AdsApiController {
     @GetMapping(value = "/me", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ResponseWrapperAdsDto> getAdsMeUsingGET() {
         return ResponseEntity.ok(adsServiceImpl.getALLAds());
+    }
+
+
+    @Operation(summary = "updateAdsImage", description = "", tags = {"Изображения"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(
+                    mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE,
+                    array = @ArraySchema(schema = @Schema(implementation = byte[].class)))),
+            @ApiResponse(responseCode = "404", description = "Not Found")})
+    @PatchMapping(value = "{idAds}",
+            produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE},
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<byte[]> updateImage(Integer id, MultipartFile image) {
+        Pair<byte[], String> pair = imageService.updateImage(id, image);
+        return read(pair);
+    }
+
+    @Operation(summary = "getImage", description = "", tags = {"Изображения"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE,
+                            array = @ArraySchema(schema = @Schema(implementation = byte[].class)))),
+            @ApiResponse(responseCode = "404", description = "Not Found")})
+    @GetMapping(value = "{idImage}",
+            produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
+    public ResponseEntity<byte[]> getImage(Integer idImage) {
+        Pair<byte[], String> pair = imageService.getImage(idImage);
+        return read(pair);
+    }
+
+    private ResponseEntity<byte[]> read(Pair<byte[], String> pair) {
+        return ResponseEntity.ok()
+                .contentLength(pair.getFirst().length)
+                .contentType(MediaType.parseMediaType(pair.getSecond()))
+                .body(pair.getFirst());
     }
 }
