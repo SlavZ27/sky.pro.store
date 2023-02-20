@@ -67,5 +67,6 @@ ALTER TABLE avatar DROP COLUMN id_author;
 ALTER TABLE image DROP COLUMN id_ads;
 ALTER TABLE ads ADD COLUMN id_image INTEGER;
 
-
+-- changeSet nadillustrator:7
+ALTER TABLE ads ADD COLUMN date_time TIMESTAMP;
 
