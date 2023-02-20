@@ -194,9 +194,7 @@ public class AdsApiController {
             @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @GetMapping(value = "/me", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<ResponseWrapperAdsDto> getAdsMeUsingGET(
-            @Parameter(in = ParameterIn.QUERY, description = "", schema = @Schema())
-            @Valid @RequestParam(value = "username") String username) {
+    public ResponseEntity<ResponseWrapperAdsDto> getAdsMeUsingGET() {
         return ResponseEntity.ok(adsServiceImpl.getALLAds());
     }
 }
