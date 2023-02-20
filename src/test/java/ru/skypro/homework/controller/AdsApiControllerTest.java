@@ -125,11 +125,6 @@ class AdsApiControllerTest {
         }
     }
 
-    @Before("")
-    public void setup() {
-        testRestTemplate.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
-    }
-
     @AfterEach
     public void clearData() {
         imageRepository.deleteAll();
