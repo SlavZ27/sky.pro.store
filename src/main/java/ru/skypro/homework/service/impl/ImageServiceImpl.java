@@ -9,7 +9,6 @@ import ru.skypro.homework.entity.Ads;
 import ru.skypro.homework.entity.Image;
 import ru.skypro.homework.exception.ImageNotFoundException;
 import ru.skypro.homework.repository.ImageRepository;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,7 +24,9 @@ public class ImageServiceImpl {
     private final String pathToBackend1;
     private final ImageRepository imageRepository;
 
-    public ImageServiceImpl(@Value("${path.to.materials.folder}") String dirForImages, @Value("${path.to.backend1}") String pathToBackend1, ImageRepository imageRepository) {
+    public ImageServiceImpl(@Value("${path.to.materials.folder}") String dirForImages,
+                            @Value("${path.to.backend1}") String pathToBackend1,
+                            ImageRepository imageRepository) {
         this.dirForImages = dirForImages;
         this.pathToBackend1 = pathToBackend1;
         this.imageRepository = imageRepository;
@@ -83,13 +84,13 @@ public class ImageServiceImpl {
         } else {
             byte[] data = file.getBytes();
             String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            String extension = Optional.ofNullable(file.getOriginalFilename()).map(fileName -> fileName.substring(file.getOriginalFilename().lastIndexOf('.')))
+            String extension = Optional.ofNullable(file.getOriginalFilename())
+                    .map(fileName -> fileName.substring(file.getOriginalFilename().lastIndexOf('.')))
                     .orElse("");
             Path path = Paths.get(dirForImages).resolve("Ads_" + ads.getId() + "_" + date + extension);
             Files.write(path, data);
             image = new Image();
             image.setPath(path.toString());
-            image.setAds(ads);
             image = imageRepository.save(image);
         }
         return image;

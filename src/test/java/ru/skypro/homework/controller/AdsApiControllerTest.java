@@ -71,11 +71,6 @@ class AdsApiControllerTest {
         this.dirForAvatars = dirForAvatars;
     }
 
-    @Before("")
-    public void setup() {
-        testRestTemplate.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
-    }
-
     @BeforeEach
     public void generateData() {
         imageRepository.deleteAll();
@@ -109,13 +104,11 @@ class AdsApiControllerTest {
         List<Ads> adsList = new ArrayList<>();
         for (User user : userList) {
             int countAds = generator.genInt(countAdsUserMin, countAdsUserMax);
-            int countImage = 1;
             for (int i = 0; i < countAds; i++) {
-                Ads ads = adsRepository.save(generator.generateAdsIfNull(null, user));
+//                imageRepository.save(generator.generateImageIfNull(null, dirForImages, ads));
+                Ads ads = adsRepository.save(generator.generateAdsIfNull(null, user));//TODO поменять местами (Ads -> Image)
                 adsList.add(ads);
-                for (int i1 = 0; i1 < countImage; i1++) {
-                    imageRepository.save(generator.generateImageIfNull(null, dirForImages, ads));
-                }
+
             }
         }
         //generate comments
@@ -130,6 +123,11 @@ class AdsApiControllerTest {
                         tempUserList.get(random.nextInt(tempUserList.size()))));
             }
         }
+    }
+
+    @Before("")
+    public void setup() {
+        testRestTemplate.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
     }
 
     @AfterEach

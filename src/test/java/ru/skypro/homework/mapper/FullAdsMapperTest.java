@@ -39,7 +39,7 @@ public class FullAdsMapperTest {
         List<Image> images = new ArrayList<>();
         images.add(image);
         images.add(image1);
-        ads.setImages(images);
+//        ads.setImages(images);
 
         FullAdsDto fullAdsDto = fullAdsMapper.adsToFullAdsDto(ads);
 

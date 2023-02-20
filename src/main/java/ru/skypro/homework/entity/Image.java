@@ -2,9 +2,7 @@ package ru.skypro.homework.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
-
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Getter
@@ -18,14 +16,10 @@ public class Image {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
-    @ManyToOne
-    @JoinColumn(name = "id_ads")
-    private Ads ads;
     @Column(name = "path")
     private String path;
 
-    public Image(Ads ads, String path) {
-        this.ads = ads;
+    public Image(String path) {
         this.path = path;
     }
 
