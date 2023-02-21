@@ -17,7 +17,7 @@ import ru.skypro.homework.service.impl.ImageServiceImpl;
 @Slf4j
 @RestController
 @CrossOrigin(value = "http://localhost:3000")
-public class ImageApiController{
+public class ImageApiController {
 
     private final ImageServiceImpl imageService;
 
@@ -35,8 +35,8 @@ public class ImageApiController{
             produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE},
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<byte[]> updateImage(Integer id, MultipartFile image) {
-        Pair<byte[], String> pair = imageService.updateImage(id, image);
-        return read(pair);
+//        Pair<byte[], String> pair = imageService.updateImage(id, image);
+        return null;
     }
 
     @Operation(summary = "getImage", description = "", tags = {"Изображения"})
@@ -48,8 +48,8 @@ public class ImageApiController{
     @GetMapping(value = "{idImage}",
             produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
     public ResponseEntity<byte[]> getImage(Integer idImage) {
-        Pair<byte[], String> pair = imageService.getImage(idImage);
-        return read(pair);
+//        Pair<byte[], String> pair = imageService.getImageData(idImage);
+        return null;
     }
 
     private ResponseEntity<byte[]> read(Pair<byte[], String> pair) {

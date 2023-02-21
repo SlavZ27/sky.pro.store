@@ -29,7 +29,7 @@ public abstract class AdsMapper {
         if (image == null) {
             throw new IllegalArgumentException();
         }
-        return imageService.getLinkOfImageOfAds(image.getId());
+        return imageService.getLinkOfImage(image);
     }
 
     @Mapping(target = "results", source = "list")

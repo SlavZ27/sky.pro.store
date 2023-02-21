@@ -29,10 +29,10 @@ public abstract class FullAdsMapper {
     @Mapping(target = "authorLastName", expression = "java(ads.getAuthor().getLastName())")
     public abstract FullAdsDto adsToFullAdsDto(Ads ads);
 
-     String mapImageToString(Image image) {
+    String mapImageToString(Image image) {
         if (image == null) {
             throw new IllegalArgumentException();
         }
-        return imageService.getLinkOfImageOfAds(image.getId());
+        return imageService.getLinkOfImage(image);
     }
 }

@@ -59,7 +59,7 @@ public class AdsServiceImpl {
             log.error("There is not ads with id = " + adsId);
             return new AdsNotFoundException(adsId);
         });
-        commentDto.setAuthor(userService.getDefaultUser(true).getId());
+        commentDto.setAuthor(userService.getRandomUser().getId());
 
         Comment comment = commentMapper.dtoToComment(commentDto);
 
@@ -85,11 +85,12 @@ public class AdsServiceImpl {
 
     public ResponseEntity<Void> removeAds(Integer idAds) {
         Ads ads = adsRepository.findById(idAds).orElseThrow(() -> new AdsNotFoundException(idAds));
-        imageService.removeAllImagesOfAds(ads.getId());
         commentService.removeAllCommentsOfAds(ads.getId());
+        Image imageForDel = ads.getImage();
         adsRepository.delete(ads);
+        imageService.removeImageWithFile(imageForDel);
         ads = adsRepository.findById(idAds).orElse(null);
-        if (imageService.getAllByIdAds(idAds).size() == 0 &&
+        if (imageService.getImageData(imageForDel) == null &&
                 commentService.getAllByIdAds(idAds).size() == 0 &&
                 ads == null) {
             return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
@@ -106,14 +107,13 @@ public class AdsServiceImpl {
     }
 
     public AdsDto addAds(CreateAdsDto createAdsDto, MultipartFile image) throws IOException {
-        User user = userService.getDefaultUser(true);
+        User user = userService.getDefaultUser();
         Ads ads = createAdsMapper.createAdsDtoToAds(createAdsDto);
         ads.setAuthor(user);
         ads = adsRepository.save(ads);
-        Image addedImage =imageService.addImage(ads, image);
+        Image addedImage = imageService.addImage(image, "ads_" + ads.getId().toString());
         ads.setImage(addedImage);
-        ads = adsRepository.save(ads);
-        return adsMapper.adsToAdsDto(ads);
+        return adsMapper.adsToAdsDto(adsRepository.save(ads));
     }
 
     public FullAdsDto getAds(Integer idAds) {
@@ -124,8 +124,7 @@ public class AdsServiceImpl {
     public ResponseWrapperAdsDto getALLAds() {
         List<Ads> list = adsRepository.findAll();
         List<AdsDto> listDto = adsMapper.mapListOfAdsToListDTO(list);
-        ResponseWrapperAdsDto responseWrapperAdsDto =adsMapper.mapToResponseWrapperAdsDto(listDto, listDto.size());
-        return responseWrapperAdsDto;
+        return adsMapper.mapToResponseWrapperAdsDto(listDto, listDto.size());
     }
 
     public ResponseEntity<Void> removeCommentsForAds(Integer adPk, Integer commentId) {

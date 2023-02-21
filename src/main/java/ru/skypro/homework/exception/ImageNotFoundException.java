@@ -9,7 +9,7 @@ public class ImageNotFoundException extends NotFoundException {
         super("Image with id: " + id + " not found");
     }
 
-    public ImageNotFoundException(String id) {
-        super("Image with id: " + id + " not found");
+    public ImageNotFoundException(String message) {
+        super(message);
     }
 }

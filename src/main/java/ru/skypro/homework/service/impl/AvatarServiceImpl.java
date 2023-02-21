@@ -23,56 +23,92 @@ import java.util.Optional;
 @Service
 public class AvatarServiceImpl {
     private final String dirForAvatars;
-    private final String pathToBackend1;
     private final AvatarRepository avatarRepository;
 
-    public AvatarServiceImpl(@Value("${path.to.materials.folder}") String dirForImages, @Value("${path.to.backend1}") String pathToBackend1, AvatarRepository avatarRepository) {
+    public AvatarServiceImpl(
+            @Value("${path.to.materials.folder}") String dirForImages,
+            AvatarRepository avatarRepository) {
         this.dirForAvatars = dirForImages;
-        this.pathToBackend1 = pathToBackend1;
         this.avatarRepository = avatarRepository;
     }
 
-    public List<byte[]> updateImage(Integer id, MultipartFile image) {
-        return null;
+    public Avatar updateAvatar(Avatar avatar, MultipartFile file, String nameFile) {
+        if (avatar == null || avatar.getId() == null) {
+            return null;
+        }
+        Avatar oldAvatar = avatarRepository.findById(avatar.getId()).orElseThrow(() ->
+                new AvatarNotFoundException(avatar.getId()));
+        Path pathOld = Paths.get(oldAvatar.getPath());
+        Path pathNew = generatePath(file, nameFile);
+        try {
+            Files.write(pathNew, file.getBytes());
+            if (Files.exists(pathNew)) {
+                Files.deleteIfExists(pathOld);
+                avatar.setPath(pathNew.toString());
+                avatarRepository.save(avatar);
+            }
+        } catch (IOException ignored) {
+            throw new AvatarNotFoundException("Absent file in Avatar with id = " + avatar.getId());
+        } catch (NullPointerException e) {
+            throw new AvatarNotFoundException("Absent path in Avatar with id = " + avatar.getId());
+        }
+        return oldAvatar;
     }
 
     public Pair<byte[], String> getAvatarData(Avatar avatar) {
+        if (avatar == null || avatar.getId() == null) {
+            return null;
+        }
         avatarRepository.findById(avatar.getId()).orElseThrow(() ->
                 new AvatarNotFoundException(avatar.getId()));
         byte[] bytes;
         try {
             bytes = Files.readAllBytes(Paths.get(avatar.getPath()));
-        } catch (IOException | NullPointerException e) {
-            throw new AvatarNotFoundException(avatar.getPath().toString());
+        } catch (IOException ignored) {
+            throw new AvatarNotFoundException("Absent file in Avatar with id = " + avatar.getId());
+        } catch (NullPointerException e) {
+            throw new AvatarNotFoundException("Absent path in Avatar with id = " + avatar.getId());
         }
         return Pair.of(bytes, MediaType.IMAGE_JPEG_VALUE);
     }
 
-    public void removeAvatarWithFile(Avatar avatar) {
+    private boolean removeAvatarWithFile(Avatar avatar) {
+        Path path = Path.of(avatar.getPath());
         try {
-            Files.deleteIfExists(Path.of(avatar.getPath()));
+            Files.deleteIfExists(path);
         } catch (IOException ignored) {
         }
         avatarRepository.delete(avatar);
+        if (Files.exists(path) || avatarRepository.findById(avatar.getId()).isPresent()) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
-    public Avatar addAvatar(MultipartFile file, Integer idName) throws IOException {
-        byte[] data = file.getBytes();
+    private Path generatePath(MultipartFile file, String nameFile) {
         String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        String extension = Optional.ofNullable(file.getOriginalFilename()).map(fileName -> fileName.substring(file.getOriginalFilename().lastIndexOf('.')))
+        String extension = Optional.ofNullable(file.getOriginalFilename())
+                .map(fileName -> fileName.substring(file.getOriginalFilename().lastIndexOf('.')))
                 .orElse("");
-        Path path = Paths.get(dirForAvatars).resolve("Avatar_" + idName + "_" + date + extension);
+        return Paths.get(dirForAvatars).resolve(nameFile + "_" + date + extension);
+    }
+
+    public Avatar addAvatar(MultipartFile file, String nameFile) throws IOException {
+        byte[] data = file.getBytes();
+        Path path = generatePath(file, nameFile);
         Files.write(path, data);
         Avatar avatar = new Avatar();
         avatar.setPath(path.toString());
-        avatar = avatarRepository.save(avatar);
-        return avatar;
+        return avatarRepository.save(avatar);
     }
 
-    public String getLinkOfImageOfAds(Avatar avatar) {
+    public String getLinkOfAvatar(Avatar avatar) {
+        if (avatar == null || avatar.getId() == null) {
+            return null;
+        }
         avatarRepository.findById(avatar.getId()).orElseThrow(
-                () -> new ImageNotFoundException(avatar.getId()));
-//        return pathToBackend1 + "users/me/image";
+                () -> new AvatarNotFoundException(avatar.getId()));
         return "/users/me/image";
     }
 }

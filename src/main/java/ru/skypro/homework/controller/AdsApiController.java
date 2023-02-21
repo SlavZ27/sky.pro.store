@@ -142,6 +142,7 @@ public class AdsApiController {
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @GetMapping(value = "/{ad_pk}/comments/{id}",
             produces = {MediaType.APPLICATION_JSON_VALUE})
+    //      http://localhost/ads/2/comments/4
     public ResponseEntity<CommentDto> getComments(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("ad_pk") Integer adPk, @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("id") Integer id) {
         return ResponseEntity.ok(adsServiceImpl.getCommentOfAds(adPk, id));
     }

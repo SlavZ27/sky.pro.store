@@ -56,7 +56,7 @@ public class UsersApiController {
     @GetMapping(value = "me/image",
             produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
     public ResponseEntity<byte[]> getAvatar() {
-        Pair<byte[], String> pair =userService.getAvatar();
+        Pair<byte[], String> pair =userService.getAvatarData();
         return read(pair);
     }
 
