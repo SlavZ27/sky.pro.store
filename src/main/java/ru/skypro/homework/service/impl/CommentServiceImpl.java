@@ -62,6 +62,10 @@ public class CommentServiceImpl {
         return commentRepository.findAllByIdAds(idAds);
     }
 
+    public Integer getCountByIdAds(Integer idAds) {
+        return commentRepository.getCountAllByAdsId(idAds);
+    }
+
     public List<Comment> getAllByIdAdsAndSortDateTime(Integer adsId) {
         return commentRepository.findAllByIdAdsAndSortDateTime(adsId);
     }

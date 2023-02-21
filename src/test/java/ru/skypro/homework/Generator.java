@@ -6,7 +6,10 @@ import ru.skypro.homework.dto.Role;
 import ru.skypro.homework.entity.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -27,6 +30,10 @@ public class Generator {
 
     public int genInt(int max) {
         return random.nextInt(max);
+    }
+
+    public int genIntWithoutZero(int max) {
+        return random.nextInt(max - 1) + 1;
     }
 
     /**
@@ -56,16 +63,30 @@ public class Generator {
         int year = tldt.getYear();
         if (isPast) {
             tldt = localDateTime.plusYears(1L);
-            while (tldt.isBefore(localDateTime)) {
-                LocalDate localDate = LocalDate.of(genInt(year - 2, year), genInt(12), genInt(25));
-                LocalTime localTime = LocalTime.of(genInt(23), genInt(59), genInt(59), 0);
+            while (!tldt.isBefore(localDateTime)) {
+                LocalDate localDate = LocalDate.of(
+                        genInt(year - 2, year),
+                        genIntWithoutZero(12),
+                        genIntWithoutZero(25));
+                LocalTime localTime = LocalTime.of(
+                        genInt(23),
+                        genInt(59),
+                        genInt(59),
+                        0);
                 tldt = LocalDateTime.of(localDate, localTime);
             }
         } else {
             tldt = localDateTime.minusYears(1L);
-            while (tldt.isAfter(localDateTime)) {
-                LocalDate localDate = LocalDate.of(genInt(year - 2, year), genInt(12), genInt(25));
-                LocalTime localTime = LocalTime.of(genInt(23), genInt(59), genInt(59), 0);
+            while (!tldt.isAfter(localDateTime)) {
+                LocalDate localDate = LocalDate.of(
+                        genInt(year - 2, year),
+                        genIntWithoutZero(12),
+                        genIntWithoutZero(25));
+                LocalTime localTime = LocalTime.of(
+                        genInt(23),
+                        genInt(59),
+                        genInt(59),
+                        0);
                 tldt = LocalDateTime.of(localDate, localTime);
             }
         }
@@ -89,7 +110,7 @@ public class Generator {
         return tld;
     }
 
-    public User generateUserRoleAdmin(Avatar avatar, String dirForAvatars) {
+    public User generateUserRoleAdmin(Avatar avatar) {
         return generateUser(
                 null,
                 null,
@@ -101,11 +122,10 @@ public class Generator {
                 null,
                 null,
                 Role.ADMIN,
-                dirForAvatars,
                 true);
     }
 
-    public User generateUserRoleUser(Avatar avatar, String dirForAvatars) {
+    public User generateUserRoleUser(Avatar avatar) {
         return generateUser(
                 null,
                 null,
@@ -117,7 +137,6 @@ public class Generator {
                 null,
                 null,
                 Role.USER,
-                dirForAvatars,
                 true);
     }
 
@@ -132,7 +151,6 @@ public class Generator {
             String username,
             String password,
             Role role,
-            String dirForAvatars,
             boolean needGenerate) {
         if (needGenerate) {
             idUser = generateIdIfEmpty(idUser);
@@ -141,7 +159,6 @@ public class Generator {
             email = generateEmailIfEmpty(email);
             phone = generatePhoneIfEmpty(phone);
             regDate = generateDate(true, LocalDate.now());
-            avatar = generateAvatarIfNull(avatar, dirForAvatars);
             username = generateNameIfEmpty(username);
             password = generateNameIfEmpty(password);
             role = generateRoleIfEmpty(role);
@@ -174,6 +191,28 @@ public class Generator {
         return avatar;
     }
 
+    public Image generateImageIfNull(Image image, String dirForImages) {
+        if (image == null) {
+            image = new Image();
+            if (dirForImages == null || dirForImages.length() == 0) {
+                image.setPath(faker.file().fileName());
+            } else {
+                List<String> pathsOfFiles = getPathsOfFiles(dirForImages);
+                image.setPath(pathsOfFiles.get(random.nextInt(pathsOfFiles.size())));
+            }
+        }
+        return image;
+    }
+
+    public byte[] generateDataFileOfImageFromDir(String dirForImages) {
+        List<String> pathsOfFiles = getPathsOfFiles(dirForImages);
+        try {
+            return Files.readAllBytes(Path.of(pathsOfFiles.get(random.nextInt(pathsOfFiles.size()))));
+        } catch (IOException ignored) {
+        }
+        return faker.avatar().image().getBytes();
+    }
+
     private List<String> getPathsOfFiles(String pathDir) {
         File dir = new File(pathDir);
         File[] files = dir.listFiles();
@@ -181,25 +220,9 @@ public class Generator {
         return Arrays.stream(files).map(file -> pathDir + "/" + file.getName()).collect(Collectors.toList());
     }
 
-    public Image generateImageIfNull(Image image, String dirForImages, Ads ads) {
-        if (image == null) {
-            image = new Image();
-//            image.setId(genInt());
-            if (dirForImages == null || dirForImages.length() == 0) {
-                image.setPath(faker.file().fileName());
-            } else {
-                List<String> pathsOfFiles = getPathsOfFiles(dirForImages);
-                image.setPath(pathsOfFiles.get(random.nextInt(pathsOfFiles.size())));
-            }
-//            image.setAds(ads);
-        }
-        return image;
-    }
-
     public Comment generateCommentIfNull(Comment comment, Ads ads, User user) {
         if (comment == null) {
             comment = new Comment();
-//            comment.setId(genInt());
             comment.setText(faker.chuckNorris().fact());
             comment.setDateTime(generateDateTime(true, LocalDateTime.now()));
             comment.setAds(ads);
@@ -208,11 +231,12 @@ public class Generator {
         return comment;
     }
 
-    public Ads generateAdsIfNull(Ads ads, User author) {
+    public Ads generateAdsIfNull(Ads ads, User author, Image image) {
         if (ads == null) {
             ads = new Ads();
-//            ads.setId(genInt());
             ads.setAuthor(author);
+            ads.setImage(image);
+            ads.setDateTime(generateDateTime(true, LocalDateTime.now()));
             ads.setTitle(faker.commerce().productName());
             ads.setPrice(Integer.valueOf(genInt(50_000)));
             ads.setDescription(faker.chuckNorris().fact());

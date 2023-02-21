@@ -72,6 +72,14 @@ public class ImageServiceImpl {
         return Pair.of(bytes, MediaType.IMAGE_JPEG_VALUE);
     }
 
+    public Image getImage(Integer id) {
+        if (id == null) {
+            return null;
+        }
+        return imageRepository.findById(id).orElseThrow(() ->
+                new ImageNotFoundException(id));
+    }
+
     public boolean removeImageWithFile(Image image) {
         Path path = Path.of(image.getPath());
         try {
