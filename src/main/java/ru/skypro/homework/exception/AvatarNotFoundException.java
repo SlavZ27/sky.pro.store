@@ -9,7 +9,7 @@ public class AvatarNotFoundException extends NotFoundException {
         super("Avatar with id: " + id + " not found");
     }
 
-    public AvatarNotFoundException(String id) {
-        super("Avatar file with id: " + id + " not found");
+    public AvatarNotFoundException(String message) {
+        super(message);
     }
 }

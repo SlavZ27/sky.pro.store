@@ -29,15 +29,13 @@ import java.io.IOException;
 @Slf4j
 @RestController
 @CrossOrigin(value = "http://localhost:3000")
+@RequestMapping(value = "ads")
 public class AdsApiController {
 
     private final AdsServiceImpl adsServiceImpl;
-    private final ImageServiceImpl imageService;
 
-    public AdsApiController(AdsServiceImpl adsServiceImpl,
-                            ImageServiceImpl imageService) {
+    public AdsApiController(AdsServiceImpl adsServiceImpl) {
         this.adsServiceImpl = adsServiceImpl;
-        this.imageService = imageService;
     }
 
     @Operation(summary = "", description = "", tags = {"Объявления"})
@@ -148,6 +146,7 @@ public class AdsApiController {
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @GetMapping(value = "/{ad_pk}/comments/{id}",
             produces = {MediaType.APPLICATION_JSON_VALUE})
+    //      http://localhost/ads/2/comments/4
     public ResponseEntity<CommentDto> getComments(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("ad_pk") Integer adPk, @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("id") Integer id) {
         return ResponseEntity.ok(adsServiceImpl.getCommentOfAds(adPk, id));
     }
@@ -205,11 +204,11 @@ public class AdsApiController {
                     mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE,
                     array = @ArraySchema(schema = @Schema(implementation = byte[].class)))),
             @ApiResponse(responseCode = "404", description = "Not Found")})
-    @PatchMapping(value = "{idAds}",
+    @PatchMapping(value = "{idAds}/image",
             produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE},
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<byte[]> updateImage(Integer id, MultipartFile image) {
-        Pair<byte[], String> pair = imageService.updateImage(id, image);
+    public ResponseEntity<byte[]> updateImage(Integer idAds, MultipartFile image) throws IOException {
+        Pair<byte[], String> pair = adsServiceImpl.updateImageOfAds(idAds, image);
         return read(pair);
     }
 
@@ -219,10 +218,10 @@ public class AdsApiController {
                     content = @Content(mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE,
                             array = @ArraySchema(schema = @Schema(implementation = byte[].class)))),
             @ApiResponse(responseCode = "404", description = "Not Found")})
-    @GetMapping(value = "{idImage}",
+    @GetMapping(value = "{idAds}/image",
             produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
-    public ResponseEntity<byte[]> getImage(Integer idImage) {
-        Pair<byte[], String> pair = imageService.getImage(idImage);
+    public ResponseEntity<byte[]> getImage(Integer idAds) {
+        Pair<byte[], String> pair = adsServiceImpl.getImage(idAds);
         return read(pair);
     }
 

@@ -47,7 +47,7 @@ public class UsersApiController {
         return ResponseEntity.ok(userService.getUser());
     }
 
-    @Operation(summary = "getAvatarOfUser", description = "", tags = {"Пользователи"})
+    @Operation(summary = "getAvatarOfMe", description = "", tags = {"Пользователи"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(
                     mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE,
@@ -56,7 +56,20 @@ public class UsersApiController {
     @GetMapping(value = "me/image",
             produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
     public ResponseEntity<byte[]> getAvatar() {
-        Pair<byte[], String> pair =userService.getAvatar();
+        Pair<byte[], String> pair = userService.getAvatarMe();
+        return read(pair);
+    }
+
+    @Operation(summary = "getAvatarOfUser", description = "", tags = {"Пользователи"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(
+                    mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE,
+                    array = @ArraySchema(schema = @Schema(implementation = byte[].class)))),
+            @ApiResponse(responseCode = "404", description = "Not Found")})
+    @GetMapping(value = "{idUser}/image",
+            produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
+    public ResponseEntity<byte[]> getAvatarOfUser(@PathVariable Integer idUser) {
+        Pair<byte[], String> pair = userService.getAvatarOfUser(idUser);
         return read(pair);
     }
 
@@ -98,6 +111,7 @@ public class UsersApiController {
     public ResponseEntity<Void> updateUserImage(MultipartFile image) throws IOException {
         return userService.updateUserImage(image);
     }
+
     private ResponseEntity<byte[]> read(Pair<byte[], String> pair) {
         return ResponseEntity.ok()
                 .contentLength(pair.getFirst().length)

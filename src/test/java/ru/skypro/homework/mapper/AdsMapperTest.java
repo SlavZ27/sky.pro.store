@@ -42,7 +42,7 @@ public class AdsMapperTest {
         user.setId(111);
         ads.setAuthor(user);
 
-        when(imageService.getLinkOfImageOfAds(1)).thenReturn("/image/1");
+        when(imageService.getLinkOfImage(image)).thenReturn("/image/1");
 
         AdsDto adsDto = adsMapper.adsToAdsDto(ads);
 

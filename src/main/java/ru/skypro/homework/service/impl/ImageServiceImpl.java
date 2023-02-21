@@ -9,11 +9,14 @@ import ru.skypro.homework.entity.Ads;
 import ru.skypro.homework.entity.Image;
 import ru.skypro.homework.exception.ImageNotFoundException;
 import ru.skypro.homework.repository.ImageRepository;
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -21,85 +24,83 @@ import java.util.Optional;
 @Service
 public class ImageServiceImpl {
     private final String dirForImages;
-    private final String pathToBackend1;
     private final ImageRepository imageRepository;
 
     public ImageServiceImpl(@Value("${path.to.materials.folder}") String dirForImages,
-                            @Value("${path.to.backend1}") String pathToBackend1,
                             ImageRepository imageRepository) {
         this.dirForImages = dirForImages;
-        this.pathToBackend1 = pathToBackend1;
         this.imageRepository = imageRepository;
     }
 
-    public Pair<byte[], String> updateImage(Integer idImage, MultipartFile image) {
-        Image oldImage = imageRepository.findById(idImage).orElseThrow(() -> new ImageNotFoundException(idImage));
-        byte[] bytes;
-        Path path = Paths.get(oldImage.getPath());
-        try {
-            if (Files.deleteIfExists(path)) {
-                Files.write(path, image.getBytes());
-            }
-            bytes = Files.readAllBytes(path);
-        } catch (IOException | NullPointerException e) {
-            throw new ImageNotFoundException(idImage);
+    public Image updateImage(Image image, MultipartFile file, String nameFile) {
+        if (image == null || image.getId() == null) {
+            return null;
         }
-        return Pair.of(bytes, MediaType.IMAGE_JPEG_VALUE);
+        Image oldImage = imageRepository.findById(image.getId()).orElseThrow(() ->
+                new ImageNotFoundException(image.getId()));
+        Path pathOld = Paths.get(oldImage.getPath());
+        Path pathNew = generatePath(file, nameFile);
+        try {
+            Files.write(pathNew, file.getBytes());
+            if (Files.exists(pathNew)) {
+                Files.deleteIfExists(pathOld);
+                image.setPath(pathNew.toString());
+                imageRepository.save(image);
+            }
+        } catch (IOException ignored) {
+            throw new ImageNotFoundException("Absent file in Image with id = " + image.getId());
+        } catch (NullPointerException e) {
+            throw new ImageNotFoundException("Absent path in Image with id = " + image.getId());
+        }
+        return oldImage;
     }
 
-    public Pair<byte[], String> getImage(Integer idImage) {
-        Image image = imageRepository.findById(idImage).orElseThrow(() -> new ImageNotFoundException(idImage));
+    public Pair<byte[], String> getImageData(Image image) {
+        if (image == null || image.getId() == null) {
+            return null;
+        }
+        imageRepository.findById(image.getId()).orElseThrow(() ->
+                new ImageNotFoundException(image.getId()));
         byte[] bytes;
         try {
             bytes = Files.readAllBytes(Paths.get(image.getPath()));
-        } catch (IOException | NullPointerException e) {
-            throw new ImageNotFoundException(idImage);
+        } catch (IOException ignored) {
+            throw new ImageNotFoundException("Absent file in Image with id = " + image.getId());
+        } catch (NullPointerException e) {
+            throw new ImageNotFoundException("Absent path in Image with id = " + image.getId());
         }
         return Pair.of(bytes, MediaType.IMAGE_JPEG_VALUE);
     }
 
-    public void removeImageWithFile(Image image) {
+    public boolean removeImageWithFile(Image image) {
+        Path path = Path.of(image.getPath());
         try {
-            Files.deleteIfExists(Path.of(image.getPath()));
+            Files.deleteIfExists(path);
         } catch (IOException ignored) {
         }
         imageRepository.delete(image);
-    }
-
-    public void removeAllImagesOfAds(Integer idAds) {
-        List<Image> imageList = getAllByIdAds(idAds);
-        for (Image image : imageList) {
-            removeImageWithFile(image);
-        }
-    }
-
-    public List<Image> getAllByIdAds(Integer idAds) {
-        return imageRepository.findAllByIdAds(idAds);
-    }
-
-    public Image addImage(Ads ads, MultipartFile file) throws IOException {
-        Image image = imageRepository.findByIdAds(ads.getId()).orElse(null);
-        if (image != null) {
-            updateImage(ads.getId(), file);
+        if (Files.exists(path) || imageRepository.findById(image.getId()).isPresent()) {
+            return false;
         } else {
-            byte[] data = file.getBytes();
-            String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            String extension = Optional.ofNullable(file.getOriginalFilename())
-                    .map(fileName -> fileName.substring(file.getOriginalFilename().lastIndexOf('.')))
-                    .orElse("");
-            Path path = Paths.get(dirForImages).resolve("Ads_" + ads.getId() + "_" + date + extension);
-            Files.write(path, data);
-            image = new Image();
-            image.setPath(path.toString());
-            image = imageRepository.save(image);
+            return true;
         }
+    }
+
+    private Path generatePath(MultipartFile file, String nameFile) {
+        String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String extension = Optional.ofNullable(file.getOriginalFilename())
+                .map(fileName -> fileName.substring(file.getOriginalFilename().lastIndexOf('.')))
+                .orElse("");
+        return Paths.get(dirForImages).resolve(nameFile + "_" + date + extension);
+    }
+
+    public Image addImage(MultipartFile file, String nameFile) throws IOException {
+        byte[] data = file.getBytes();
+        Path path = generatePath(file, nameFile);
+        Files.write(path, data);
+        Image image = new Image();
+        image.setPath(path.toString());
+        image = imageRepository.save(image);
         return image;
     }
-
-    public String getLinkOfImageOfAds(Integer idImage) {
-        Image image = imageRepository.findById(idImage).orElseThrow(() -> new ImageNotFoundException(idImage));
-//        return pathToBackend1 + "image/" + image.getId();
-        return "/image/" + image.getId();
-    }
-
 }
