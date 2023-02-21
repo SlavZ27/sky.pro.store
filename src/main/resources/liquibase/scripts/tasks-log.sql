@@ -73,4 +73,9 @@ alter table comment
 alter table comment
     add primary key (id, id_ads);
 
+-- changeSet nadillustrator:7
+ALTER TABLE ads ADD COLUMN date_time TIMESTAMP;
+
+
+
 
