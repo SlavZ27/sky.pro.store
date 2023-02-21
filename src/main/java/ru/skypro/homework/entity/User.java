@@ -3,7 +3,9 @@ package ru.skypro.homework.entity;
 import lombok.*;
 import org.hibernate.Hibernate;
 import ru.skypro.homework.dto.Role;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -12,6 +14,7 @@ import java.util.Objects;
 @ToString
 @RequiredArgsConstructor
 @Entity
+@Table(name = "users")
 public class User {
 
     @Id
@@ -29,9 +32,6 @@ public class User {
     @Column(name = "reg_date")
     private LocalDate regDate;
     @OneToOne
-    @JoinColumn(name = "id_city")
-    private City city;
-    @OneToOne
     @JoinColumn(name = "id_avatar")
     private Avatar avatar;
     @Column(name = "password")
@@ -39,7 +39,28 @@ public class User {
     @Column(name = "username")
     private String username;
     @Column(name = "role")
+    @Enumerated(EnumType.STRING)
     private Role role;
+
+    public User(String email,
+                String firstName,
+                String lastName,
+                String phone,
+                LocalDate regDate,
+                Avatar avatar,
+                String password,
+                String username,
+                Role role) {
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phone = phone;
+        this.regDate = regDate;
+        this.avatar = avatar;
+        this.password = password;
+        this.username = username;
+        this.role = role;
+    }
 
     @Override
     public boolean equals(Object o) {

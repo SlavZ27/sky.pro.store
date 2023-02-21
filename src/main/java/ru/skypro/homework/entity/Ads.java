@@ -3,7 +3,7 @@ package ru.skypro.homework.entity;
 import lombok.*;
 import org.hibernate.Hibernate;
 import javax.persistence.*;
-import java.util.List;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Getter
@@ -24,10 +24,21 @@ public class Ads {
     private Integer price;
     @Column(name = "title")
     private String title;
-    @OneToMany(mappedBy="ads", fetch=FetchType.EAGER)
-    private List<Image> images;
+    @OneToOne
+    @JoinColumn(name = "id_image")
+    private Image image;
     @Column(name = "description")
     private String description;
+    @Column(name = "date_time")
+    private LocalDateTime dateTime; // yyyy-MM-dd HH:mm
+
+    public Ads(User author, Integer price, String title, Image image, String description) {
+        this.author = author;
+        this.price = price;
+        this.title = title;
+        this.image = image;
+        this.description = description;
+    }
 
     @Override
     public boolean equals(Object o) {

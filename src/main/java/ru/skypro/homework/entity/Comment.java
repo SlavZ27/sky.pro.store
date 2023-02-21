@@ -2,6 +2,7 @@ package ru.skypro.homework.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -20,10 +21,20 @@ public class Comment {
     @OneToOne
     @JoinColumn(name = "id_author")
     private User author;
+    @OneToOne
+    @JoinColumn(name = "id_ads")
+    private Ads ads;
     @Column(name = "text")
     private String text;
     @Column(name = "date_time")
-    private LocalDateTime dateTime;
+    private LocalDateTime dateTime; // yyyy-MM-dd HH:mm
+
+    public Comment(User author, Ads ads, String text, LocalDateTime dateTime) {
+        this.author = author;
+        this.ads = ads;
+        this.text = text;
+        this.dateTime = dateTime;
+    }
 
     @Override
     public boolean equals(Object o) {

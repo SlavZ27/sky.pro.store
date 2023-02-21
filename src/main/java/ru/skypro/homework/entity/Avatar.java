@@ -2,7 +2,9 @@ package ru.skypro.homework.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Getter
@@ -11,16 +13,16 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Entity
 public class Avatar {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
-    @OneToOne
-    @JoinColumn(name = "id_author")
-    private User author;
     @Column(name = "path")
     private String path;
+
+    public Avatar(String path) {
+        this.path = path;
+    }
 
     @Override
     public boolean equals(Object o) {

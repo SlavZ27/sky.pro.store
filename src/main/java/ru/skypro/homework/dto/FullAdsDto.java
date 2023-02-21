@@ -31,7 +31,7 @@ public class FullAdsDto {
 
   @JsonProperty("image")
   @Valid
-  private List<String> image = null;
+  private String image = null;
 
   @JsonProperty("phone")
   private String phone = null;
@@ -121,30 +121,11 @@ public class FullAdsDto {
     this.email = email;
   }
 
-  public FullAdsDto image(List<String> image) {
-    this.image = image;
-    return this;
-  }
-
-  public FullAdsDto addImageItem(String imageItem) {
-    if (this.image == null) {
-      this.image = new ArrayList<String>();
-    }
-    this.image.add(imageItem);
-    return this;
-  }
-
-  /**
-   * Get image
-   * @return image
-   **/
-  @Schema(description = "")
-  
-    public List<String> getImage() {
+  public String getImage() {
     return image;
   }
 
-  public void setImage(List<String> image) {
+  public void setImage(String image) {
     this.image = image;
   }
 

@@ -16,11 +16,12 @@ public class Image {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
-    @ManyToOne
-    @JoinColumn(name = "id_ads")
-    private Ads ads;
     @Column(name = "path")
     private String path;
+
+    public Image(String path) {
+        this.path = path;
+    }
 
     @Override
     public boolean equals(Object o) {

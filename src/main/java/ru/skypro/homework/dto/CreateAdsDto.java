@@ -15,13 +15,13 @@ import javax.validation.constraints.*;
 
 public class CreateAdsDto {
   @JsonProperty("description")
-  private String description = null;
+  private String description;
 
   @JsonProperty("price")
-  private Integer price = null;
+  private Integer price;
 
   @JsonProperty("title")
-  private String title = null;
+  private String title;
 
   public CreateAdsDto description(String description) {
     this.description = description;

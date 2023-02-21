@@ -22,7 +22,7 @@ public class AdsDto {
 
   @JsonProperty("image")
   @Valid
-  private List<String> image = null;
+  private String image;
 
   @JsonProperty("pk")
   private Integer pk = null;
@@ -52,30 +52,11 @@ public class AdsDto {
     this.author = author;
   }
 
-  public AdsDto image(List<String> image) {
-    this.image = image;
-    return this;
-  }
-
-  public AdsDto addImageItem(String imageItem) {
-    if (this.image == null) {
-      this.image = new ArrayList<String>();
-    }
-    this.image.add(imageItem);
-    return this;
-  }
-
-  /**
-   * Get image
-   * @return image
-   **/
-  @Schema(description = "")
-  
-    public List<String> getImage() {
+  public String getImage() {
     return image;
   }
 
-  public void setImage(List<String> image) {
+  public void setImage(String image) {
     this.image = image;
   }
 
