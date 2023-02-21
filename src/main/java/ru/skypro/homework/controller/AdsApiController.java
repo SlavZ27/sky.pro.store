@@ -207,7 +207,7 @@ public class AdsApiController {
     @PatchMapping(value = "{idAds}/image",
             produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE},
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<byte[]> updateImage(Integer idAds, MultipartFile image) throws IOException {
+    public ResponseEntity<byte[]> updateImage(@PathVariable Integer idAds, MultipartFile image) throws IOException {
         Pair<byte[], String> pair = adsServiceImpl.updateImageOfAds(idAds, image);
         return read(pair);
     }
@@ -220,7 +220,7 @@ public class AdsApiController {
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @GetMapping(value = "{idAds}/image",
             produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
-    public ResponseEntity<byte[]> getImage(Integer idAds) {
+    public ResponseEntity<byte[]> getImage(@PathVariable Integer idAds) {
         Pair<byte[], String> pair = adsServiceImpl.getImage(idAds);
         return read(pair);
     }

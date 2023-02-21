@@ -58,8 +58,16 @@ public class CommentServiceImpl {
         return commentRepository.save(comment);
     }
 
-    public List<Comment> listComment(Integer adsId) {
-        return commentRepository.findAllByIdAds(adsId);
+    public List<Comment> getAllByIdAds(Integer idAds) {
+        return commentRepository.findAllByIdAds(idAds);
+    }
+
+    public List<Comment> getAllByIdAdsAndSortDateTime(Integer adsId) {
+        return commentRepository.findAllByIdAdsAndSortDateTime(adsId);
+    }
+
+    public Comment getCommentOfAds(Integer adsId, Integer commentId) {
+        return commentRepository.findAllByIdAndAdsId(adsId, commentId).orElseThrow(() -> new CommentNotFoundException(commentId));
     }
 
     public void removeComment(Comment comment) {
@@ -67,23 +75,13 @@ public class CommentServiceImpl {
     }
 
     public void removeAllCommentsOfAds(Integer idAds) {
-        List<Comment> commentList = getAllByIdAds(idAds);
-        for (Comment comment : commentList) {
-            removeComment(comment);
-        }
+        commentRepository.deleteAllByAdsId(idAds);
     }
 
     public void removeCommentForAds(Integer adPk, Integer commentId) {
-        Comment comment = commentRepository.findAllByIdAndAdsId(adPk, commentId).orElseThrow(() -> new CommentNotFoundException(commentId));
+        Comment comment = commentRepository.findAllByIdAndAdsId(adPk, commentId).orElseThrow(() ->
+                new CommentNotFoundException(commentId));
         removeComment(comment);
-    }
-
-    public List<Comment> getAllByIdAds(Integer idAds) {
-        return commentRepository.findAllByIdAds(idAds);
-    }
-
-    public Comment getCommentOfAds(Integer adsId, Integer commentId) {
-        return commentRepository.findAllByIdAndAdsId(adsId, commentId).orElseThrow(() -> new CommentNotFoundException(commentId));
     }
 
 }
