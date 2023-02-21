@@ -32,10 +32,5 @@ public abstract class AdsMapper {
     @Mapping(target = "results", source = "list")
     public abstract ResponseWrapperAdsDto mapToResponseWrapperAdsDto(List<AdsDto> list, Integer count);
 
-    ResponseWrapperAdsDto map(List<AdsDto> list) {
-        return mapToResponseWrapperAdsDto(list, list.size());
-    }
-
-
     public abstract List<AdsDto> mapListOfAdsToListDTO(List<Ads> listAds);
 }
