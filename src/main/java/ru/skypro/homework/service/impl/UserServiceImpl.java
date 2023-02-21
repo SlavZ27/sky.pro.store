@@ -15,6 +15,7 @@ import ru.skypro.homework.entity.Avatar;
 import ru.skypro.homework.entity.Image;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.AvatarNotFoundException;
+import ru.skypro.homework.exception.UserNotFoundException;
 import ru.skypro.homework.mapper.UserMapper;
 import ru.skypro.homework.repository.UsersRepository;
 
@@ -88,8 +89,7 @@ public class UserServiceImpl {
         return new ResponseEntity<Void>(HttpStatus.OK);
     }
 
-    public Pair<byte[], String> getAvatarData() {
-        User user = getDefaultUser();
+    private Pair<byte[], String> getAvatarDataOfUser(User user) {
         if (user.getAvatar() != null) {
             return avatarService.getAvatarData(user.getAvatar());
         } else {
@@ -123,5 +123,15 @@ public class UserServiceImpl {
             Random random = new Random();
             return userList.get(random.nextInt(userList.size()));
         }
+    }
+
+    public Pair<byte[], String> getAvatarOfUser(Integer idUser) {
+        User user = usersRepository.findById(idUser).orElseThrow(() ->
+                new UserNotFoundException(idUser));
+        return getAvatarDataOfUser(user);
+    }
+
+    public Pair<byte[], String> getAvatarMe() {
+        return getAvatarDataOfUser(getDefaultUser());
     }
 }

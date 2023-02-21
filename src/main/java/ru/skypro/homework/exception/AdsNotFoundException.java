@@ -9,7 +9,7 @@ public class AdsNotFoundException extends NotFoundException {
     public AdsNotFoundException (Integer id) {
         super("Ads with id: " + id + " not found");
     }
-    public AdsNotFoundException (String id) {
-        super("Ads with id: " + id + " not found");
+    public AdsNotFoundException (String message) {
+        super(message);
     }
 }

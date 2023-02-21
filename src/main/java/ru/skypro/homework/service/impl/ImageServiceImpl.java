@@ -103,14 +103,4 @@ public class ImageServiceImpl {
         image = imageRepository.save(image);
         return image;
     }
-
-    public String getLinkOfImage(Image image) {
-        if (image == null || image.getId() == null) {
-            return null;
-        }
-        imageRepository.findById(image.getId()).orElseThrow(
-                () -> new ImageNotFoundException(image.getId()));
-            return "/image/" + image.getId();
-    }
-
 }

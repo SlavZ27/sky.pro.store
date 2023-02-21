@@ -2,6 +2,7 @@ package ru.skypro.homework.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import ru.skypro.homework.entity.Ads;
 import ru.skypro.homework.entity.Image;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.AdsNotFoundException;
+import ru.skypro.homework.exception.ImageNotFoundException;
 import ru.skypro.homework.mapper.CreateAdsMapper;
 import ru.skypro.homework.mapper.FullAdsMapper;
 import ru.skypro.homework.repository.AdsRepository;
@@ -45,11 +47,9 @@ public class AdsServiceImpl {
             log.error("There is not ads with id = " + adsId);
             return new AdsNotFoundException(adsId);
         });
-
         oldAds.setDescription(createAdsDto.getDescription());
         oldAds.setPrice(createAdsDto.getPrice());
         oldAds.setTitle(createAdsDto.getTitle());
-
         return adsMapper.adsToAdsDto(adsRepository.save(oldAds));
     }
 
@@ -60,9 +60,7 @@ public class AdsServiceImpl {
             return new AdsNotFoundException(adsId);
         });
         commentDto.setAuthor(userService.getRandomUser().getId());
-
         Comment comment = commentMapper.dtoToComment(commentDto);
-
         return commentMapper.commentToDto(commentService.addCommentsToAds(adsId, comment));
     }
 
@@ -128,11 +126,37 @@ public class AdsServiceImpl {
     }
 
     public ResponseEntity<Void> removeCommentsForAds(Integer adPk, Integer commentId) {
-        Ads oldAds = adsRepository.findById(adPk).orElseThrow(() -> {
+        adsRepository.findById(adPk).orElseThrow(() -> {
             log.error("There is not ads with id = " + adPk);
             return new AdsNotFoundException(adPk);
         });
         commentService.removeCommentForAds(adPk, commentId);
         return new ResponseEntity<Void>(HttpStatus.OK);
+    }
+
+    public Pair<byte[], String> updateImageOfAds(Integer idAds, MultipartFile image) throws IOException {
+        Ads ads = adsRepository.findById(idAds).orElseThrow(() -> {
+            log.error("There is not ads with id = " + idAds);
+            return new AdsNotFoundException(idAds);
+        });
+        if (ads.getImage() == null) {
+            ads.setImage(imageService.addImage(image, ads.getId().toString()));
+        } else {
+            ads.setImage(imageService.updateImage(ads.getImage(), image, ads.getId().toString()));
+        }
+        ads = adsRepository.save(ads);
+        return imageService.getImageData(ads.getImage());
+    }
+
+    public Pair<byte[], String> getImage(Integer idAds) {
+        Ads ads = adsRepository.findById(idAds).orElseThrow(() -> {
+            log.error("There is not ads with id = " + idAds);
+            return new AdsNotFoundException(idAds);
+        });
+        if (ads.getImage() == null) {
+            throw new ImageNotFoundException("Image for ads with id = " + ads.getId() + " is absent");
+        } else {
+            return imageService.getImageData(ads.getImage());
+        }
     }
 }
