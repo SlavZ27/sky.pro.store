@@ -26,7 +26,7 @@ public class AvatarServiceImpl {
     private final AvatarRepository avatarRepository;
 
     public AvatarServiceImpl(
-            @Value("${path.to.materials.folder}") String dirForImages,
+            @Value("${path.to.avatars.folder}") String dirForImages,
             AvatarRepository avatarRepository) {
         this.dirForAvatars = dirForImages;
         this.avatarRepository = avatarRepository;
@@ -87,7 +87,7 @@ public class AvatarServiceImpl {
     }
 
     private Path generatePath(MultipartFile file, String nameFile) {
-        String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String date = LocalDate.now().toString();
         String extension = Optional.ofNullable(file.getOriginalFilename())
                 .map(fileName -> fileName.substring(file.getOriginalFilename().lastIndexOf('.')))
                 .orElse("");

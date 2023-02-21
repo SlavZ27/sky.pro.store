@@ -25,7 +25,10 @@ import ru.skypro.homework.mapper.AdsMapper;
 import ru.skypro.homework.mapper.CommentMapper;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -65,19 +68,20 @@ public class AdsServiceImpl {
     }
 
     public CommentDto updateCommentsForAds(Integer adPk, Integer commentId, CommentDto commentDto) {
-        Ads oldAds = adsRepository.findById(adPk).orElseThrow(() -> {
+        Ads ads = adsRepository.findById(adPk).orElseThrow(() -> {
             log.error("There is not ads with id = " + adPk);
             return new AdsNotFoundException(adPk);
         });
-        return commentMapper.commentToDto(commentService.updateCommentsForAds(commentDto, adPk, commentId));
+        return commentMapper.commentToDto(commentService.updateCommentsForAds(commentDto, ads.getId(), commentId));
     }
 
     public ResponseWrapperCommentDto getCommentsOfAds(Integer adsId) {
-        Ads oldAds = adsRepository.findById(adsId).orElseThrow(() -> {
+        Ads ads = adsRepository.findById(adsId).orElseThrow(() -> {
             log.error("There is not ads with id = " + adsId);
             return new AdsNotFoundException(adsId);
         });
-        List<CommentDto> commentList = commentMapper.mapListOfCommentToListDto(commentService.listComment(adsId));
+        List<CommentDto> commentList = commentMapper.mapListOfCommentToListDto(
+                commentService.getAllByIdAdsAndSortDateTime(ads.getId()));
         return commentMapper.mapListOfCommentDtoToResponseWrapper(commentList.size(), commentList);
     }
 
@@ -97,17 +101,18 @@ public class AdsServiceImpl {
     }
 
     public CommentDto getCommentOfAds(Integer adsId, Integer commentId) {
-        Ads oldAds = adsRepository.findById(adsId).orElseThrow(() -> {
+        Ads ads = adsRepository.findById(adsId).orElseThrow(() -> {
             log.error("There is not ads with id = " + adsId);
             return new AdsNotFoundException(adsId);
         });
-        return commentMapper.commentToDto(commentService.getCommentOfAds(adsId, commentId));
+        return commentMapper.commentToDto(commentService.getCommentOfAds(ads.getId(), commentId));
     }
 
     public AdsDto addAds(CreateAdsDto createAdsDto, MultipartFile image) throws IOException {
         User user = userService.getDefaultUser();
         Ads ads = createAdsMapper.createAdsDtoToAds(createAdsDto);
         ads.setAuthor(user);
+        ads.setDateTime(LocalDateTime.now());
         ads = adsRepository.save(ads);
         Image addedImage = imageService.addImage(image, "ads_" + ads.getId().toString());
         ads.setImage(addedImage);
@@ -120,7 +125,14 @@ public class AdsServiceImpl {
     }
 
     public ResponseWrapperAdsDto getALLAds() {
-        List<Ads> list = adsRepository.findAll();
+        List<Ads> list = adsRepository.findAllAndSortDateTime();
+        List<AdsDto> listDto = adsMapper.mapListOfAdsToListDTO(list);
+        return adsMapper.mapToResponseWrapperAdsDto(listDto, listDto.size());
+    }
+
+    public ResponseWrapperAdsDto getALLAdsOfMe() {
+        User user = userService.getDefaultUser();
+        List<Ads> list = adsRepository.findAllByUserIdAndSortDateTime(user.getId());
         List<AdsDto> listDto = adsMapper.mapListOfAdsToListDTO(list);
         return adsMapper.mapToResponseWrapperAdsDto(listDto, listDto.size());
     }
@@ -134,15 +146,19 @@ public class AdsServiceImpl {
         return new ResponseEntity<Void>(HttpStatus.OK);
     }
 
+    private String getNameFileForImage(Ads ads) {
+        return "ads_" + ads.getId();
+    }
+
     public Pair<byte[], String> updateImageOfAds(Integer idAds, MultipartFile image) throws IOException {
         Ads ads = adsRepository.findById(idAds).orElseThrow(() -> {
             log.error("There is not ads with id = " + idAds);
             return new AdsNotFoundException(idAds);
         });
         if (ads.getImage() == null) {
-            ads.setImage(imageService.addImage(image, ads.getId().toString()));
+            ads.setImage(imageService.addImage(image, getNameFileForImage(ads)));
         } else {
-            ads.setImage(imageService.updateImage(ads.getImage(), image, ads.getId().toString()));
+            ads.setImage(imageService.updateImage(ads.getImage(), image, getNameFileForImage(ads)));
         }
         ads = adsRepository.save(ads);
         return imageService.getImageData(ads.getImage());

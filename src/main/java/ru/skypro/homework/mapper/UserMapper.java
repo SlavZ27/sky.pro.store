@@ -32,6 +32,10 @@ public abstract class UserMapper {
     public abstract User userDtoToUser(UserDto userDto);
 
     String mapImageToString(User user) {
-        return "/user/" + user.getId() + "/image";
+        if (user.getAvatar() == null || user.getAvatar().getId() == null) {
+            return null;
+        } else {
+            return "/users/" + user.getId() + "/image";
+        }
     }
 }

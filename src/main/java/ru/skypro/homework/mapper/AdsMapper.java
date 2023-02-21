@@ -26,7 +26,11 @@ public abstract class AdsMapper {
     public abstract AdsDto adsToAdsDto(Ads ads);
 
     String mapImageToString(Ads ads) {
-        return "/ads/" + ads.getId() + "/image/";
+        if (ads.getImage() == null || ads.getImage().getId() == null) {
+            return null;
+        } else {
+            return "/ads/" + ads.getId() + "/image/";
+        }
     }
 
     @Mapping(target = "results", source = "list")

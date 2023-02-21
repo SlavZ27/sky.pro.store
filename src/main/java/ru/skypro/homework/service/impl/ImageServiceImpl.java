@@ -87,7 +87,7 @@ public class ImageServiceImpl {
     }
 
     private Path generatePath(MultipartFile file, String nameFile) {
-        String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String date = LocalDate.now().toString();
         String extension = Optional.ofNullable(file.getOriginalFilename())
                 .map(fileName -> fileName.substring(file.getOriginalFilename().lastIndexOf('.')))
                 .orElse("");

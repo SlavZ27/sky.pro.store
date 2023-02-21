@@ -39,7 +39,7 @@ public class UserServiceImpl {
     private final UserMapper userMapper;
 
     public User getDefaultUser() {
-        return usersRepository.findByFirstNameAndLastName("Default", "User").orElseThrow(() ->
+        return usersRepository.findByUsernameAndPas("user@gmail.com", "password").orElseThrow(() ->
                 new UsernameNotFoundException("Default User"));
     }
 
@@ -78,12 +78,16 @@ public class UserServiceImpl {
         return userMapper.userToDto(oldUser);
     }
 
+    private String getNameFileForAvatar(User user) {
+        return "user_" + user.getId();
+    }
+
     public ResponseEntity<Void> updateUserImage(MultipartFile image) throws IOException {
         User user = getDefaultUser();
         if (user.getAvatar() == null) {
-            user.setAvatar(avatarService.addAvatar(image, user.getId().toString()));
+            user.setAvatar(avatarService.addAvatar(image, getNameFileForAvatar(user)));
         } else {
-            user.setAvatar(avatarService.updateAvatar(user.getAvatar(), image, user.getId().toString()));
+            user.setAvatar(avatarService.updateAvatar(user.getAvatar(), image, getNameFileForAvatar(user)));
         }
         usersRepository.save(user);
         return new ResponseEntity<Void>(HttpStatus.OK);
@@ -110,6 +114,7 @@ public class UserServiceImpl {
             user.setLastName("User");
             user.setRegDate(LocalDate.now());
             user.setRole(Role.ADMIN);
+            user.setUsername("user@gmail.com");
             user.setPassword("password");
             usersRepository.save(user);
         }
