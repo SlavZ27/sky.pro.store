@@ -3,6 +3,7 @@ package ru.skypro.homework.entity;
 import lombok.*;
 import org.hibernate.Hibernate;
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Getter
@@ -28,6 +29,8 @@ public class Ads {
     private Image image;
     @Column(name = "description")
     private String description;
+    @Column(name = "date_time")
+    private LocalDateTime dateTime; // yyyy-MM-dd HH:mm
 
     public Ads(User author, Integer price, String title, Image image, String description) {
         this.author = author;
