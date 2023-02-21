@@ -27,6 +27,10 @@ public abstract class FullAdsMapper {
     public abstract FullAdsDto adsToFullAdsDto(Ads ads);
 
     String mapImageToString(Ads ads) {
-        return "/ads/" + ads.getId() + "/image/";
+        if (ads.getImage() == null || ads.getImage().getId() == null) {
+            return null;
+        } else {
+            return "/ads/" + ads.getId() + "/image/";
+        }
     }
 }

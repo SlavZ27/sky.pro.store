@@ -15,6 +15,11 @@ public interface AdsRepository extends JpaRepository<Ads, Integer> {
             , nativeQuery = true)
     List<Ads> findAllAndSortDateTime();
 
-    @Query("select a from Ads a where a.title like %:title%")
+    @Query(value = "select a from Ads a where a.title like '%:title%' order by date_time",
+            nativeQuery = true)
     List<Ads> findByTitleLike(String title);
+
+    @Query(value = "select * from ads where id_author=:idAuthor order by date_time"
+            , nativeQuery = true)
+    List<Ads> findAllByUserIdAndSortDateTime(Integer idAuthor);
 }

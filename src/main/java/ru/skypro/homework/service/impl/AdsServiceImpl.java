@@ -25,6 +25,7 @@ import ru.skypro.homework.mapper.AdsMapper;
 import ru.skypro.homework.mapper.CommentMapper;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -111,6 +112,7 @@ public class AdsServiceImpl {
         User user = userService.getDefaultUser();
         Ads ads = createAdsMapper.createAdsDtoToAds(createAdsDto);
         ads.setAuthor(user);
+        ads.setDateTime(LocalDateTime.now());
         ads = adsRepository.save(ads);
         Image addedImage = imageService.addImage(image, "ads_" + ads.getId().toString());
         ads.setImage(addedImage);
@@ -128,6 +130,13 @@ public class AdsServiceImpl {
         return adsMapper.mapToResponseWrapperAdsDto(listDto, listDto.size());
     }
 
+    public ResponseWrapperAdsDto getALLAdsOfMe() {
+        User user = userService.getDefaultUser();
+        List<Ads> list = adsRepository.findAllByUserIdAndSortDateTime(user.getId());
+        List<AdsDto> listDto = adsMapper.mapListOfAdsToListDTO(list);
+        return adsMapper.mapToResponseWrapperAdsDto(listDto, listDto.size());
+    }
+
     public ResponseEntity<Void> removeCommentsForAds(Integer adPk, Integer commentId) {
         adsRepository.findById(adPk).orElseThrow(() -> {
             log.error("There is not ads with id = " + adPk);
@@ -137,15 +146,19 @@ public class AdsServiceImpl {
         return new ResponseEntity<Void>(HttpStatus.OK);
     }
 
+    private String getNameFileForImage(Ads ads) {
+        return "user_" + ads.getId();
+    }
+
     public Pair<byte[], String> updateImageOfAds(Integer idAds, MultipartFile image) throws IOException {
         Ads ads = adsRepository.findById(idAds).orElseThrow(() -> {
             log.error("There is not ads with id = " + idAds);
             return new AdsNotFoundException(idAds);
         });
         if (ads.getImage() == null) {
-            ads.setImage(imageService.addImage(image, ads.getId().toString()));
+            ads.setImage(imageService.addImage(image, getNameFileForImage(ads)));
         } else {
-            ads.setImage(imageService.updateImage(ads.getImage(), image, ads.getId().toString()));
+            ads.setImage(imageService.updateImage(ads.getImage(), image, getNameFileForImage(ads)));
         }
         ads = adsRepository.save(ads);
         return imageService.getImageData(ads.getImage());
