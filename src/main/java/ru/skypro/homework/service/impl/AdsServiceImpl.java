@@ -147,7 +147,7 @@ public class AdsServiceImpl {
     }
 
     private String getNameFileForImage(Ads ads) {
-        return "user_" + ads.getId();
+        return "ads_" + ads.getId();
     }
 
     public Pair<byte[], String> updateImageOfAds(Integer idAds, MultipartFile image) throws IOException {
