@@ -159,4 +159,10 @@ public class AdsServiceImpl {
             return imageService.getImageData(ads.getImage());
         }
     }
+
+    public ResponseWrapperAdsDto findAdsByTitle(String title) {
+        List<Ads> list = adsRepository.findByTitleLike(title);
+        List<AdsDto> listDto = adsMapper.mapListOfAdsToListDTO(list);
+        return adsMapper.mapToResponseWrapperAdsDto(listDto, listDto.size());
+    }
 }

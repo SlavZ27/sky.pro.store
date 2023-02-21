@@ -1,5 +1,6 @@
 package ru.skypro.homework.controller;
 
+import antlr.collections.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -230,5 +232,10 @@ public class AdsApiController {
                 .contentLength(pair.getFirst().length)
                 .contentType(MediaType.parseMediaType(pair.getSecond()))
                 .body(pair.getFirst());
+    }
+
+    @GetMapping(value = "/by-title", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<ResponseWrapperAdsDto> findByTitleLike(@Param("title") String title) {
+        return ResponseEntity.ok(adsServiceImpl.findAdsByTitle(title));
     }
 }
