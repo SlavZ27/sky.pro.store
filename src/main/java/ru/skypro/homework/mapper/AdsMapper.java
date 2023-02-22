@@ -3,16 +3,11 @@ package ru.skypro.homework.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.springframework.beans.factory.annotation.Autowired;
 import ru.skypro.homework.dto.AdsDto;
 import ru.skypro.homework.dto.ResponseWrapperAdsDto;
 import ru.skypro.homework.entity.Ads;
-import ru.skypro.homework.entity.Image;
-import ru.skypro.homework.service.impl.AdsServiceImpl;
-import ru.skypro.homework.service.impl.ImageServiceImpl;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public abstract class AdsMapper {
