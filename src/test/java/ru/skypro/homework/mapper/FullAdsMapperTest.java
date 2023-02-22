@@ -24,7 +24,7 @@ public class FullAdsMapperTest {
         ads.setDescription("Description");
 
         User user = new User();
-        user.setId(111);
+        user.setId(222);
         user.setEmail("some@mail.com");
         user.setFirstName("Vasya");
         user.setLastName("Vasin");
@@ -32,14 +32,9 @@ public class FullAdsMapperTest {
         ads.setAuthor(user);
 
         Image image = new Image();
-        Image image1 = new Image();
+        image.setId(333);
         image.setPath("/some/path/image.png");
-        image1.setPath("/some/path/image1.png");
-
-        List<Image> images = new ArrayList<>();
-        images.add(image);
-        images.add(image1);
-//        ads.setImages(images);
+        ads.setImage(image);
 
         FullAdsDto fullAdsDto = fullAdsMapper.adsToFullAdsDto(ads);
 
@@ -50,10 +45,6 @@ public class FullAdsMapperTest {
         assertEquals(fullAdsDto.getAuthorFirstName(), "Vasya");
         assertEquals(fullAdsDto.getAuthorLastName(), "Vasin");
         assertEquals(fullAdsDto.getPhone(), "+79990001122");
-
-        List<String> stringList = new ArrayList<>();
-        stringList.add("/some/path/image.png");
-        stringList.add("/some/path/image1.png");
-        assertEquals(fullAdsDto.getImage(), stringList);
+        assertEquals(fullAdsDto.getImage(), "/ads/111/image/");
     }
 }

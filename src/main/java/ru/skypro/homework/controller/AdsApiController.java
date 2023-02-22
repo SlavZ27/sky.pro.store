@@ -46,6 +46,7 @@ public class AdsApiController {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ResponseWrapperAdsDto.class)))})
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+    //      GET http://localhost:8080/ads/
     public ResponseEntity<ResponseWrapperAdsDto> getALLAds() {
         return ResponseEntity.ok(adsServiceImpl.getALLAds());
     }
@@ -59,8 +60,8 @@ public class AdsApiController {
             @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    //      POST http://localhost:8080/ads/
     public ResponseEntity<AdsDto> addAds(
             @Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema())
             @RequestPart(value = "properties", required = false) CreateAdsDto properties,
@@ -77,6 +78,7 @@ public class AdsApiController {
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @GetMapping(value = "/{ad_pk}/comments",
             produces = {MediaType.APPLICATION_JSON_VALUE})
+    //      GET http://localhost:8080/ads/{ad_pk}/comments
     public ResponseEntity<ResponseWrapperCommentDto> getComments(
             @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema())
             @PathVariable("ad_pk") Integer adPk) {
@@ -110,6 +112,7 @@ public class AdsApiController {
                             schema = @Schema(implementation = FullAdsDto.class))),
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @GetMapping(value = "{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
+    //      GET http://localhost:8080/ads/{ad_pk}
     public ResponseEntity<FullAdsDto> getAds(@PathVariable("id") Integer idAds) {
         return ResponseEntity.ok(adsServiceImpl.getAds(idAds));
     }
@@ -150,7 +153,7 @@ public class AdsApiController {
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @GetMapping(value = "/{ad_pk}/comments/{id}",
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    //      http://localhost/ads/2/comments/4
+    //      http://localhost:8080/ads/2/comments/4
     public ResponseEntity<CommentDto> getComments(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("ad_pk") Integer adPk, @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("id") Integer id) {
         return ResponseEntity.ok(adsServiceImpl.getCommentOfAds(adPk, id));
     }
@@ -197,6 +200,7 @@ public class AdsApiController {
             @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @GetMapping(value = "/me", produces = {MediaType.APPLICATION_JSON_VALUE})
+    //      http://localhost:8080/ads/me
     public ResponseEntity<ResponseWrapperAdsDto> getAdsMeUsingGET() {
         return ResponseEntity.ok(adsServiceImpl.getALLAdsOfMe());
     }

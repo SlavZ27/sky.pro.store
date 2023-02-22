@@ -7,7 +7,7 @@ import ru.skypro.homework.dto.CommentDto;
 import ru.skypro.homework.dto.ResponseWrapperCommentDto;
 import ru.skypro.homework.entity.Comment;
 import ru.skypro.homework.entity.User;
-import ru.skypro.homework.exception.AuthorNotFoundException;
+import ru.skypro.homework.exception.UserNotFoundException;
 import ru.skypro.homework.repository.UsersRepository;
 
 import java.util.List;
@@ -32,24 +32,20 @@ public abstract class CommentMapper {
 
     User dtoToUser(CommentDto commentDto) {
         if (commentDto == null || commentDto.getAuthor() == null) {
-            throw new IllegalArgumentException();
+            throw new NullPointerException();
         }
 
         User author = null;
         if (commentDto.getAuthor() != null) {
             author = usersRepository
                     .findById(commentDto.getAuthor())
-                    .orElseThrow(() -> new AuthorNotFoundException(String.valueOf(commentDto.getAuthor())));
+                    .orElseThrow(() -> new UserNotFoundException(String.valueOf(commentDto.getAuthor())));
         }
         return author;
     }
 
     @Mapping(target = "results", source = "commentDtoList")
     public abstract ResponseWrapperCommentDto mapListOfCommentDtoToResponseWrapper(Integer count, List<CommentDto> commentDtoList);
-
-    ResponseWrapperCommentDto mapListToWrapper(List<CommentDto> commentDtoList) {
-        return mapListOfCommentDtoToResponseWrapper(commentDtoList.size(), commentDtoList);
-    }
 
     public abstract List<CommentDto> mapListOfCommentToListDto(List<Comment> commentList);
 

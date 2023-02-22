@@ -1,6 +1,7 @@
 package ru.skypro.homework.controller;
 
 import org.aspectj.lang.annotation.Before;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,12 +17,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
 import ru.skypro.homework.Generator;
-import ru.skypro.homework.dto.AdsDto;
-import ru.skypro.homework.dto.CommentDto;
-import ru.skypro.homework.dto.CreateAdsDto;
+import ru.skypro.homework.dto.*;
 import ru.skypro.homework.entity.*;
 import ru.skypro.homework.mapper.AdsMapper;
 import ru.skypro.homework.mapper.CommentMapper;
+import ru.skypro.homework.mapper.FullAdsMapper;
 import ru.skypro.homework.repository.*;
 
 import java.io.IOException;
@@ -43,7 +43,7 @@ class AdsApiControllerTest {
     @LocalServerPort
     private int port;
     private final static String REQUEST_MAPPING_STRING = "ads";
-    private final static String REQUEST_MAPPING_STRING_COMMENT = "comment";
+    private final static String REQUEST_MAPPING_STRING_COMMENT = "comments";
     private final static String REQUEST_MAPPING_STRING_IMAGE = "image";
     private final String dirForImages;
     private final String dirForAvatars;
@@ -63,6 +63,8 @@ class AdsApiControllerTest {
     private TestRestTemplate testRestTemplate;
     @Autowired
     private AdsMapper adsMapper;
+    @Autowired
+    private FullAdsMapper fullAdsMapper;
     @Autowired
     private CommentMapper commentMapper;
     private final Generator generator = new Generator();
@@ -287,4 +289,152 @@ class AdsApiControllerTest {
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
+    @Test
+    void getALLAdsTest() {
+        //http://localhost:8080/ads/
+        List<Ads> adsList = adsRepository.findAll();
+        List<AdsDto> adsDtoList = adsList.stream()
+                .map(ads -> adsMapper.adsToAdsDto(ads))
+                .collect(Collectors.toList());
+
+        ResponseEntity<ResponseWrapperAdsDto> result = testRestTemplate.exchange(
+                "http://localhost:" + port + "/" + REQUEST_MAPPING_STRING,
+                HttpMethod.GET,
+                null,
+                ResponseWrapperAdsDto.class);
+
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(result.getBody().getCount()).isEqualTo(adsList.size());
+        Assertions.assertThat(result.getBody().getResults())
+                .usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                .isEqualTo(adsDtoList);
+    }
+
+    @Test
+    void getCommentsTest() {
+//      GET http://localhost:8080/ads/{ad_pk}/comments
+//      actualAds With comment
+        Ads ads = adsRepository.findAll().stream()
+                .filter(ads1 -> commentRepository.findAll().stream()
+                        .anyMatch(comment -> comment.getAds().getId().equals(ads1.getId())))
+                .findAny().orElse(null);
+        assert ads != null;
+
+        List<Comment> commentList = commentRepository.findAll().stream()
+                .filter(comment -> comment.getAds().getId().equals(ads.getId()))
+                .collect(Collectors.toList());
+        List<CommentDto> commentDtos = commentList.stream()
+                .map(ads1 -> commentMapper.commentToDto(ads1))
+                .collect(Collectors.toList());
+
+        ResponseEntity<ResponseWrapperCommentDto> result = testRestTemplate.exchange(
+                "http://localhost:" + port + "/" +
+                        REQUEST_MAPPING_STRING + "/" + ads.getId() + "/" +
+                        REQUEST_MAPPING_STRING_COMMENT
+                ,
+                HttpMethod.GET,
+                null,
+                ResponseWrapperCommentDto.class);
+
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(result.getBody().getCount()).isEqualTo(commentDtos.size());
+        Assertions.assertThat(result.getBody().getResults())
+                .usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                .isEqualTo(commentDtos);
+    }
+
+    @Test
+    void getCommentsNegativeTest() {
+//      GET http://localhost:8080/ads/{ad_pk}/comments
+        //      get idAds non-exist
+        int idAds = random.nextInt();
+        while (adsRepository.findById(idAds).isPresent()) {
+            idAds = random.nextInt();
+        }
+
+        ResponseEntity<ResponseWrapperCommentDto> result = testRestTemplate.exchange(
+                "http://localhost:" + port + "/" +
+                        REQUEST_MAPPING_STRING + "/" + idAds + "/" +
+                        REQUEST_MAPPING_STRING_COMMENT
+                ,
+                HttpMethod.GET,
+                null,
+                ResponseWrapperCommentDto.class);
+
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(result.getBody().getCount()).isNull();
+        assertThat(result.getBody().getResults()).isNull();
+    }
+
+
+    @Test
+    void getAdsTest() {
+//      GET http://localhost:8080/ads/{ad_pk}
+//      get actualAds With Image
+        Ads adsWithImage = adsRepository.findAll().stream()
+                .filter(ads1 -> ads1.getImage() != null)
+                .findAny().orElse(null);
+        assert adsWithImage != null;
+        FullAdsDto fullAdsDtoWithImage = fullAdsMapper.adsToFullAdsDto(adsWithImage);
+
+        //check Ads With Image
+        ResponseEntity<FullAdsDto> result = testRestTemplate.exchange(
+                "http://localhost:" + port + "/" +
+                        REQUEST_MAPPING_STRING + "/" + adsWithImage.getId()
+                ,
+                HttpMethod.GET,
+                null,
+                FullAdsDto.class);
+
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        Assertions.assertThat(result.getBody())
+                .usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                .isEqualTo(fullAdsDtoWithImage);
+
+        //check Ads Without Image
+        adsWithImage.setImage(null);
+        Ads adsWithoutImage = adsRepository.save(adsWithImage);
+        FullAdsDto fullAdsDtoWithoutImage = fullAdsMapper.adsToFullAdsDto(adsWithImage);
+
+        result = testRestTemplate.exchange(
+                "http://localhost:" + port + "/" +
+                        REQUEST_MAPPING_STRING + "/" + adsWithoutImage.getId()
+                ,
+                HttpMethod.GET,
+                null,
+                FullAdsDto.class);
+
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        Assertions.assertThat(result.getBody())
+                .usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                .isEqualTo(fullAdsDtoWithoutImage);
+    }
+
+    @Test
+    void getAdsNegativeTest() {
+//      GET http://localhost:8080/ads/{ad_pk}
+        //      get idAds non-exist
+        int idAds = random.nextInt();
+        while (adsRepository.findById(idAds).isPresent()) {
+            idAds = random.nextInt();
+        }
+
+        ResponseEntity<FullAdsDto> result = testRestTemplate.exchange(
+                "http://localhost:" + port + "/" +
+                        REQUEST_MAPPING_STRING + "/" + idAds
+                ,
+                HttpMethod.GET,
+                null,
+                FullAdsDto.class);
+
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        Assertions.assertThat(result.getBody())
+                .usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                .isEqualTo(new FullAdsDto());
+    }
 }

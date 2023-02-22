@@ -37,6 +37,7 @@ import java.util.Random;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -144,10 +145,10 @@ public class AdsApiControllerMockMvcTest {
         when(adsRepository.save(ads)).thenReturn(ads);
         when(adsRepository.findById(ads.getId())).thenReturn(Optional.of(ads));
         when(imageRepository.findById(image.getId())).thenReturn(Optional.of(image));
+        //check with standard parameters  (ads exist, image exist)
         String url = "http://localhost:8080/" +
                 REQUEST_MAPPING_STRING + "/" + ads.getId() + "/" +
                 REQUEST_MAPPING_STRING_IMAGE;
-
 
         MockMultipartFile mockMultipartFile = new MockMultipartFile("image", "image.jpg",
                 MediaType.IMAGE_JPEG_VALUE, data2);
@@ -161,6 +162,46 @@ public class AdsApiControllerMockMvcTest {
         assertThat(Files.exists(path1)).isFalse();
         Files.deleteIfExists(path1);
         Files.deleteIfExists(newPathFile);
+
+        //check with standard parameters  (ads exist, image non-exist)
+        ads.setImage(null);
+
+        when(imageRepository.save(any(Image.class))).thenReturn(image);
+        url = "http://localhost:8080/" +
+                REQUEST_MAPPING_STRING + "/" + ads.getId() + "/" +
+                REQUEST_MAPPING_STRING_IMAGE;
+
+        mockMultipartFile = new MockMultipartFile("image", "image.jpg",
+                MediaType.IMAGE_JPEG_VALUE, data2);
+
+        builder =
+                MockMvcRequestBuilders.multipart(HttpMethod.PATCH, url).file(mockMultipartFile).contentType(MediaType.MULTIPART_FORM_DATA).with(csrf());
+        mockMvc.perform(builder).andExpect(status().isOk())
+                .andDo(MockMvcResultHandlers.print());
+
+        assertThat(Files.readAllBytes(newPathFile)).isEqualTo(data2);
+        assertThat(Files.exists(path1)).isFalse();
+        Files.deleteIfExists(path1);
+        Files.deleteIfExists(newPathFile);
+    }
+
+    @Test
+    void updateImageNegativeTest() throws Exception {
+        when(adsRepository.findById(anyInt())).thenReturn(Optional.empty());
+
+        //check with standard parameters  (ads exist, image exist)
+        String url = "http://localhost:8080/" +
+                REQUEST_MAPPING_STRING + "/" + random.nextInt() + "/" +
+                REQUEST_MAPPING_STRING_IMAGE;
+
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("image", "image.jpg",
+                MediaType.IMAGE_JPEG_VALUE, new byte[0]);
+
+        MockHttpServletRequestBuilder builder =
+                MockMvcRequestBuilders.multipart(HttpMethod.PATCH, url)
+                        .file(mockMultipartFile).contentType(MediaType.MULTIPART_FORM_DATA).with(csrf());
+        mockMvc.perform(builder)
+                .andExpect(status().isNotFound());
     }
 
     private Path generatePath(String nameFile) {
