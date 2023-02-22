@@ -86,15 +86,33 @@ public class AdsServiceImpl {
     }
 
     public ResponseEntity<Void> removeAds(Integer idAds) {
+        //finding
         Ads ads = adsRepository.findById(idAds).orElseThrow(() -> new AdsNotFoundException(idAds));
+        //deleting
         commentService.removeAllCommentsOfAds(ads.getId());
         Image imageForDel = ads.getImage();
         adsRepository.delete(ads);
         imageService.removeImageWithFile(imageForDel);
-        ads = adsRepository.findById(idAds).orElse(null);
-        if (imageService.getImageData(imageForDel) == null &&
-                commentService.getAllByIdAds(idAds).size() == 0 &&
-                ads == null) {
+        //checking Ads
+        Ads adsMustBeNull = adsRepository.findById(idAds).orElse(null);
+        //checking Image
+        Image imageMustBeNull;
+        try {
+            imageMustBeNull = imageService.getImage(imageForDel.getId());
+        } catch (ImageNotFoundException e) {
+            imageMustBeNull = null;
+        }
+        //checking File of Image
+        boolean existFile = true;
+        try {
+            imageService.getImageData(imageForDel);
+        } catch (ImageNotFoundException e) {
+            existFile = false;
+        }
+        //checking finish
+        if (adsMustBeNull == null &&
+                imageMustBeNull == null &&
+                !existFile) {
             return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
         }
         return null;

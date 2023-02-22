@@ -1,6 +1,7 @@
 package ru.skypro.homework.controller;
 
 import org.aspectj.lang.annotation.Before;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,22 +17,23 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
 import ru.skypro.homework.Generator;
-import ru.skypro.homework.dto.AdsDto;
-import ru.skypro.homework.dto.CommentDto;
-import ru.skypro.homework.dto.CreateAdsDto;
+import ru.skypro.homework.dto.*;
 import ru.skypro.homework.entity.*;
 import ru.skypro.homework.mapper.AdsMapper;
 import ru.skypro.homework.mapper.CommentMapper;
+import ru.skypro.homework.mapper.FullAdsMapper;
 import ru.skypro.homework.repository.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -41,7 +43,8 @@ class AdsApiControllerTest {
     @LocalServerPort
     private int port;
     private final static String REQUEST_MAPPING_STRING = "ads";
-    private final static String REQUEST_MAPPING_STRING_COMMENT = "comment";
+    private final static String REQUEST_MAPPING_STRING_COMMENT = "comments";
+    private final static String REQUEST_MAPPING_STRING_IMAGE = "image";
     private final String dirForImages;
     private final String dirForAvatars;
     @Autowired
@@ -61,8 +64,9 @@ class AdsApiControllerTest {
     @Autowired
     private AdsMapper adsMapper;
     @Autowired
+    private FullAdsMapper fullAdsMapper;
+    @Autowired
     private CommentMapper commentMapper;
-
     private final Generator generator = new Generator();
     private final Random random = new Random();
 
@@ -73,10 +77,10 @@ class AdsApiControllerTest {
 
     @BeforeEach
     public void generateData() {
-        imageRepository.deleteAll();
         commentRepository.deleteAll();
         adsRepository.deleteAll();
         usersRepository.deleteAll();
+        imageRepository.deleteAll();
         avatarRepository.deleteAll();
 
         int countUserAdmin = 5;
@@ -92,23 +96,22 @@ class AdsApiControllerTest {
         List<User> userAdminList = new ArrayList<>();
         for (int i = 0; i < countUserAdmin; i++) {
             Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(null, dirForAvatars));
-            userAdminList.add(usersRepository.save(generator.generateUserRoleAdmin(avatar, dirForAvatars)));
+            userAdminList.add(usersRepository.save(generator.generateUserRoleAdmin(avatar)));
         }
         //generate user
         List<User> userList = new ArrayList<>();
         for (int i = 0; i < countUser; i++) {
             Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(null, dirForAvatars));
-            userList.add(usersRepository.save(generator.generateUserRoleUser(avatar, dirForAvatars)));
+            userList.add(usersRepository.save(generator.generateUserRoleUser(avatar)));
         }
         //generate ads
         List<Ads> adsList = new ArrayList<>();
         for (User user : userList) {
             int countAds = generator.genInt(countAdsUserMin, countAdsUserMax);
             for (int i = 0; i < countAds; i++) {
-//                imageRepository.save(generator.generateImageIfNull(null, dirForImages, ads));
-                Ads ads = adsRepository.save(generator.generateAdsIfNull(null, user));//TODO поменять местами (Ads -> Image)
+                Image image = imageRepository.save(generator.generateImageIfNull(null, dirForImages));
+                Ads ads = adsRepository.save(generator.generateAdsIfNull(null, user, image));
                 adsList.add(ads);
-
             }
         }
         //generate comments
@@ -118,20 +121,18 @@ class AdsApiControllerTest {
             int countComments = generator.genInt(countCommentForAdsMin, countCommentForAdsMax);
             for (int i = 0; i < countComments; i++) {
                 commentRepository.save(generator.generateCommentIfNull(
-                        null,
-                        adsList.get(random.nextInt(adsList.size())),
-                        tempUserList.get(random.nextInt(tempUserList.size()))));
+                        null, ads, tempUserList.get(random.nextInt(tempUserList.size()))));
             }
         }
     }
 
     @AfterEach
     public void clearData() {
-        imageRepository.deleteAll();
         commentRepository.deleteAll();
         adsRepository.deleteAll();
         usersRepository.deleteAll();
         avatarRepository.deleteAll();
+        imageRepository.deleteAll();
     }
 
 
@@ -150,24 +151,25 @@ class AdsApiControllerTest {
     void removeAdsTest() throws IOException {
         //actualAds With Image And Comment
         Ads actualAds = adsRepository.findAll().stream()
-                .filter(ads -> commentRepository.findAllByIdAds(ads.getId()).size() > 0 &&
-                        imageRepository.findAllByIdAds(ads.getId()).size() > 0)
+                .filter(ads ->
+                        commentRepository.findAll().stream().
+                                anyMatch(comment -> comment.getAds().getId().equals(ads.getId())) &&
+                                ads.getImage() != null)
                 .findAny().orElse(null);
         assert actualAds != null;
-        //get image of actualAds
-        List<Image> imageList = imageRepository.findAllByIdAds(actualAds.getId());
         //create file and set pathStr to images
         String pathStr = dirForImages + "/" + "file_for_removeAdsTest" + ".jpg";
         Path path = Path.of(pathStr);
         if (!Files.exists(path)) {
             Files.createFile(path);
         }
-        for (Image image : imageList) {
-            image.setPath(pathStr);
-            imageRepository.save(image);
-        }
+        Image image = actualAds.getImage();
+        image.setPath(pathStr);
+        imageRepository.save(image);
         //get comment of actualAds
-        List<Comment> commentList = commentRepository.findAllByIdAds(actualAds.getId());
+        List<Comment> commentList = commentRepository.findAll().stream()
+                .filter(comment -> comment.getAds().getId().equals(actualAds.getId()))
+                .collect(Collectors.toList());
         //remember counts of repositories
         int countAds = adsRepository.findAll().size();
         int countImage = imageRepository.findAll().size();
@@ -183,7 +185,7 @@ class AdsApiControllerTest {
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         assertThat(Files.exists(path)).isFalse();
         assertThat(adsRepository.findAll().size()).isEqualTo(countAds - 1);
-        assertThat(imageRepository.findAll().size()).isEqualTo(countImage - imageList.size());
+        assertThat(imageRepository.findAll().size()).isEqualTo(countImage - 1);
         assertThat(commentRepository.findAll().size()).isEqualTo(countComment - commentList.size());
     }
 
@@ -191,15 +193,18 @@ class AdsApiControllerTest {
     void removeAdsNegativeTest() {
         //actualAds With Image And Comment
         Ads actualAds = adsRepository.findAll().stream()
-                .filter(ads -> commentRepository.findAllByIdAds(ads.getId()).size() > 0 &&
-                        imageRepository.findAllByIdAds(ads.getId()).size() > 0)
+                .filter(ads ->
+                        commentRepository.findAll().stream().
+                                anyMatch(comment -> comment.getAds().getId().equals(ads.getId())) &&
+                                ads.getImage() != null)
                 .findAny().orElse(null);
         assert actualAds != null;
-        //delete image and comment of actualAds
-        imageRepository.deleteAll(imageRepository.findAllByIdAds(actualAds.getId()));
+        //delete comment of actualAds
         commentRepository.deleteAll(commentRepository.findAllByIdAds(actualAds.getId()));
         actualAds = adsRepository.findById(actualAds.getId()).orElse(null);
         adsRepository.delete(actualAds);
+        //delete image of actualAds
+        imageRepository.delete(actualAds.getImage());
         //remember counts of repositories
         int countAds = adsRepository.findAll().size();
         int countImage = imageRepository.findAll().size();
@@ -219,96 +224,217 @@ class AdsApiControllerTest {
     }
 
     @Test
-    public void updateAdsTest() {
-        //actualAds With Image And Comment
+    void getImageTest() throws IOException {
+        //actualAds With Image
         Ads actualAds = adsRepository.findAll().stream()
-                .filter(ads -> commentRepository.findAllByIdAds(ads.getId()).size() > 0 &&
-                        imageRepository.findAllByIdAds(ads.getId()).size() > 0)
+                .filter(ads -> ads.getImage() != null)
                 .findAny().orElse(null);
         assert actualAds != null;
+        Image actualImage = actualAds.getImage();
+        assert actualImage != null;
 
-        AdsDto adsDto = adsMapper.adsToAdsDto(actualAds);
+        ResponseEntity<byte[]> result = testRestTemplate.exchange(
+                "http://localhost:" + port + "/" +
+                        REQUEST_MAPPING_STRING + "/" + actualAds.getId() + "/" +
+                        REQUEST_MAPPING_STRING_IMAGE,
+                HttpMethod.GET,
+                null,
+                byte[].class);
 
-        String url = "http://localhost:" + port + "/" + REQUEST_MAPPING_STRING + "/" + adsDto.getPk();
-        ResponseEntity<AdsDto> getForEntityResponse = testRestTemplate.getForEntity(url, AdsDto.class, adsDto.getPk());
-        assertThat(getForEntityResponse.getBody()).isNotNull();
-
-        CreateAdsDto createAdsDto = new CreateAdsDto();
-        createAdsDto.setDescription("Updated description");
-        createAdsDto.setPrice(15_000);
-        createAdsDto.setTitle("Updated Title");
-
-        actualAds.setDescription(createAdsDto.getDescription());
-        actualAds.setPrice(createAdsDto.getPrice());
-        actualAds.setTitle(createAdsDto.getTitle());
-
-        adsDto = adsMapper.adsToAdsDto(actualAds);
-
-        ResponseEntity<AdsDto> result = testRestTemplate.exchange(
-                url,
-                HttpMethod.PATCH,
-                new HttpEntity<>(adsDto),
-                AdsDto.class
-        );
-
-
-        assertThat(result.getBody()).usingRecursiveComparison().isEqualTo(adsDto);
-        assertThat(result.getBody().getTitle()).isEqualTo(createAdsDto.getTitle());
-        assertThat(result.getBody().getPrice()).isEqualTo(createAdsDto.getPrice());
-        assertThat(result.getBody().getAuthor()).usingRecursiveComparison().isEqualTo(actualAds.getAuthor().getId());
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(result.getBody())
+                .isEqualTo(Files.readAllBytes(Paths.get(actualImage.getPath())));
+        assertThat(result.getBody().length)
+                .isEqualTo(Files.readAllBytes(Paths.get(actualImage.getPath())).length);
     }
 
     @Test
-    public void updateCommentsTest() {
-//actualAds With Image And Comment
+    void getImageNegativeTest() {
+        //actualAds With Image
         Ads actualAds = adsRepository.findAll().stream()
-                .filter(ads -> commentRepository.findAllByIdAds(ads.getId()).size() > 0 &&
-                        imageRepository.findAllByIdAds(ads.getId()).size() > 0)
+                .filter(ads -> ads.getImage() != null)
                 .findAny().orElse(null);
         assert actualAds != null;
-
-        AdsDto adsDto = adsMapper.adsToAdsDto(actualAds);
-
-        CommentDto commentToPatch = new CommentDto();
-        commentToPatch.setCreatedAt("2023-02-15 16:20");
-        commentToPatch.setText("Text to patch");
-        commentToPatch.setPk(1);
-
-        Comment comment = commentRepository.findAllByIdAds(actualAds.getId()).stream()
-                .findAny().orElse(null);
-        assert comment != null;
-
-        comment.setAds(actualAds);
-        comment.setAuthor(actualAds.getAuthor());
-        comment.setText(commentToPatch.getText());
-        comment.setDateTime(LocalDateTime.parse(commentToPatch.getCreatedAt(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
-
-        String url = "http://localhost:" + port + "/" + REQUEST_MAPPING_STRING + "/" + adsDto.getPk() + "/" + REQUEST_MAPPING_STRING_COMMENT + "/" + comment.getId();
-        ResponseEntity<Comment> getForEntityResponse = testRestTemplate.getForEntity(url, Comment.class, comment.getId());
-//        assertThat(getForEntityResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(getForEntityResponse.getBody()).isNotNull();
-
-//        comment.setAds(actualAds);
-//        comment.setAuthor(actualAds.getAuthor());
-//        comment.setText(commentToPatch.getText());
-//        comment.setDateTime(LocalDateTime.parse(commentToPatch.getCreatedAt(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
-
-        CommentDto newCommentDto = commentMapper.commentToDto(comment);
-
-        ResponseEntity<CommentDto> result = testRestTemplate.exchange(
-                url,
-                HttpMethod.PATCH,
-                new HttpEntity<>(newCommentDto),
-                CommentDto.class
-        );
-
-//        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(result.getBody()).isNotNull();
-        assertThat(result.getBody()).usingRecursiveComparison().isEqualTo(newCommentDto);
-        assertThat(result.getBody().getPk()).isEqualTo(newCommentDto.getPk());
-        assertThat(result.getBody().getText()).isEqualTo(newCommentDto.getText());
-        assertThat(result.getBody().getAuthor()).usingRecursiveComparison().isEqualTo(actualAds.getAuthor().getId());
-        assertThat(result.getBody().getCreatedAt()).isEqualTo(newCommentDto.getCreatedAt());
+        Image actualImage = actualAds.getImage();
+        assert actualImage != null;
+        actualImage.setPath("null");
+        actualImage = imageRepository.save(actualImage);
+        ResponseEntity<byte[]> result = testRestTemplate.exchange(
+                "http://localhost:" + port + "/" +
+                        REQUEST_MAPPING_STRING + "/" + actualAds.getId() + "/" +
+                        REQUEST_MAPPING_STRING_IMAGE,
+                HttpMethod.GET,
+                null,
+                byte[].class);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        actualImage.setPath(null);
+        actualImage = imageRepository.save(actualImage);
+        result = testRestTemplate.exchange(
+                "http://localhost:" + port + "/" +
+                        REQUEST_MAPPING_STRING + "/" + actualAds.getId() + "/" +
+                        REQUEST_MAPPING_STRING_IMAGE,
+                HttpMethod.GET,
+                null,
+                byte[].class);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        actualAds.setImage(null);
+        adsRepository.save(actualAds);
+        result = testRestTemplate.exchange(
+                "http://localhost:" + port + "/" +
+                        REQUEST_MAPPING_STRING + "/" + actualAds.getId() + "/" +
+                        REQUEST_MAPPING_STRING_IMAGE,
+                HttpMethod.GET,
+                null,
+                byte[].class);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
+    @Test
+    void getALLAdsTest() {
+        //http://localhost:8080/ads/
+        List<Ads> adsList = adsRepository.findAll();
+        List<AdsDto> adsDtoList = adsList.stream()
+                .map(ads -> adsMapper.adsToAdsDto(ads))
+                .collect(Collectors.toList());
+
+        ResponseEntity<ResponseWrapperAdsDto> result = testRestTemplate.exchange(
+                "http://localhost:" + port + "/" + REQUEST_MAPPING_STRING,
+                HttpMethod.GET,
+                null,
+                ResponseWrapperAdsDto.class);
+
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(result.getBody().getCount()).isEqualTo(adsList.size());
+        Assertions.assertThat(result.getBody().getResults())
+                .usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                .isEqualTo(adsDtoList);
+    }
+
+    @Test
+    void getCommentsTest() {
+//      GET http://localhost:8080/ads/{ad_pk}/comments
+//      actualAds With comment
+        Ads ads = adsRepository.findAll().stream()
+                .filter(ads1 -> commentRepository.findAll().stream()
+                        .anyMatch(comment -> comment.getAds().getId().equals(ads1.getId())))
+                .findAny().orElse(null);
+        assert ads != null;
+
+        List<Comment> commentList = commentRepository.findAll().stream()
+                .filter(comment -> comment.getAds().getId().equals(ads.getId()))
+                .collect(Collectors.toList());
+        List<CommentDto> commentDtos = commentList.stream()
+                .map(ads1 -> commentMapper.commentToDto(ads1))
+                .collect(Collectors.toList());
+
+        ResponseEntity<ResponseWrapperCommentDto> result = testRestTemplate.exchange(
+                "http://localhost:" + port + "/" +
+                        REQUEST_MAPPING_STRING + "/" + ads.getId() + "/" +
+                        REQUEST_MAPPING_STRING_COMMENT
+                ,
+                HttpMethod.GET,
+                null,
+                ResponseWrapperCommentDto.class);
+
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(result.getBody().getCount()).isEqualTo(commentDtos.size());
+        Assertions.assertThat(result.getBody().getResults())
+                .usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                .isEqualTo(commentDtos);
+    }
+
+    @Test
+    void getCommentsNegativeTest() {
+//      GET http://localhost:8080/ads/{ad_pk}/comments
+        //      get idAds non-exist
+        int idAds = random.nextInt();
+        while (adsRepository.findById(idAds).isPresent()) {
+            idAds = random.nextInt();
+        }
+
+        ResponseEntity<ResponseWrapperCommentDto> result = testRestTemplate.exchange(
+                "http://localhost:" + port + "/" +
+                        REQUEST_MAPPING_STRING + "/" + idAds + "/" +
+                        REQUEST_MAPPING_STRING_COMMENT
+                ,
+                HttpMethod.GET,
+                null,
+                ResponseWrapperCommentDto.class);
+
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(result.getBody().getCount()).isNull();
+        assertThat(result.getBody().getResults()).isNull();
+    }
+
+
+    @Test
+    void getAdsTest() {
+//      GET http://localhost:8080/ads/{ad_pk}
+//      get actualAds With Image
+        Ads adsWithImage = adsRepository.findAll().stream()
+                .filter(ads1 -> ads1.getImage() != null)
+                .findAny().orElse(null);
+        assert adsWithImage != null;
+        FullAdsDto fullAdsDtoWithImage = fullAdsMapper.adsToFullAdsDto(adsWithImage);
+
+        //check Ads With Image
+        ResponseEntity<FullAdsDto> result = testRestTemplate.exchange(
+                "http://localhost:" + port + "/" +
+                        REQUEST_MAPPING_STRING + "/" + adsWithImage.getId()
+                ,
+                HttpMethod.GET,
+                null,
+                FullAdsDto.class);
+
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        Assertions.assertThat(result.getBody())
+                .usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                .isEqualTo(fullAdsDtoWithImage);
+
+        //check Ads Without Image
+        adsWithImage.setImage(null);
+        Ads adsWithoutImage = adsRepository.save(adsWithImage);
+        FullAdsDto fullAdsDtoWithoutImage = fullAdsMapper.adsToFullAdsDto(adsWithImage);
+
+        result = testRestTemplate.exchange(
+                "http://localhost:" + port + "/" +
+                        REQUEST_MAPPING_STRING + "/" + adsWithoutImage.getId()
+                ,
+                HttpMethod.GET,
+                null,
+                FullAdsDto.class);
+
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        Assertions.assertThat(result.getBody())
+                .usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                .isEqualTo(fullAdsDtoWithoutImage);
+    }
+
+    @Test
+    void getAdsNegativeTest() {
+//      GET http://localhost:8080/ads/{ad_pk}
+        //      get idAds non-exist
+        int idAds = random.nextInt();
+        while (adsRepository.findById(idAds).isPresent()) {
+            idAds = random.nextInt();
+        }
+
+        ResponseEntity<FullAdsDto> result = testRestTemplate.exchange(
+                "http://localhost:" + port + "/" +
+                        REQUEST_MAPPING_STRING + "/" + idAds
+                ,
+                HttpMethod.GET,
+                null,
+                FullAdsDto.class);
+
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        Assertions.assertThat(result.getBody())
+                .usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                .isEqualTo(new FullAdsDto());
+    }
 }

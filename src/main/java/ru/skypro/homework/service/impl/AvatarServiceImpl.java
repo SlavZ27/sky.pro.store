@@ -72,6 +72,14 @@ public class AvatarServiceImpl {
         return Pair.of(bytes, MediaType.IMAGE_JPEG_VALUE);
     }
 
+    public Avatar getImage(Integer id) {
+        if (id == null) {
+            return null;
+        }
+        return avatarRepository.findById(id).orElseThrow(() ->
+                new AvatarNotFoundException(id));
+    }
+
     private boolean removeAvatarWithFile(Avatar avatar) {
         Path path = Path.of(avatar.getPath());
         try {
@@ -111,4 +119,6 @@ public class AvatarServiceImpl {
                 () -> new AvatarNotFoundException(avatar.getId()));
         return "/users/me/image";
     }
+
+
 }
