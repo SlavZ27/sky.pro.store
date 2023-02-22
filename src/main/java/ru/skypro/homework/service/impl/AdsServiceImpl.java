@@ -7,9 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import ru.skypro.homework.dto.AdsDto;
-import ru.skypro.homework.dto.FullAdsDto;
-import ru.skypro.homework.dto.ResponseWrapperAdsDto;
 import ru.skypro.homework.entity.Ads;
 import ru.skypro.homework.entity.Image;
 import ru.skypro.homework.entity.User;
@@ -71,7 +68,7 @@ public class AdsServiceImpl {
     /**
      * This method uses method repository add Comments to Ads id
      * Uses {@link AdsRepository#findById(Object)}
-     * Uses {@link UserServiceImpl#getRandomUser()}
+     * Uses {@link UserServiceImpl#getDefaultUser()}
      * Uses {@link CommentServiceImpl#addCommentsToAds(Integer, Comment)}
      * @param adsId is not null
      * @param commentDto is not null
@@ -83,7 +80,7 @@ public class AdsServiceImpl {
             log.error("There is not ads with id = " + adsId);
             return new AdsNotFoundException(adsId);
         });
-        commentDto.setAuthor(userService.getRandomUser().getId());
+        commentDto.setAuthor(userService.getDefaultUser().getId());
         Comment comment = commentMapper.dtoToComment(commentDto);
         return commentMapper.commentToDto(commentService.addCommentsToAds(adsId, comment));
     }

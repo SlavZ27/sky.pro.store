@@ -4,7 +4,6 @@ import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Getter

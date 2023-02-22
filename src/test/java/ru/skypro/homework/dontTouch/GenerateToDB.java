@@ -3,18 +3,12 @@ package ru.skypro.homework.dontTouch;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.test.context.ActiveProfiles;
 import ru.skypro.homework.Generator;
-import ru.skypro.homework.controller.AdsApiController;
 import ru.skypro.homework.entity.Ads;
 import ru.skypro.homework.entity.Avatar;
 import ru.skypro.homework.entity.Image;
 import ru.skypro.homework.entity.User;
-import ru.skypro.homework.mapper.AdsMapper;
-import ru.skypro.homework.mapper.CommentMapper;
 import ru.skypro.homework.repository.*;
 
 import java.util.ArrayList;
@@ -59,14 +53,14 @@ public class GenerateToDB {
         imageRepository.deleteAll();
         avatarRepository.deleteAll();
 
-        int countUserAdmin = 5;
-        int countUser = 100;
+        int countUserAdmin = 0;
+        int countUser = 20;
 
         int countAdsUserMin = 0;
         int countAdsUserMax = 5;
 
         int countCommentForAdsMin = 0;
-        int countCommentForAdsMax = 20;
+        int countCommentForAdsMax = 5;
 
         //generate userAdmin
         List<User> userAdminList = new ArrayList<>();

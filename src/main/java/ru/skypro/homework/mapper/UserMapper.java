@@ -2,13 +2,8 @@ package ru.skypro.homework.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Autowired;
 import ru.skypro.homework.dto.UserDto;
-import ru.skypro.homework.entity.Ads;
 import ru.skypro.homework.entity.User;
-import ru.skypro.homework.service.impl.AdsServiceImpl;
-import ru.skypro.homework.service.impl.UserServiceImpl;
 
 @Mapper(componentModel = "spring")
 public abstract class UserMapper {

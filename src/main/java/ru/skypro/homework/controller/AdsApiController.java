@@ -1,7 +1,5 @@
 package ru.skypro.homework.controller;
 
-import antlr.collections.List;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -17,12 +15,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.*;
 
 import ru.skypro.homework.service.impl.AdsServiceImpl;
-import ru.skypro.homework.service.impl.ImageServiceImpl;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -40,7 +36,7 @@ public class AdsApiController {
         this.adsServiceImpl = adsServiceImpl;
     }
 
-    @Operation(summary = "", description = "", tags = {"Объявления"})
+    @Operation(summary = "getALLAds", description = "", tags = {"Объявления"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -215,7 +211,9 @@ public class AdsApiController {
     @PatchMapping(value = "{idAds}/image",
             produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE},
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<byte[]> updateImage(@PathVariable Integer idAds, MultipartFile image) throws IOException {
+    public ResponseEntity<byte[]> updateImage(
+            @PathVariable Integer idAds,
+            @RequestPart MultipartFile image) throws IOException {
         Pair<byte[], String> pair = adsServiceImpl.updateImageOfAds(idAds, image);
         return read(pair);
     }
@@ -240,6 +238,11 @@ public class AdsApiController {
                 .body(pair.getFirst());
     }
 
+    @Operation(summary = "findByTitleLike", description = "", tags = {"Объявления"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ResponseWrapperAdsDto.class)))})
     @GetMapping(value = "/by-title", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ResponseWrapperAdsDto> findByTitleLike(@Param("title") String title) {
         return ResponseEntity.ok(adsServiceImpl.findAdsByTitle(title));

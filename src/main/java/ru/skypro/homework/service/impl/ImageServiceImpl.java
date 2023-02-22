@@ -105,10 +105,10 @@ public class ImageServiceImpl {
      * This method, uses method repository, del image by file
      * Uses {@link ImageRepository#delete(Object)}
      * Uses {@link ImageRepository#findById(Object)}
+     *
      * @param image is not null
-     * @return false or true
      */
-    public boolean removeImageWithFile(Image image) {
+    public void removeImageWithFile(Image image) {
         Path path = Path.of(image.getPath());
         try {
             Files.deleteIfExists(path);
@@ -116,9 +116,7 @@ public class ImageServiceImpl {
         }
         imageRepository.delete(image);
         if (Files.exists(path) || imageRepository.findById(image.getId()).isPresent()) {
-            return false;
         } else {
-            return true;
         }
     }
 

@@ -65,7 +65,7 @@ public class Generator {
             tldt = localDateTime.plusYears(1L);
             while (!tldt.isBefore(localDateTime)) {
                 LocalDate localDate = LocalDate.of(
-                        genInt(year - 2, year),
+                        genInt(year - 2, year + 1),
                         genIntWithoutZero(12),
                         genIntWithoutZero(25));
                 LocalTime localTime = LocalTime.of(
@@ -79,7 +79,7 @@ public class Generator {
             tldt = localDateTime.minusYears(1L);
             while (!tldt.isAfter(localDateTime)) {
                 LocalDate localDate = LocalDate.of(
-                        genInt(year - 2, year),
+                        genInt(year - 2, year + 1),
                         genIntWithoutZero(12),
                         genIntWithoutZero(25));
                 LocalTime localTime = LocalTime.of(
