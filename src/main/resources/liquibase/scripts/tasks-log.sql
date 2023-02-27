@@ -80,7 +80,10 @@ ALTER TABLE ads ADD COLUMN date_time TIMESTAMP;
 ALTER TABLE users
     ADD CONSTRAINT constraint_users UNIQUE (email, password, username);
 
-
-
+--changeSet nadillustrator:9
+ALTER TABLE users
+    DROP CONSTRAINT constraint_users;
+ALTER TABLE users
+    ADD CONSTRAINT constraint_users UNIQUE (email, username);
 
 
