@@ -76,6 +76,11 @@ alter table comment
 -- changeSet nadillustrator:7
 ALTER TABLE ads ADD COLUMN date_time TIMESTAMP;
 
+--changeSet nadillustrator:8
+ALTER TABLE users
+    ADD CONSTRAINT constraint_users UNIQUE (email, password, username);
+
+
 
 
 
