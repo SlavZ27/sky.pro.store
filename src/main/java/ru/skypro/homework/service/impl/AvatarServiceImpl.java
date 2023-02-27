@@ -1,5 +1,6 @@
 package ru.skypro.homework.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
@@ -19,6 +20,7 @@ import java.util.Optional;
 /**
  * This class handles the command associated with creating an avatar in user, allowing users to create, update, receive, delete avatar.
  */
+@Slf4j
 @Service
 public class AvatarServiceImpl {
     private final String dirForAvatars;
@@ -42,11 +44,14 @@ public class AvatarServiceImpl {
      * @throws AvatarNotFoundException if passed non id avatar
      */
     public Avatar updateAvatar(Avatar avatar, MultipartFile file, String nameFile) {
+        log.debug("Method update Avatar was invoked");
         if (avatar == null || avatar.getId() == null) {
             return null;
         }
-        Avatar oldAvatar = avatarRepository.findById(avatar.getId()).orElseThrow(() ->
-                new AvatarNotFoundException(avatar.getId()));
+        Avatar oldAvatar = avatarRepository.findById(avatar.getId()).orElseThrow(() ->{
+            log.error("There is not Avatar with id = " + avatar.getId());
+                return new AvatarNotFoundException(avatar.getId());
+        });
         Path pathOld = Paths.get(oldAvatar.getPath());
         Path pathNew = generatePath(file, nameFile);
         try {
@@ -72,11 +77,14 @@ public class AvatarServiceImpl {
      * @throws AvatarNotFoundException if passed non id avatar
      */
     public Pair<byte[], String> getAvatarData(Avatar avatar) {
+        log.debug("Method getAvatarDate Avatar was invoked");
         if (avatar == null || avatar.getId() == null) {
             return null;
         }
-        avatarRepository.findById(avatar.getId()).orElseThrow(() ->
-                new AvatarNotFoundException(avatar.getId()));
+        avatarRepository.findById(avatar.getId()).orElseThrow(() ->{
+                log.error("There is not Avatar with id = " + avatar.getId());
+                return new AvatarNotFoundException(avatar.getId());
+        });
         byte[] bytes;
         try {
             bytes = Files.readAllBytes(Paths.get(avatar.getPath()));
@@ -96,11 +104,14 @@ public class AvatarServiceImpl {
      * @throws AvatarNotFoundException if passed non id avatar
      */
     public Avatar getImage(Integer id) {
+        log.debug("Method getImage Avatar was invoked");
         if (id == null) {
             return null;
         }
-        return avatarRepository.findById(id).orElseThrow(() ->
-                new AvatarNotFoundException(id));
+        return avatarRepository.findById(id).orElseThrow(() ->{
+            log.error("There is not Avatar with id = " + id);
+               return new AvatarNotFoundException(id);
+        });
     }
 
     /**
@@ -111,6 +122,7 @@ public class AvatarServiceImpl {
      * @return true or false
      */
     private boolean removeAvatarWithFile(Avatar avatar) {
+        log.debug("Method getImage Avatar was invoked");
         Path path = Path.of(avatar.getPath());
         try {
             Files.deleteIfExists(path);
@@ -131,6 +143,7 @@ public class AvatarServiceImpl {
      * @return Patch with the specified data
      */
     private Path generatePath(MultipartFile file, String nameFile) {
+        log.debug("Method generatePath Avatar was invoked");
         String date = LocalDate.now().toString();
         String extension = Optional.ofNullable(file.getOriginalFilename())
                 .map(fileName -> fileName.substring(file.getOriginalFilename().lastIndexOf('.')))
@@ -146,6 +159,7 @@ public class AvatarServiceImpl {
      * @throws IOException
      */
     public Avatar addAvatar(MultipartFile file, String nameFile) throws IOException {
+        log.debug("Method addAvatar was invoked");
         byte[] data = file.getBytes();
         Path path = generatePath(file, nameFile);
         Files.write(path, data);
@@ -162,11 +176,15 @@ public class AvatarServiceImpl {
      * @throws AvatarNotFoundException if passed non id avatar
      */
     public String getLinkOfAvatar(Avatar avatar) {
+        log.debug("Method getLinkOfAvatar was invoked");
         if (avatar == null || avatar.getId() == null) {
             return null;
         }
         avatarRepository.findById(avatar.getId()).orElseThrow(
-                () -> new AvatarNotFoundException(avatar.getId()));
+                () ->{
+                    log.error("There is not Avatar with id = " + avatar.getId());
+                   return new AvatarNotFoundException(avatar.getId());
+                });
         return "/users/me/image";
     }
 

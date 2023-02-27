@@ -12,6 +12,7 @@ import ru.skypro.homework.dto.NewPasswordDto;
 import ru.skypro.homework.dto.Role;
 import ru.skypro.homework.dto.UserDto;
 
+import ru.skypro.homework.entity.Avatar;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.AvatarNotFoundException;
 import ru.skypro.homework.exception.UserNotFoundException;
@@ -24,6 +25,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * This class handles the command associated with creating user, allowing users to manage with own accounts.
+ */
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -41,6 +45,12 @@ public class UserServiceImpl {
         return userMapper.userToDto(getDefaultUser());
     }
 
+    /**
+     * This method, used method repository, allows set Password the User
+     * Uses {@link UsersRepository#save(Object)}
+     * @param body is not null
+     * @return body
+     */
     public NewPasswordDto setPassword(NewPasswordDto body) {
         User user = getDefaultUser();
         if (user.getPassword().equals(body.getCurrentPassword())) {
@@ -50,6 +60,12 @@ public class UserServiceImpl {
         return body;
     }
 
+    /**
+     * This method, used method repository, allows update User
+     * {@link UsersRepository#save(Object)}
+     * @param body is not null
+     * @return User
+     */
     public UserDto updateUser(UserDto body) {
         User newUser = userMapper.userDtoToUser(body);
         User oldUser = getDefaultUser();
@@ -72,10 +88,24 @@ public class UserServiceImpl {
         return userMapper.userToDto(oldUser);
     }
 
+    /**
+     * This method allows get Name file for avatar
+     * @param user is not null
+     * @return user
+     */
     private String getNameFileForAvatar(User user) {
         return "user_" + user.getId();
     }
 
+    /**
+     * This method used method repository allows update user image
+     * {@link AvatarServiceImpl#addAvatar(MultipartFile, String)}
+     * {@link AvatarServiceImpl#updateAvatar(Avatar, MultipartFile, String)
+     * {@link UsersRepository#save(Object)}
+     * @param image is not null
+     * @return user or HttpStatus.Ok
+     * @throws IOException
+     */
     public ResponseEntity<Void> updateUserImage(MultipartFile image) throws IOException {
         User user = getDefaultUser();
         if (user.getAvatar() == null) {
@@ -87,6 +117,12 @@ public class UserServiceImpl {
         return new ResponseEntity<Void>(HttpStatus.OK);
     }
 
+    /**
+     * This method used method repository allows get avatar data of user
+     * {@link AvatarServiceImpl#getAvatarData(Avatar)}
+     * @param user is  not null
+     * @return avatar data
+     */
     private Pair<byte[], String> getAvatarDataOfUser(User user) {
         if (user.getAvatar() != null) {
             return avatarService.getAvatarData(user.getAvatar());
@@ -95,6 +131,9 @@ public class UserServiceImpl {
         }
     }
 
+    /**
+     * This method generates default user
+     */
     @PostConstruct
     public void generateDefaultUser() {
         try {
@@ -114,6 +153,10 @@ public class UserServiceImpl {
         }
     }
 
+    /**
+     * This method get random user
+     * @return randob user
+     */
     public User getRandomUser() {
         List<User> userList = usersRepository.findAll();
         if (userList.size() == 0) {
@@ -124,12 +167,22 @@ public class UserServiceImpl {
         }
     }
 
+    /**
+     * This method used method repository allows get avatar of user
+     * {@link UsersRepository#findById(Object)}
+     * @param idUser is not null
+     * @return user
+     */
     public Pair<byte[], String> getAvatarOfUser(Integer idUser) {
         User user = usersRepository.findById(idUser).orElseThrow(() ->
                 new UserNotFoundException(idUser));
         return getAvatarDataOfUser(user);
     }
 
+    /**
+     * This method get avatar me
+     * @return avatar
+     */
     public Pair<byte[], String> getAvatarMe() {
         return getAvatarDataOfUser(getDefaultUser());
     }
