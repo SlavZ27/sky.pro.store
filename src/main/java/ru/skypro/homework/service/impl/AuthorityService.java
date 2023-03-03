@@ -25,7 +25,7 @@ public class AuthorityService {
     }
 
     public void delAuthority(User user, Role role) {
-        Authority tempAuthority = authorityRepository.findByUsernameAndAuthority(user.getUsername(), role.name())
+        Authority tempAuthority = authorityRepository.findByUsernameAndAuthority(user.getUsername(), "ROLE_" + role.name())
                 .orElse(null);
         if (tempAuthority != null) {
             authorityRepository.delete(tempAuthority);
@@ -34,5 +34,9 @@ public class AuthorityService {
 
     public List<Authority> getAuthority(User user) {
         return authorityRepository.getAllByUsername(user.getUsername());
+    }
+
+    public boolean checkRoleForUsername(User user, Role role) {
+        return authorityRepository.findByUsernameAndAuthority(user.getUsername(), "ROLE_" + role.name()).isPresent();
     }
 }

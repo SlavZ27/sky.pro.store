@@ -25,6 +25,7 @@ import ru.skypro.homework.service.impl.AdsServiceImpl;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 
 
 @Slf4j
@@ -99,8 +100,9 @@ public class AdsApiController {
             @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema())
             @PathVariable("ad_pk") Integer adPk,
             @Parameter(in = ParameterIn.DEFAULT, description = "", required = true, schema = @Schema())
-            @Valid @RequestBody CommentDto body) {
-        CommentDto commentDto = adsServiceImpl.addCommentsToAds(adPk, body);
+            @Valid @RequestBody CommentDto body,
+            Authentication authentication) {
+        CommentDto commentDto = adsServiceImpl.addCommentsToAds(adPk, body, authentication.getName());
         return ResponseEntity.ok(commentDto);
     }
 
@@ -164,10 +166,16 @@ public class AdsApiController {
             @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @DeleteMapping(value = "/{ad_pk}/comments/{id}")
-    @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<Void> deleteComments(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("ad_pk") Integer adPk, @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("id") Integer id) {
-        return adsServiceImpl.removeCommentsForAds(adPk, id);
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Void> deleteComments(
+            @Parameter(in = ParameterIn.PATH, description = "", required = true,
+                    schema = @Schema()) @PathVariable("ad_pk") Integer adPk,
+            @Parameter(in = ParameterIn.PATH, description = "", required = true,
+                    schema = @Schema()) @PathVariable("id") Integer id,
+            Authentication authentication) {
+        return adsServiceImpl.removeCommentsForAds(adPk, id, authentication.getName());
     }
+
 
     @Operation(summary = "updateComments", description = "", tags = {"Объявления"})
     @ApiResponses(value = {
