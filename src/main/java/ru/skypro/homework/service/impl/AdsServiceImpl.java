@@ -68,7 +68,7 @@ public class AdsServiceImpl {
     /**
      * This method uses method repository add Comments to Ads id
      * Uses {@link AdsRepository#findById(Object)}
-     * Uses {@link UserServiceImpl#getDefaultUser()}
+     * Uses {@link UserServiceImpl#getUserByUserName}
      * Uses {@link CommentServiceImpl#addCommentsToAds(Integer, Comment)}
      * @param adsId is not null
      * @param commentDto is not null
@@ -80,7 +80,7 @@ public class AdsServiceImpl {
             log.error("There is not ads with id = " + adsId);
             return new AdsNotFoundException(adsId);
         });
-        commentDto.setAuthor(userService.getDefaultUser().getId());
+        commentDto.setAuthor(userService.getUserByUserName("user@gmail.com").getId());
         Comment comment = commentMapper.dtoToComment(commentDto);
         return commentMapper.commentToDto(commentService.addCommentsToAds(adsId, comment));
     }
@@ -185,7 +185,7 @@ public class AdsServiceImpl {
 
     /**
      * This method uses method repository get Ads to CreateAdsDto
-     * Uses {@link UserServiceImpl#getDefaultUser()}
+     * Uses {@link UserServiceImpl#getUserByUserName(String)}
      * Uses {@link AdsRepository#save(Object)}
      * Uses {@link ImageServiceImpl#addImage(MultipartFile, String)}
      * @param createAdsDto is not null
@@ -194,7 +194,7 @@ public class AdsServiceImpl {
      * @throws IOException
      */
     public AdsDto addAds(CreateAdsDto createAdsDto, MultipartFile image) throws IOException {
-        User user = userService.getDefaultUser();
+        User user = userService.getUserByUserName("user@gmail.com");
         Ads ads = createAdsMapper.createAdsDtoToAds(createAdsDto);
         ads.setAuthor(user);
         ads.setDateTime(LocalDateTime.now());
@@ -232,8 +232,8 @@ public class AdsServiceImpl {
      * Uses {@link AdsRepository#findAllByUserIdAndSortDateTime(Integer)}
      * @return List<Ads> to default user
      */
-    public ResponseWrapperAdsDto getALLAdsOfMe() {
-        User user = userService.getDefaultUser();
+    public ResponseWrapperAdsDto getALLAdsOfMe(String username) {
+        User user = userService.getUserByUserName(username);
         List<Ads> list = adsRepository.findAllByUserIdAndSortDateTime(user.getId());
         List<AdsDto> listDto = adsMapper.mapListOfAdsToListDTO(list);
         return adsMapper.mapToResponseWrapperAdsDto(listDto, listDto.size());

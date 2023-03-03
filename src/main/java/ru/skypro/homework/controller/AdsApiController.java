@@ -14,6 +14,9 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.*;
@@ -161,6 +164,7 @@ public class AdsApiController {
             @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @DeleteMapping(value = "/{ad_pk}/comments/{id}")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Void> deleteComments(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("ad_pk") Integer adPk, @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("id") Integer id) {
         return adsServiceImpl.removeCommentsForAds(adPk, id);
     }
@@ -197,8 +201,8 @@ public class AdsApiController {
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @GetMapping(value = "/me", produces = {MediaType.APPLICATION_JSON_VALUE})
     //      http://localhost:8080/ads/me
-    public ResponseEntity<ResponseWrapperAdsDto> getAdsMeUsingGET() {
-        return ResponseEntity.ok(adsServiceImpl.getALLAdsOfMe());
+    public ResponseEntity<ResponseWrapperAdsDto> getAdsMeUsingGET(Authentication authentication) {
+        return ResponseEntity.ok(adsServiceImpl.getALLAdsOfMe(authentication.getName()));
     }
 
 

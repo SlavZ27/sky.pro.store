@@ -22,7 +22,7 @@ public class RegisterReqDto {
     @JsonProperty("phone")
     private String phone = null;
 
-    private Role role;
+    private String role;
 
 
     public RegisterReqDto username(String username) {
@@ -30,9 +30,6 @@ public class RegisterReqDto {
         return this;
     }
 
-    public void setRole(Role role) {
-        this.role = role;
-    }
 
     public String getUsername() {
         return username;
@@ -95,8 +92,12 @@ public class RegisterReqDto {
         this.phone = phone;
     }
 
-    public Role getRole() {
+    public String getRole() {
         return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     @Override

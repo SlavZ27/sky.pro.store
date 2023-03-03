@@ -5,13 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.NewPasswordDto;
-import ru.skypro.homework.dto.Role;
 import ru.skypro.homework.dto.UserDto;
 
+import ru.skypro.homework.entity.Role;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.AvatarNotFoundException;
 import ru.skypro.homework.exception.UserNotFoundException;
@@ -21,28 +20,30 @@ import ru.skypro.homework.repository.UsersRepository;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Random;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
+//public class UserServiceImpl implements UserDetailsManager {
 public class UserServiceImpl {
     private final UsersRepository usersRepository;
     private final AvatarServiceImpl avatarService;
+    private final AuthorityService authorityService;
     private final UserMapper userMapper;
 
-    public User getDefaultUser() {
-        return usersRepository.findByUsernameAndPas("user@gmail.com", "password").orElseThrow(() ->
-                new UsernameNotFoundException("Default User"));
+
+    public UserDto getUser(String username) {
+        return userMapper.userToDto(getUserByUserName(username));
     }
 
-    public UserDto getUser() {
-        return userMapper.userToDto(getDefaultUser());
+    public User getUserByUserName(String userName) {
+        return usersRepository.findByUsername(userName).orElseThrow(() ->
+                new UserNotFoundException(userName));
     }
 
     public NewPasswordDto setPassword(NewPasswordDto body) {
-        User user = getDefaultUser();
+        User user = null;
+//        User user = getDefaultUser(); /TODO
         if (user.getPassword().equals(body.getCurrentPassword())) {
             user.setPassword(body.getNewPassword());
             usersRepository.save(user);
@@ -50,9 +51,9 @@ public class UserServiceImpl {
         return body;
     }
 
-    public UserDto updateUser(UserDto body) {
+    public UserDto updateUser(String username, UserDto body) {
         User newUser = userMapper.userDtoToUser(body);
-        User oldUser = getDefaultUser();
+        User oldUser = getUserByUserName(username);
         if (newUser.getEmail() != null) {
             oldUser.setEmail(newUser.getEmail());
         }
@@ -76,8 +77,8 @@ public class UserServiceImpl {
         return "user_" + user.getId();
     }
 
-    public ResponseEntity<Void> updateUserImage(MultipartFile image) throws IOException {
-        User user = getDefaultUser();
+    public ResponseEntity<Void> updateUserImage(String username, MultipartFile image) throws IOException {
+        User user = getUserByUserName(username);
         if (user.getAvatar() == null) {
             user.setAvatar(avatarService.addAvatar(image, getNameFileForAvatar(user)));
         } else {
@@ -98,29 +99,50 @@ public class UserServiceImpl {
     @PostConstruct
     public void generateDefaultUser() {
         try {
-            getDefaultUser();
-        } catch (UsernameNotFoundException e) {
+            getUserByUserName("user@gmail.com");
+        } catch (UserNotFoundException e) {
             User user = new User();
-            user.setId(1);
             user.setEmail("user@gmail.com");
             user.setPhone("0987654321");
-            user.setFirstName("Default");
+            user.setFirstName("user@gmail");
             user.setLastName("User");
             user.setRegDate(LocalDate.now());
-            user.setRole(Role.ADMIN);
             user.setUsername("user@gmail.com");
-            user.setPassword("password");
-            usersRepository.save(user);
+            user.setPassword("{bcrypt}$2a$12$DEyozL4Gh3JgVyg.wPQFsOMbUxItlqhPafiT.1swhiM870pNhQlCm");
+            user.setEnabled(true);
+            user = usersRepository.save(user);
+            authorityService.addAuthority(user, Role.ROLE_USER);
         }
-    }
-
-    public User getRandomUser() {
-        List<User> userList = usersRepository.findAll();
-        if (userList.size() == 0) {
-            return null;
-        } else {
-            Random random = new Random();
-            return userList.get(random.nextInt(userList.size()));
+        try {
+            getUserByUserName("adminuser@gmail.com");
+        } catch (UserNotFoundException e) {
+            User user = new User();
+            user.setEmail("adminuser@gmail.com");
+            user.setPhone("0987654321");
+            user.setFirstName("adminuser@gmail");
+            user.setLastName("adminuser");
+            user.setRegDate(LocalDate.now());
+            user.setUsername("adminuser@gmail.com");
+            user.setPassword("{bcrypt}$2a$12$DEyozL4Gh3JgVyg.wPQFsOMbUxItlqhPafiT.1swhiM870pNhQlCm");
+            user.setEnabled(true);
+            user = usersRepository.save(user);
+            authorityService.addAuthority(user, Role.ROLE_ADMIN);
+            authorityService.addAuthority(user, Role.ROLE_USER);
+        }
+        try {
+            getUserByUserName("admin@gmail.com");
+        } catch (UserNotFoundException e) {
+            User user = new User();
+            user.setEmail("admin@gmail.com");
+            user.setPhone("0987654321");
+            user.setFirstName("admin@gmail");
+            user.setLastName("admin");
+            user.setRegDate(LocalDate.now());
+            user.setUsername("admin@gmail.com");
+            user.setPassword("{bcrypt}$2a$12$DEyozL4Gh3JgVyg.wPQFsOMbUxItlqhPafiT.1swhiM870pNhQlCm");
+            user.setEnabled(true);
+            user = usersRepository.save(user);
+            authorityService.addAuthority(user, Role.ROLE_ADMIN);
         }
     }
 
@@ -130,7 +152,8 @@ public class UserServiceImpl {
         return getAvatarDataOfUser(user);
     }
 
-    public Pair<byte[], String> getAvatarMe() {
-        return getAvatarDataOfUser(getDefaultUser());
+    public Pair<byte[], String> getAvatarMe(String username) {
+        return getAvatarDataOfUser(getUserByUserName(username));
     }
+
 }
