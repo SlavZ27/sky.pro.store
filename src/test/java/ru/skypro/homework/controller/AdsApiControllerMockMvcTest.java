@@ -119,7 +119,7 @@ public class AdsApiControllerMockMvcTest {
 
     @Test
     void updateImageTest() throws Exception {
-        User user = generator.generateUserRoleUser(null);
+        User user = generator.generateUserRoleUser(null, null);
         user.setId(111);
         Image image = generator.generateImageIfNull(null, dirForImages);
         image.setId(222);

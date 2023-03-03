@@ -96,13 +96,13 @@ class AdsApiControllerTest {
         List<User> userAdminList = new ArrayList<>();
         for (int i = 0; i < countUserAdmin; i++) {
             Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(null, dirForAvatars));
-            userAdminList.add(usersRepository.save(generator.generateUserRoleAdmin(avatar)));
+            userAdminList.add(usersRepository.save(generator.generateUserRoleAdmin(avatar,"password")));
         }
         //generate user
         List<User> userList = new ArrayList<>();
         for (int i = 0; i < countUser; i++) {
             Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(null, dirForAvatars));
-            userList.add(usersRepository.save(generator.generateUserRoleUser(avatar)));
+            userList.add(usersRepository.save(generator.generateUserRoleUser(avatar,"password")));
         }
         //generate ads
         List<Ads> adsList = new ArrayList<>();

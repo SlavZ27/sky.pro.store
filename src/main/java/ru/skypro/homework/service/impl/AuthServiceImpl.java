@@ -44,7 +44,7 @@ public class AuthServiceImpl implements AuthService {
                 User.withDefaultPasswordEncoder()
                         .password(registerReq.getPassword())
                         .username(registerReq.getUsername())
-                        .roles(Role.ROLE_USER.name())
+                        .roles(Role.USER.name())
                         .build()
         );
         return true;

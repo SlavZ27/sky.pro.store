@@ -111,7 +111,7 @@ public class UserServiceImpl {
             user.setPassword("{bcrypt}$2a$12$DEyozL4Gh3JgVyg.wPQFsOMbUxItlqhPafiT.1swhiM870pNhQlCm");
             user.setEnabled(true);
             user = usersRepository.save(user);
-            authorityService.addAuthority(user, Role.ROLE_USER);
+            authorityService.addAuthority(user, Role.USER);
         }
         try {
             getUserByUserName("adminuser@gmail.com");
@@ -126,8 +126,8 @@ public class UserServiceImpl {
             user.setPassword("{bcrypt}$2a$12$DEyozL4Gh3JgVyg.wPQFsOMbUxItlqhPafiT.1swhiM870pNhQlCm");
             user.setEnabled(true);
             user = usersRepository.save(user);
-            authorityService.addAuthority(user, Role.ROLE_ADMIN);
-            authorityService.addAuthority(user, Role.ROLE_USER);
+            authorityService.addAuthority(user, Role.ADMIN);
+            authorityService.addAuthority(user, Role.USER);
         }
         try {
             getUserByUserName("admin@gmail.com");
@@ -142,7 +142,7 @@ public class UserServiceImpl {
             user.setPassword("{bcrypt}$2a$12$DEyozL4Gh3JgVyg.wPQFsOMbUxItlqhPafiT.1swhiM870pNhQlCm");
             user.setEnabled(true);
             user = usersRepository.save(user);
-            authorityService.addAuthority(user, Role.ROLE_ADMIN);
+            authorityService.addAuthority(user, Role.ADMIN);
         }
     }
 

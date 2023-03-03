@@ -61,22 +61,22 @@ public class GenerateToDB {
         int countAdsUserMax = 5;
 
         int countCommentForAdsMin = 0;
-        int countCommentForAdsMax = 5;
+        int countCommentForAdsMax = 10;
 
         //generate userAdmin
         List<User> userAdminList = new ArrayList<>();
         for (int i = 0; i < countUserAdmin; i++) {
             Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(null, dirForAvatars));
-            User user = usersRepository.save(generator.generateUserRoleAdmin(avatar));
-            authorityRepository.save(generator.generateAuthority(user, Role.ROLE_ADMIN));
+            User user = usersRepository.save(generator.generateUserRoleAdmin(avatar, "password"));
+            authorityRepository.save(generator.generateAuthority(user, Role.ADMIN));
             userAdminList.add(user);
         }
         //generate user
         List<User> userList = new ArrayList<>();
         for (int i = 0; i < countUser; i++) {
             Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(null, dirForAvatars));
-            User user = usersRepository.save(generator.generateUserRoleUser(avatar));
-            authorityRepository.save(generator.generateAuthority(user, Role.ROLE_USER));
+            User user = usersRepository.save(generator.generateUserRoleUser(avatar, "password"));
+            authorityRepository.save(generator.generateAuthority(user, Role.USER));
             userList.add(user);
         }
         //generate ads

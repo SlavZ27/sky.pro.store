@@ -114,7 +114,7 @@ public class Generator {
         return tld;
     }
 
-    public User generateUserRoleAdmin(Avatar avatar) {
+    public User generateUserRoleAdmin(Avatar avatar, String pas) {
         return generateUser(
                 null,
                 null,
@@ -124,11 +124,11 @@ public class Generator {
                 null,
                 avatar,
                 null,
-                null,
+                pas,
                 true);
     }
 
-    public User generateUserRoleUser(Avatar avatar) {
+    public User generateUserRoleUser(Avatar avatar, String pas) {
         return generateUser(
                 null,
                 null,
@@ -138,7 +138,7 @@ public class Generator {
                 null,
                 avatar,
                 null,
-                null,
+                pas,
                 true);
     }
 
@@ -184,7 +184,7 @@ public class Generator {
         }
         if (bcrypt) {
             CharSequence charSequence = new StringBuilder(password);
-            return "{bcrypt}"+encoder.encode(charSequence);
+            return "{bcrypt}" + encoder.encode(charSequence);
         } else {
             return password;
         }
@@ -345,6 +345,7 @@ public class Generator {
         } else {
             authority.setAuthority(role.name());
         }
+        authority.setAuthority("ROLE_" + authority.getAuthority());
         return authority;
     }
 
