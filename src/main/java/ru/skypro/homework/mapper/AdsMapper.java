@@ -3,16 +3,11 @@ package ru.skypro.homework.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.springframework.beans.factory.annotation.Autowired;
 import ru.skypro.homework.dto.AdsDto;
 import ru.skypro.homework.dto.ResponseWrapperAdsDto;
 import ru.skypro.homework.entity.Ads;
-import ru.skypro.homework.entity.Image;
-import ru.skypro.homework.service.impl.AdsServiceImpl;
-import ru.skypro.homework.service.impl.ImageServiceImpl;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public abstract class AdsMapper {
@@ -26,7 +21,11 @@ public abstract class AdsMapper {
     public abstract AdsDto adsToAdsDto(Ads ads);
 
     String mapImageToString(Ads ads) {
-        return "/ads/" + ads.getId() + "/image/";
+        if (ads.getImage() == null || ads.getImage().getId() == null) {
+            return null;
+        } else {
+            return "/ads/" + ads.getId() + "/image/";
+        }
     }
 
     @Mapping(target = "results", source = "list")

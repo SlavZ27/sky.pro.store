@@ -24,6 +24,7 @@ public class UserMapperTest {
         user.setPhone("+79990001122");
         user.setRegDate(LocalDate.parse("11/02/2023", DateTimeFormatter.ofPattern("d/MM/yyyy")));
         Avatar avatar = new Avatar();
+        avatar.setId(222);
         avatar.setPath("/some/path/image.png");
         user.setAvatar(avatar);
 
@@ -32,7 +33,7 @@ public class UserMapperTest {
         assertEquals(userDto.getEmail(), "some@mail.com");
         assertEquals(userDto.getFirstName(), "Vasya");
         assertEquals(userDto.getRegDate(), "11/02/2023");
-        assertEquals(userDto.getImage(), "/some/path/image.png");
+        assertEquals(userDto.getImage(), "/users/111/image");
 
     }
 

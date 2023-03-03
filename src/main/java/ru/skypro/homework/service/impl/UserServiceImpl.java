@@ -11,8 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.NewPasswordDto;
 import ru.skypro.homework.dto.Role;
 import ru.skypro.homework.dto.UserDto;
-import ru.skypro.homework.entity.Avatar;
-import ru.skypro.homework.entity.Image;
+
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.AvatarNotFoundException;
 import ru.skypro.homework.exception.UserNotFoundException;
@@ -21,13 +20,8 @@ import ru.skypro.homework.repository.UsersRepository;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -39,7 +33,7 @@ public class UserServiceImpl {
     private final UserMapper userMapper;
 
     public User getDefaultUser() {
-        return usersRepository.findByFirstNameAndLastName("Default", "User").orElseThrow(() ->
+        return usersRepository.findByUsernameAndPas("user@gmail.com", "password").orElseThrow(() ->
                 new UsernameNotFoundException("Default User"));
     }
 
@@ -78,12 +72,16 @@ public class UserServiceImpl {
         return userMapper.userToDto(oldUser);
     }
 
+    private String getNameFileForAvatar(User user) {
+        return "user_" + user.getId();
+    }
+
     public ResponseEntity<Void> updateUserImage(MultipartFile image) throws IOException {
         User user = getDefaultUser();
         if (user.getAvatar() == null) {
-            user.setAvatar(avatarService.addAvatar(image, user.getId().toString()));
+            user.setAvatar(avatarService.addAvatar(image, getNameFileForAvatar(user)));
         } else {
-            user.setAvatar(avatarService.updateAvatar(user.getAvatar(), image, user.getId().toString()));
+            user.setAvatar(avatarService.updateAvatar(user.getAvatar(), image, getNameFileForAvatar(user)));
         }
         usersRepository.save(user);
         return new ResponseEntity<Void>(HttpStatus.OK);
@@ -110,6 +108,7 @@ public class UserServiceImpl {
             user.setLastName("User");
             user.setRegDate(LocalDate.now());
             user.setRole(Role.ADMIN);
+            user.setUsername("user@gmail.com");
             user.setPassword("password");
             usersRepository.save(user);
         }

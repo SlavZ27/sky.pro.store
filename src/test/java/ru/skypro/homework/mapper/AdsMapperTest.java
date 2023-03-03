@@ -18,13 +18,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 public class AdsMapperTest {
-    @InjectMocks
     private AdsMapper adsMapper = Mappers.getMapper(AdsMapper.class);
-    @Mock
-    private ImageServiceImpl imageService;
-
     @Test
     public void testAdsToAdsDto() {
 
@@ -42,14 +37,12 @@ public class AdsMapperTest {
         user.setId(111);
         ads.setAuthor(user);
 
-        when(imageService.getLinkOfImage(image)).thenReturn("/image/1");
-
         AdsDto adsDto = adsMapper.adsToAdsDto(ads);
 
         assertEquals(adsDto.getPk(), 111);
         assertEquals(adsDto.getPrice(), 15_000);
         assertEquals(adsDto.getTitle(), "Title");
         assertEquals(adsDto.getAuthor(), 111);
-        assertEquals(adsDto.getImage(), "/image/" + image.getId());
+        assertEquals(adsDto.getImage(), "/ads/111/image/");
     }
 }

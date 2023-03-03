@@ -1,7 +1,5 @@
 package ru.skypro.homework.controller;
 
-import antlr.collections.List;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -17,12 +15,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.*;
 
 import ru.skypro.homework.service.impl.AdsServiceImpl;
-import ru.skypro.homework.service.impl.ImageServiceImpl;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -40,12 +36,13 @@ public class AdsApiController {
         this.adsServiceImpl = adsServiceImpl;
     }
 
-    @Operation(summary = "", description = "", tags = {"Объявления"})
+    @Operation(summary = "getALLAds", description = "", tags = {"Объявления"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ResponseWrapperAdsDto.class)))})
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+    //      GET http://localhost:8080/ads/
     public ResponseEntity<ResponseWrapperAdsDto> getALLAds() {
         return ResponseEntity.ok(adsServiceImpl.getALLAds());
     }
@@ -59,8 +56,8 @@ public class AdsApiController {
             @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    //      POST http://localhost:8080/ads/
     public ResponseEntity<AdsDto> addAds(
             @Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema())
             @RequestPart(value = "properties", required = false) CreateAdsDto properties,
@@ -77,6 +74,7 @@ public class AdsApiController {
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @GetMapping(value = "/{ad_pk}/comments",
             produces = {MediaType.APPLICATION_JSON_VALUE})
+    //      GET http://localhost:8080/ads/{ad_pk}/comments
     public ResponseEntity<ResponseWrapperCommentDto> getComments(
             @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema())
             @PathVariable("ad_pk") Integer adPk) {
@@ -110,6 +108,7 @@ public class AdsApiController {
                             schema = @Schema(implementation = FullAdsDto.class))),
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @GetMapping(value = "{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
+    //      GET http://localhost:8080/ads/{ad_pk}
     public ResponseEntity<FullAdsDto> getAds(@PathVariable("id") Integer idAds) {
         return ResponseEntity.ok(adsServiceImpl.getAds(idAds));
     }
@@ -136,7 +135,9 @@ public class AdsApiController {
     @PatchMapping(value = "/{id}",
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<AdsDto> updateAds(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("id") Integer id, @Parameter(in = ParameterIn.DEFAULT, description = "", required = true, schema = @Schema()) @Valid @RequestBody CreateAdsDto body) {
+    public ResponseEntity<AdsDto> updateAds(
+            @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("id") Integer id,
+            @Parameter(in = ParameterIn.DEFAULT, description = "", required = true, schema = @Schema()) @Valid @RequestBody CreateAdsDto body) {
         return ResponseEntity.ok(adsServiceImpl.updateAds(id, body));
     }
 
@@ -148,7 +149,7 @@ public class AdsApiController {
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @GetMapping(value = "/{ad_pk}/comments/{id}",
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    //      http://localhost/ads/2/comments/4
+    //      http://localhost:8080/ads/2/comments/4
     public ResponseEntity<CommentDto> getComments(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("ad_pk") Integer adPk, @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("id") Integer id) {
         return ResponseEntity.ok(adsServiceImpl.getCommentOfAds(adPk, id));
     }
@@ -195,8 +196,9 @@ public class AdsApiController {
             @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @GetMapping(value = "/me", produces = {MediaType.APPLICATION_JSON_VALUE})
+    //      http://localhost:8080/ads/me
     public ResponseEntity<ResponseWrapperAdsDto> getAdsMeUsingGET() {
-        return ResponseEntity.ok(adsServiceImpl.getALLAds());
+        return ResponseEntity.ok(adsServiceImpl.getALLAdsOfMe());
     }
 
 
@@ -209,7 +211,9 @@ public class AdsApiController {
     @PatchMapping(value = "{idAds}/image",
             produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE},
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<byte[]> updateImage(Integer idAds, MultipartFile image) throws IOException {
+    public ResponseEntity<byte[]> updateImage(
+            @PathVariable Integer idAds,
+            @RequestPart MultipartFile image) throws IOException {
         Pair<byte[], String> pair = adsServiceImpl.updateImageOfAds(idAds, image);
         return read(pair);
     }
@@ -222,7 +226,7 @@ public class AdsApiController {
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @GetMapping(value = "{idAds}/image",
             produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
-    public ResponseEntity<byte[]> getImage(Integer idAds) {
+    public ResponseEntity<byte[]> getImage(@PathVariable Integer idAds) {
         Pair<byte[], String> pair = adsServiceImpl.getImage(idAds);
         return read(pair);
     }
@@ -234,6 +238,11 @@ public class AdsApiController {
                 .body(pair.getFirst());
     }
 
+    @Operation(summary = "findByTitleLike", description = "", tags = {"Объявления"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ResponseWrapperAdsDto.class)))})
     @GetMapping(value = "/by-title", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ResponseWrapperAdsDto> findByTitleLike(@Param("title") String title) {
         return ResponseEntity.ok(adsServiceImpl.findAdsByTitle(title));

@@ -1,6 +1,8 @@
 package ru.skypro.homework.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,6 +19,7 @@ import ru.skypro.homework.dto.NewPasswordDto;
 import ru.skypro.homework.dto.UserDto;
 import ru.skypro.homework.service.impl.UserServiceImpl;
 
+import javax.validation.Valid;
 import java.io.IOException;
 
 
@@ -99,7 +102,8 @@ public class UsersApiController {
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @PatchMapping(value = "me",
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<UserDto> updateUser(UserDto body) {
+    public ResponseEntity<UserDto> updateUser(
+            @Parameter(in = ParameterIn.DEFAULT, description = "", required = true, schema = @Schema()) @Valid @RequestBody UserDto body) {
         return ResponseEntity.ok(userService.updateUser(body));
     }
 
