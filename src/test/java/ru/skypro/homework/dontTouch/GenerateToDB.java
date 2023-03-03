@@ -35,7 +35,7 @@ public class GenerateToDB {
 
 
     //Uncomment annotation and run this test for generate DB. After generate comment again
-    @Test
+//    @Test
     void contextLoads() {
         assertThat(adsRepository).isNotNull();
         assertThat(avatarRepository).isNotNull();
