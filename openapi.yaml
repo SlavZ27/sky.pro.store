@@ -1,16 +1,9 @@
-openapi: 3.0.1
+openapi: 3.0.3
 info:
-  contact: {}
-  description: Api Documentation
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0
-  termsOfService: urn:tos
-  title: Api Documentation
+  title: API Documentation
   version: '1.0'
 servers:
   - url: http://localhost:8080
-    description: Generated server url
 paths:
   /users/set_password:
     post:
@@ -33,12 +26,12 @@ paths:
                 $ref: '#/components/schemas/NewPassword'
         '401':
           description: Unauthorized
-          content: {}
+          content: { }
         '403':
           description: Forbidden
-          content: {}
+          content: { }
         '404':
-          content: {}
+          content: { }
           description: Not Found
 
   /register:
@@ -57,13 +50,13 @@ paths:
         '404':
           description: Not Found
         '201':
-          content: {}
+          content: { }
           description: Created
         '401':
-          content: {}
+          content: { }
           description: Unauthorized
         '403':
-          content: {}
+          content: { }
           description: Forbidden
   /login:
     post:
@@ -87,10 +80,10 @@ paths:
         '404':
           description: Not Found
         '401':
-          content: {}
+          content: { }
           description: Unauthorized
         '403':
-          content: {}
+          content: { }
           description: Forbidden
   /ads:
     get:
@@ -133,23 +126,24 @@ paths:
         '404':
           description: Not Found
         '403':
-          content: {}
+          content: { }
           description: Forbidden
         '401':
-          content: {}
+          content: { }
           description: Unauthorized
-  /ads/{ad_pk}/comments:
+  /ads/{id}/comments:
     get:
       tags:
         - Объявления
       summary: getComments
       operationId: getComments
       parameters:
-        - name: ad_pk
+        - name: id
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+            format: int32
       responses:
         '200':
           description: OK
@@ -166,11 +160,12 @@ paths:
       summary: addComments
       operationId: addComments
       parameters:
-        - name: ad_pk
+        - name: id
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+            format: int32
       requestBody:
         content:
           application/json:
@@ -187,17 +182,17 @@ paths:
         '404':
           description: Not Found
         '403':
-          content: {}
+          content: { }
           description: Forbidden
         '401':
-          content: {}
+          content: { }
           description: Unauthorized
   /users/me:
     get:
       tags:
         - Пользователи
       summary: getUser
-      operationId: getUser_1
+      operationId: getUser
       responses:
         '200':
           content:
@@ -206,13 +201,13 @@ paths:
                 $ref: '#/components/schemas/User'
           description: OK
         '401':
-          content: {}
+          content: { }
           description: Unauthorized
         '403':
-          content: {}
+          content: { }
           description: Forbidden
         '404':
-          content: {}
+          content: { }
           description: Not Found
     patch:
       tags:
@@ -234,13 +229,13 @@ paths:
                 $ref: '#/components/schemas/User'
         '204':
           description: No Content
-          content: {}
+          content: { }
         '401':
           description: Unauthorized
-          content: {}
+          content: { }
         '403':
           description: Forbidden
-          content: {}
+          content: { }
         '404':
           description: Not Found
   /users/me/image:
@@ -264,7 +259,7 @@ paths:
       responses:
         '200':
           description: OK
-          content: {}
+          content: { }
         '404':
           description: Not Found
   /ads/{id}:
@@ -303,13 +298,13 @@ paths:
             format: int32
       responses:
         '204':
-          content: {}
+          content: { }
           description: No Content
         '401':
-          content: {}
+          content: { }
           description: Unauthorized
         '403':
-          content: {}
+          content: { }
           description: Forbidden
     patch:
       tags:
@@ -339,24 +334,25 @@ paths:
         '404':
           description: Not Found
         '403':
-          content: {}
+          content: { }
           description: Forbidden
         '401':
-          content: {}
+          content: { }
           description: Unauthorized
-  /ads/{ad_pk}/comments/{id}:
+  /ads/{adId}/comments/{commentId}:
     get:
       tags:
         - Объявления
       summary: getComments
-      operationId: getComments_1
+      operationId: getComments
       parameters:
-        - name: ad_pk
+        - name: adId
           in: path
           required: true
           schema:
-            type: string
-        - name: id
+            type: integer
+            format: int32
+        - name: commentId
           in: path
           required: true
           schema:
@@ -377,12 +373,13 @@ paths:
       summary: deleteComments
       operationId: deleteComments
       parameters:
-        - name: ad_pk
+        - name: adId
           in: path
           required: true
           schema:
-            type: string
-        - name: id
+            type: integer
+            format: int32
+        - name: commentId
           in: path
           required: true
           schema:
@@ -394,10 +391,10 @@ paths:
         '404':
           description: Not Found
         '403':
-          content: {}
+          content: { }
           description: Forbidden
         '401':
-          content: {}
+          content: { }
           description: Unauthorized
     patch:
       tags:
@@ -405,12 +402,13 @@ paths:
       summary: updateComments
       operationId: updateComments
       parameters:
-        - name: ad_pk
+        - name: adId
           in: path
           required: true
           schema:
-            type: string
-        - name: id
+            type: integer
+            format: int32
+        - name: commentId
           in: path
           required: true
           schema:
@@ -432,36 +430,15 @@ paths:
         '404':
           description: Not Found
         '403':
-          content: {}
+          content: { }
           description: Forbidden
         '401':
-          content: {}
+          content: { }
           description: Unauthorized
-        
+
   /ads/me:
     get:
       operationId: getAdsMeUsingGET
-      parameters:
-        - in: query
-          name: authenticated
-          schema:
-            type: boolean
-        - in: query
-          name: authorities[0].authority
-          schema:
-            type: string
-        - in: query
-          name: credentials
-          schema:
-            type: object
-        - in: query
-          name: details
-          schema:
-            type: object
-        - in: query
-          name: principal
-          schema:
-            type: object
       responses:
         '200':
           content:
@@ -470,22 +447,18 @@ paths:
                 $ref: '#/components/schemas/ResponseWrapperAds'
           description: OK
         '401':
-          content: {}
+          content: { }
           description: Unauthorized
         '403':
-          content: {}
+          content: { }
           description: Forbidden
-        '404':
-          content: {}
-          description: Not Found
       summary: getAdsMe
       tags:
         - Объявления
-      x-accepts: '*/*'
-  /image/{id}:
+  /ads/{id}/image:
     patch:
       tags:
-        - Изображения
+        - Объявления
       summary: updateAdsImage
       operationId: updateImage
       parameters:
@@ -540,7 +513,7 @@ components:
           type: string
         phone:
           type: string
-        role:
+        role: #todo: need to add input it in front-side
           type: string
           enum:
             - USER
@@ -573,10 +546,8 @@ components:
           type: integer
           format: int32
         image:
-          type: array
-          items:
-            type: string
-        pk:
+          type: string
+        id:
           type: integer
           format: int32
         price:
@@ -592,7 +563,7 @@ components:
           format: int32
         createdAt:
           type: string
-        pk:
+        id:
           type: integer
           format: int32
         text:
@@ -611,9 +582,7 @@ components:
           type: string
         phone:
           type: string
-        regDate:
-          type: string
-        city:
+        regDate: #todo: need to add handling in front-side
           type: string
         image:
           type: string
@@ -630,21 +599,19 @@ components:
     FullAds:
       type: object
       properties:
-        authorFirstName:
+        authorFirstName: #todo: need to add handling in front-side
           type: string
-        authorLastName:
+        authorLastName: #todo: need to add handling in front-side
           type: string
         description:
           type: string
-        email:
+        email: #todo: need to add handling in front-side
           type: string
         image:
-          type: array
-          items:
-            type: string
-        phone:
           type: string
-        pk:
+        phone: #todo: need to add handling in front-side
+          type: string
+        id:
           type: integer
           format: int32
         price:

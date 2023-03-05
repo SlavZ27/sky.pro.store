@@ -22,9 +22,9 @@ import ru.skypro.homework.mapper.AdsMapper;
 import ru.skypro.homework.mapper.CommentMapper;
 
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.List;
-
 
 
 /**
@@ -48,7 +48,8 @@ public class AdsServiceImpl {
      * This method, uses method repository and Mapper, allows update Ads.
      * Uses {@link AdsRepository#findById(Object)}
      * Uses {@link AdsRepository#save(Object)}
-     * @param adsId is not null
+     *
+     * @param adsId        is not null
      * @param createAdsDto is not null
      * @return ads
      * @throws AdsNotFoundException if passed non- existent id
@@ -68,29 +69,32 @@ public class AdsServiceImpl {
     /**
      * This method uses method repository add Comments to Ads id
      * Uses {@link AdsRepository#findById(Object)}
-     * Uses {@link UserServiceImpl#getDefaultUser()}
-     * Uses {@link CommentServiceImpl#addCommentsToAds(Integer, Comment)}
-     * @param adsId is not null
+     * Uses {@link UserServiceImpl#getUserByUserName}
+     * Uses {@link CommentServiceImpl#addCommentsToAds(Ads, Comment, User)}
+     *
+     * @param adsId      is not null
      * @param commentDto is not null
      * @return adsId, comment
      * @throws AdsNotFoundException if passed non- existent id
      */
-    public CommentDto addCommentsToAds(Integer adsId, CommentDto commentDto) {
-        adsRepository.findById(adsId).orElseThrow(() -> {
+    public CommentDto addCommentsToAds(Integer adsId, CommentDto commentDto, String username) {
+        User user = userService.getUserByUserName(username);
+        Ads ads = adsRepository.findById(adsId).orElseThrow(() -> {
             log.error("There is not ads with id = " + adsId);
             return new AdsNotFoundException(adsId);
         });
-        commentDto.setAuthor(userService.getDefaultUser().getId());
+        commentDto.setAuthor(user.getId());
         Comment comment = commentMapper.dtoToComment(commentDto);
-        return commentMapper.commentToDto(commentService.addCommentsToAds(adsId, comment));
+        return commentMapper.commentToDto(commentService.addCommentsToAds(ads, comment, user));
     }
 
     /**
      * This method uses method repository update Comments to Ads id and comment id.
      * Uses {@link AdsRepository#findById(Object)}
-     * Uses {@link CommentServiceImpl#updateCommentsForAds(CommentDto, Integer, Integer)}
-     * @param adPk is not null
-     * @param commentId is not null
+     * Uses {@link CommentServiceImpl#updateCommentsForAds(CommentDto, Ads, Integer)}
+     *
+     * @param adPk       is not null
+     * @param commentId  is not null
      * @param commentDto is not null
      * @return comment
      * @throws AdsNotFoundException if passed non- existent id
@@ -100,13 +104,14 @@ public class AdsServiceImpl {
             log.error("There is not ads with id = " + adPk);
             return new AdsNotFoundException(adPk);
         });
-        return commentMapper.commentToDto(commentService.updateCommentsForAds(commentDto, ads.getId(), commentId));
+        return commentMapper.commentToDto(commentService.updateCommentsForAds(commentDto, ads, commentId));
     }
 
     /**
      * This method uses method repository get Comments to Ads id.
      * Uses {@link AdsRepository#findById(Object)}
      * Uses {@link CommentServiceImpl#getAllByIdAdsAndSortDateTime(Integer)}
+     *
      * @param adsId is not null
      * @return comment
      * @throws AdsNotFoundException if passed non- existent id
@@ -129,6 +134,7 @@ public class AdsServiceImpl {
      * Uses {@link ImageServiceImpl#removeImageWithFile(Image)}
      * Uses {@link ImageServiceImpl#getImageData(Image)}
      * Uses {@link CommentServiceImpl#getAllByIdAds(Integer)}
+     *
      * @param idAds is not null
      * @return HttpStatus.NO_CONTENT or null
      * @throws AdsNotFoundException if passed non- existent id
@@ -170,7 +176,8 @@ public class AdsServiceImpl {
      * This method uses method repository get Comments to Ads id and comment id
      * Uses {@link AdsRepository#findById(Object)}
      * Uses {@link CommentServiceImpl#getCommentOfAds(Integer, Integer)}
-     * @param adsId is not null
+     *
+     * @param adsId     is not null
      * @param commentId is not null
      * @return comment
      * @throws AdsNotFoundException if passed non- existent id
@@ -185,16 +192,17 @@ public class AdsServiceImpl {
 
     /**
      * This method uses method repository get Ads to CreateAdsDto
-     * Uses {@link UserServiceImpl#getDefaultUser()}
+     * Uses {@link UserServiceImpl#getUserByUserName(String)}
      * Uses {@link AdsRepository#save(Object)}
      * Uses {@link ImageServiceImpl#addImage(MultipartFile, String)}
+     *
      * @param createAdsDto is not null
-     * @param image is not null
+     * @param image        is not null
      * @return Ads
      * @throws IOException
      */
     public AdsDto addAds(CreateAdsDto createAdsDto, MultipartFile image) throws IOException {
-        User user = userService.getDefaultUser();
+        User user = userService.getUserByUserName("user@gmail.com");
         Ads ads = createAdsMapper.createAdsDtoToAds(createAdsDto);
         ads.setAuthor(user);
         ads.setDateTime(LocalDateTime.now());
@@ -207,6 +215,7 @@ public class AdsServiceImpl {
     /**
      * This method uses method repository get Ads to Ads id
      * Uses {@link AdsRepository#findById(Object)}
+     *
      * @param idAds is not null
      * @return ads
      * @throws AdsNotFoundException if passed non- existent id
@@ -219,6 +228,7 @@ public class AdsServiceImpl {
     /**
      * This method uses method repository get all Ads
      * Uses {@link AdsRepository#findAllAndSortDateTime()}
+     *
      * @return List<Ads>
      */
     public ResponseWrapperAdsDto getALLAds() {
@@ -230,10 +240,11 @@ public class AdsServiceImpl {
     /**
      * This method uses method repository get Ads for Default user
      * Uses {@link AdsRepository#findAllByUserIdAndSortDateTime(Integer)}
+     *
      * @return List<Ads> to default user
      */
-    public ResponseWrapperAdsDto getALLAdsOfMe() {
-        User user = userService.getDefaultUser();
+    public ResponseWrapperAdsDto getALLAdsOfMe(String username) {
+        User user = userService.getUserByUserName(username);
         List<Ads> list = adsRepository.findAllByUserIdAndSortDateTime(user.getId());
         List<AdsDto> listDto = adsMapper.mapListOfAdsToListDTO(list);
         return adsMapper.mapToResponseWrapperAdsDto(listDto, listDto.size());
@@ -242,23 +253,30 @@ public class AdsServiceImpl {
     /**
      * This method uses method repository get comment for Ads id and comment id
      * Uses {@link AdsRepository#findById(Object)}
-     * Uses {@link CommentServiceImpl#removeCommentForAds(Integer, Integer)}
-     * @param adPk is not null
+     * Uses {@link CommentServiceImpl#removeCommentForAds(Integer, Integer, User)}
+     *
+     * @param adPk      is not null
      * @param commentId is not null
-     * @return  null or HttpStatus.OK
+     * @return null or HttpStatus.OK
      * @throws AdsNotFoundException if passed non- existent id
      */
-    public ResponseEntity<Void> removeCommentsForAds(Integer adPk, Integer commentId) {
-        adsRepository.findById(adPk).orElseThrow(() -> {
-            log.error("There is not ads with id = " + adPk);
-            return new AdsNotFoundException(adPk);
-        });
-        commentService.removeCommentForAds(adPk, commentId);
+    public ResponseEntity<Void> removeCommentsForAds(Integer adPk, Integer commentId, String username) {
+        User user = userService.getUserByUserName(username);
+        if (userService.checkAdmin(user)) {
+            commentService.removeCommentAdmin(commentId);
+        } else {
+            adsRepository.findById(adPk).orElseThrow(() -> {
+                log.error("There is not ads with id = " + adPk);
+                return new AdsNotFoundException(adPk);
+            });
+            commentService.removeCommentForAds(adPk, commentId, user);
+        }
         return new ResponseEntity<Void>(HttpStatus.OK);
     }
 
     /**
      * This method uses method repository get name file for image
+     *
      * @param ads is not null
      * @return Name file for image
      */
@@ -273,6 +291,7 @@ public class AdsServiceImpl {
      * Uses {@link ImageServiceImpl#updateImage(Image, MultipartFile, String)}
      * Uses {@link AdsRepository#save(Object)}
      * Uses {@link ImageServiceImpl#getImageData(Image)}
+     *
      * @param idAds is not null
      * @param image is not null
      * @return image for ads
@@ -296,9 +315,10 @@ public class AdsServiceImpl {
      * This method uses method repository get image for Ads id
      * Uses {@link AdsRepository#findById(Object)}
      * Uses {@link ImageServiceImpl#getImageData(Image)}
+     *
      * @param idAds is not null
      * @return image
-     * @throws AdsNotFoundException if passed non- existent id
+     * @throws AdsNotFoundException   if passed non- existent id
      * @throws ImageNotFoundException if passed existent id Ads
      */
     public Pair<byte[], String> getImage(Integer idAds) {
@@ -316,6 +336,7 @@ public class AdsServiceImpl {
     /**
      * This method uses method repository find Ads for Title
      * Uses {@link AdsRepository#findByTitleLike(String)}
+     *
      * @param title is not null
      * @return ads
      */

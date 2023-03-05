@@ -14,6 +14,9 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.*;
@@ -22,6 +25,7 @@ import ru.skypro.homework.service.impl.AdsServiceImpl;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 
 
 @Slf4j
@@ -96,8 +100,9 @@ public class AdsApiController {
             @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema())
             @PathVariable("ad_pk") Integer adPk,
             @Parameter(in = ParameterIn.DEFAULT, description = "", required = true, schema = @Schema())
-            @Valid @RequestBody CommentDto body) {
-        CommentDto commentDto = adsServiceImpl.addCommentsToAds(adPk, body);
+            @Valid @RequestBody CommentDto body,
+            Authentication authentication) {
+        CommentDto commentDto = adsServiceImpl.addCommentsToAds(adPk, body, authentication.getName());
         return ResponseEntity.ok(commentDto);
     }
 
@@ -161,9 +166,16 @@ public class AdsApiController {
             @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @DeleteMapping(value = "/{ad_pk}/comments/{id}")
-    public ResponseEntity<Void> deleteComments(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("ad_pk") Integer adPk, @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("id") Integer id) {
-        return adsServiceImpl.removeCommentsForAds(adPk, id);
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Void> deleteComments(
+            @Parameter(in = ParameterIn.PATH, description = "", required = true,
+                    schema = @Schema()) @PathVariable("ad_pk") Integer adPk,
+            @Parameter(in = ParameterIn.PATH, description = "", required = true,
+                    schema = @Schema()) @PathVariable("id") Integer id,
+            Authentication authentication) {
+        return adsServiceImpl.removeCommentsForAds(adPk, id, authentication.getName());
     }
+
 
     @Operation(summary = "updateComments", description = "", tags = {"Объявления"})
     @ApiResponses(value = {
@@ -197,8 +209,8 @@ public class AdsApiController {
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @GetMapping(value = "/me", produces = {MediaType.APPLICATION_JSON_VALUE})
     //      http://localhost:8080/ads/me
-    public ResponseEntity<ResponseWrapperAdsDto> getAdsMeUsingGET() {
-        return ResponseEntity.ok(adsServiceImpl.getALLAdsOfMe());
+    public ResponseEntity<ResponseWrapperAdsDto> getAdsMeUsingGET(Authentication authentication) {
+        return ResponseEntity.ok(adsServiceImpl.getALLAdsOfMe(authentication.getName()));
     }
 
 
