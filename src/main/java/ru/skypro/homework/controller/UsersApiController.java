@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -52,6 +53,7 @@ public class UsersApiController {
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @GetMapping(value = "me",
             produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<UserDto> getUser1(Authentication authentication) {
         return ResponseEntity.ok(userService.getUser(authentication.getName()));
     }
@@ -64,6 +66,7 @@ public class UsersApiController {
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @GetMapping(value = "me/image",
             produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<byte[]> getAvatar(Authentication authentication) {
         Pair<byte[], String> pair = userService.getAvatarMe(authentication.getName());
         return read(pair);

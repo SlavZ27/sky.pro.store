@@ -41,9 +41,9 @@ public class UserServiceImpl {
                 new UserNotFoundException(userName));
     }
 
-    public boolean checkAdmin(User user) {
-        return authorityService.checkRoleForUsername(user, Role.ADMIN);
-    }
+//    public boolean checkAdmin(User user) {
+//        return authorityService.checkRoleForUsername(user, Role.ADMIN);
+//    }
 
     public NewPasswordDto setPassword(NewPasswordDto body) {
         User user = null;

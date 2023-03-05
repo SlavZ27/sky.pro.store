@@ -145,19 +145,15 @@ public class CommentServiceImpl {
      * @param commentId is not null
      * @throws CommentNotFoundException if passed non id comment
      */
-    public void removeCommentForAds(Integer adPk, Integer commentId, User user){
+    public void removeCommentForAds(Integer adPk, Integer commentId){
         Comment comment = commentRepository.findAllByIdAndAdsId(adPk, commentId).orElseThrow(() ->
                 new CommentNotFoundException(commentId));
-        if (comment.getAuthor().getId().equals(user.getId())) {
             removeComment(comment);
-        } else {
-            throw new ForbiddenException();
-        }
     }
 
-    public void removeCommentAdmin(Integer commentId) {
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
-                new CommentNotFoundException(commentId));
-        removeComment(comment);
-    }
+//    public void removeCommentAdmin(Integer commentId) {
+//        Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
+//                new CommentNotFoundException(commentId));
+//        removeComment(comment);
+//    }
 }

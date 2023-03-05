@@ -36,7 +36,7 @@ public class AuthorityService {
         return authorityRepository.getAllByUsername(user.getUsername());
     }
 
-    public boolean checkRoleForUsername(User user, Role role) {
-        return authorityRepository.findByUsernameAndAuthority(user.getUsername(), "ROLE_" + role.name()).isPresent();
-    }
+//    public boolean checkRoleForUsername(User user, Role role) {
+//        return authorityRepository.findByUsernameAndAuthority(user.getUsername(), "ROLE_" + role.name()).isPresent();
+//    }
 }

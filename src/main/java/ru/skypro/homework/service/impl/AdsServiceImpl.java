@@ -253,24 +253,19 @@ public class AdsServiceImpl {
     /**
      * This method uses method repository get comment for Ads id and comment id
      * Uses {@link AdsRepository#findById(Object)}
-     * Uses {@link CommentServiceImpl#removeCommentForAds(Integer, Integer, User)}
+     * Uses {@link CommentServiceImpl#removeCommentForAds(Integer, Integer)} 
      *
      * @param adPk      is not null
      * @param commentId is not null
      * @return null or HttpStatus.OK
      * @throws AdsNotFoundException if passed non- existent id
      */
-    public ResponseEntity<Void> removeCommentsForAds(Integer adPk, Integer commentId, String username) {
-        User user = userService.getUserByUserName(username);
-        if (userService.checkAdmin(user)) {
-            commentService.removeCommentAdmin(commentId);
-        } else {
+    public ResponseEntity<Void> removeCommentsForAds(Integer adPk, Integer commentId) {
             adsRepository.findById(adPk).orElseThrow(() -> {
                 log.error("There is not ads with id = " + adPk);
                 return new AdsNotFoundException(adPk);
             });
-            commentService.removeCommentForAds(adPk, commentId, user);
-        }
+            commentService.removeCommentForAds(adPk, commentId);
         return new ResponseEntity<Void>(HttpStatus.OK);
     }
 
