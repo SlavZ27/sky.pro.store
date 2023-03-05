@@ -22,7 +22,6 @@ import ru.skypro.homework.mapper.AdsMapper;
 import ru.skypro.homework.mapper.CommentMapper;
 
 import java.io.IOException;
-import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -55,13 +54,14 @@ public class AdsServiceImpl {
      * @throws AdsNotFoundException if passed non- existent id
      */
     public AdsDto updateAds(Integer adsId, CreateAdsDto createAdsDto) {
+        Ads newAds = createAdsMapper.createAdsDtoToAds(createAdsDto);
         Ads oldAds = adsRepository.findById(adsId).orElseThrow(() -> {
             log.error("There is not ads with id = " + adsId);
             return new AdsNotFoundException(adsId);
         });
-        oldAds.setDescription(createAdsDto.getDescription());
-        oldAds.setPrice(createAdsDto.getPrice());
-        oldAds.setTitle(createAdsDto.getTitle());
+        oldAds.setDescription(newAds.getDescription());
+        oldAds.setPrice(newAds.getPrice());
+        oldAds.setTitle(newAds.getTitle());
         return adsMapper.adsToAdsDto(adsRepository.save(oldAds));
     }
 
@@ -83,7 +83,6 @@ public class AdsServiceImpl {
             log.error("There is not ads with id = " + adsId);
             return new AdsNotFoundException(adsId);
         });
-        commentDto.setAuthor(user.getId());
         Comment comment = commentMapper.dtoToComment(commentDto);
         return commentMapper.commentToDto(commentService.addCommentsToAds(ads, comment, user));
     }
@@ -122,7 +121,8 @@ public class AdsServiceImpl {
             return new AdsNotFoundException(adsId);
         });
         List<CommentDto> commentList = commentMapper.mapListOfCommentToListDto(
-                commentService.getAllByIdAdsAndSortDateTime(ads.getId()));
+                commentService.getAllByIdAdsAndSortDateTime(ads.getId())
+        );
         return commentMapper.mapListOfCommentDtoToResponseWrapper(commentList.size(), commentList);
     }
 
@@ -163,11 +163,14 @@ public class AdsServiceImpl {
         } catch (ImageNotFoundException e) {
             existFile = false;
         }
+        //checking comments
+        int countComments = commentService.getCountByIdAds(idAds);
         //checking finish
         if (adsMustBeNull == null &&
                 imageMustBeNull == null &&
-                !existFile) {
-            return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+                !existFile &&
+                countComments == 0) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return null;
     }
@@ -199,15 +202,14 @@ public class AdsServiceImpl {
      * @param createAdsDto is not null
      * @param image        is not null
      * @return Ads
-     * @throws IOException
      */
-    public AdsDto addAds(CreateAdsDto createAdsDto, MultipartFile image) throws IOException {
-        User user = userService.getUserByUserName("user@gmail.com");
+    public AdsDto addAds(CreateAdsDto createAdsDto, MultipartFile image, String username) throws IOException {
+        User user = userService.getUserByUserName(username);
         Ads ads = createAdsMapper.createAdsDtoToAds(createAdsDto);
         ads.setAuthor(user);
         ads.setDateTime(LocalDateTime.now());
         ads = adsRepository.save(ads);
-        Image addedImage = imageService.addImage(image, "ads_" + ads.getId().toString());
+        Image addedImage = imageService.addImage(image, getNameFileForImage(ads));
         ads.setImage(addedImage);
         return adsMapper.adsToAdsDto(adsRepository.save(ads));
     }
@@ -232,8 +234,9 @@ public class AdsServiceImpl {
      * @return List<Ads>
      */
     public ResponseWrapperAdsDto getALLAds() {
-        List<Ads> list = adsRepository.findAllAndSortDateTime();
-        List<AdsDto> listDto = adsMapper.mapListOfAdsToListDTO(list);
+        List<AdsDto> listDto = adsMapper.mapListOfAdsToListDTO(
+                adsRepository.findAllAndSortDateTime()
+        );
         return adsMapper.mapToResponseWrapperAdsDto(listDto, listDto.size());
     }
 
@@ -244,16 +247,16 @@ public class AdsServiceImpl {
      * @return List<Ads> to default user
      */
     public ResponseWrapperAdsDto getALLAdsOfMe(String username) {
-        User user = userService.getUserByUserName(username);
-        List<Ads> list = adsRepository.findAllByUserIdAndSortDateTime(user.getId());
-        List<AdsDto> listDto = adsMapper.mapListOfAdsToListDTO(list);
+        List<AdsDto> listDto = adsMapper.mapListOfAdsToListDTO(
+                adsRepository.findAllByUsernameAndSortDateTime(username)
+        );
         return adsMapper.mapToResponseWrapperAdsDto(listDto, listDto.size());
     }
 
     /**
      * This method uses method repository get comment for Ads id and comment id
      * Uses {@link AdsRepository#findById(Object)}
-     * Uses {@link CommentServiceImpl#removeCommentForAds(Integer, Integer)} 
+     * Uses {@link CommentServiceImpl#removeCommentForAds(Integer, Integer)}
      *
      * @param adPk      is not null
      * @param commentId is not null
@@ -261,12 +264,12 @@ public class AdsServiceImpl {
      * @throws AdsNotFoundException if passed non- existent id
      */
     public ResponseEntity<Void> removeCommentsForAds(Integer adPk, Integer commentId) {
-            adsRepository.findById(adPk).orElseThrow(() -> {
-                log.error("There is not ads with id = " + adPk);
-                return new AdsNotFoundException(adPk);
-            });
-            commentService.removeCommentForAds(adPk, commentId);
-        return new ResponseEntity<Void>(HttpStatus.OK);
+        adsRepository.findById(adPk).orElseThrow(() -> {
+            log.error("There is not ads with id = " + adPk);
+            return new AdsNotFoundException(adPk);
+        });
+        commentService.removeCommentForAds(adPk, commentId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**
@@ -290,20 +293,23 @@ public class AdsServiceImpl {
      * @param idAds is not null
      * @param image is not null
      * @return image for ads
-     * @throws IOException
      */
     public Pair<byte[], String> updateImageOfAds(Integer idAds, MultipartFile image) throws IOException {
         Ads ads = adsRepository.findById(idAds).orElseThrow(() -> {
             log.error("There is not ads with id = " + idAds);
             return new AdsNotFoundException(idAds);
         });
+        updateImageOfAds(ads, image);
+        ads = adsRepository.save(ads);
+        return imageService.getImageData(ads.getImage());
+    }
+
+    private void updateImageOfAds(Ads ads, MultipartFile image) throws IOException {
         if (ads.getImage() == null) {
             ads.setImage(imageService.addImage(image, getNameFileForImage(ads)));
         } else {
             ads.setImage(imageService.updateImage(ads.getImage(), image, getNameFileForImage(ads)));
         }
-        ads = adsRepository.save(ads);
-        return imageService.getImageData(ads.getImage());
     }
 
     /**
@@ -323,9 +329,8 @@ public class AdsServiceImpl {
         });
         if (ads.getImage() == null) {
             throw new ImageNotFoundException("Image for ads with id = " + ads.getId() + " is absent");
-        } else {
-            return imageService.getImageData(ads.getImage());
         }
+        return imageService.getImageData(ads.getImage());
     }
 
     /**
@@ -336,8 +341,9 @@ public class AdsServiceImpl {
      * @return ads
      */
     public ResponseWrapperAdsDto findAdsByTitle(String title) {
-        List<Ads> list = adsRepository.findByTitleLike(title);
-        List<AdsDto> listDto = adsMapper.mapListOfAdsToListDTO(list);
+        List<AdsDto> listDto = adsMapper.mapListOfAdsToListDTO(
+                adsRepository.findByTitleLike(title)
+        );
         return adsMapper.mapToResponseWrapperAdsDto(listDto, listDto.size());
     }
 }

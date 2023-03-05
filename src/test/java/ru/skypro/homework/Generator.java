@@ -178,7 +178,7 @@ public class Generator {
         return user;
     }
 
-    private String generatePasswordIfEmpty(String password, boolean bcrypt) {
+    public String generatePasswordIfEmpty(String password, boolean bcrypt) {
         if (password == null) {
             password = faker.internet().password();
         }
@@ -343,9 +343,9 @@ public class Generator {
         if (role == null) {
             authority.setAuthority(generateRoleIfEmpty(null).toString());
         } else {
-            authority.setAuthority(role.name());
+            authority.setAuthority(role.getRole());
         }
-        authority.setAuthority("ROLE_" + authority.getAuthority());
+        authority.setAuthority(authority.getAuthority());
         return authority;
     }
 

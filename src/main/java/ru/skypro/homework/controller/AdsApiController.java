@@ -15,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +25,6 @@ import ru.skypro.homework.service.impl.AdsServiceImpl;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.nio.file.AccessDeniedException;
 
 
 @Slf4j
@@ -70,8 +68,9 @@ public class AdsApiController {
             @Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema())
             @RequestPart(value = "properties", required = false) CreateAdsDto properties,
             @Parameter(description = "file detail")
-            @RequestPart("image") MultipartFile image) throws IOException {
-        return ResponseEntity.ok(adsServiceImpl.addAds(properties, image));
+            @RequestPart("image") MultipartFile image,
+            Authentication authentication) throws IOException {
+        return ResponseEntity.ok(adsServiceImpl.addAds(properties, image, authentication.getName()));
     }
 
     @Operation(summary = "getComments", description = "", tags = {"Объявления"})
@@ -123,7 +122,6 @@ public class AdsApiController {
     @GetMapping(value = "{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
     //      GET http://localhost:8080/ads/{ad_pk}
     // // available only for the authenticated
-    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<FullAdsDto> getAds(@PathVariable("id") Integer idAds) {
         return ResponseEntity.ok(adsServiceImpl.getAds(idAds));
     }
@@ -136,7 +134,7 @@ public class AdsApiController {
             @ApiResponse(responseCode = "404", description = "Not Found")})     //was not in the specification
     @DeleteMapping(value = "{id_ads}")
     // available only to the admin or the user who created this ad
-    @PreAuthorize("@userSecurity.isAdsAuthor(#idAds) or hasAuthority('ADMIN')")
+    @PreAuthorize("@userSecurity.isAdsAuthor(#idAds) or hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Void> removeAds(@PathVariable("id_ads") Integer idAds) {
         return adsServiceImpl.removeAds(idAds);
     }
@@ -153,10 +151,12 @@ public class AdsApiController {
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
 //    available only to the admin or the user who created this ad
-    @PreAuthorize("@userSecurity.isAdsAuthor(#id) or hasAuthority('ADMIN')")
+    @PreAuthorize("@userSecurity.isAdsAuthor(#id) or hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<AdsDto> updateAds(
-            @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("id") Integer id,
-            @Parameter(in = ParameterIn.DEFAULT, description = "", required = true, schema = @Schema()) @Valid @RequestBody CreateAdsDto body) {
+            @Parameter(in = ParameterIn.PATH, description = "", required = true,
+                    schema = @Schema()) @PathVariable("id") Integer id,
+            @Parameter(in = ParameterIn.DEFAULT, description = "", required = true,
+                    schema = @Schema()) @Valid @RequestBody CreateAdsDto body) {
         return ResponseEntity.ok(adsServiceImpl.updateAds(id, body));
     }
 
@@ -170,7 +170,11 @@ public class AdsApiController {
             produces = {MediaType.APPLICATION_JSON_VALUE})
     //      http://localhost:8080/ads/2/comments/4
     // // available only for the authenticated users
-    public ResponseEntity<CommentDto> getComments(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("ad_pk") Integer adPk, @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("id") Integer id) {
+    public ResponseEntity<CommentDto> getComments(
+            @Parameter(in = ParameterIn.PATH, description = "", required = true,
+                    schema = @Schema()) @PathVariable("ad_pk") Integer adPk,
+            @Parameter(in = ParameterIn.PATH, description = "", required = true,
+                    schema = @Schema()) @PathVariable("id") Integer id) {
         return ResponseEntity.ok(adsServiceImpl.getCommentOfAds(adPk, id));
     }
 
@@ -182,7 +186,7 @@ public class AdsApiController {
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @DeleteMapping(value = "/{ad_pk}/comments/{id}")
 //    @PreAuthorize("@userSecurity.isCommentAuthor(#id)")
-    @PreAuthorize("@userSecurity.isCommentAuthor(#id) or hasAuthority('ADMIN')")
+    @PreAuthorize("@userSecurity.isCommentAuthor(#id) or hasAuthority('ROLE_ADMIN')")
 //    available only to the admin or the user who created this comment
     public ResponseEntity<Void> deleteComments(
             @Parameter(in = ParameterIn.PATH, description = "", required = true,
@@ -205,7 +209,7 @@ public class AdsApiController {
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     //    available only to the admin or the user who created this comment
-    @PreAuthorize("@userSecurity.isCommentAuthor(#id) or hasAuthority('ADMIN')")
+    @PreAuthorize("@userSecurity.isCommentAuthor(#id) or hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<CommentDto> updateComments(
             @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema())
             @PathVariable("ad_pk") Integer adPk,
@@ -243,7 +247,7 @@ public class AdsApiController {
             produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE},
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     // available only to the admin or the user who created ad with this image
-    @PreAuthorize("@userSecurity.isAdsAuthor(#idAds) or hasAuthority('ADMIN')")
+    @PreAuthorize("@userSecurity.isAdsAuthor(#idAds) or hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<byte[]> updateImage(
             @PathVariable Integer idAds,
             @RequestPart MultipartFile image) throws IOException {

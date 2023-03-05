@@ -24,7 +24,7 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
 
     @Query(value = "select * from comment where id=:commentId and id_ads=:adsId"
             , nativeQuery = true)
-    Optional<Comment> findAllByIdAndAdsId(Integer adsId, Integer commentId);
+    Optional<Comment> findByIdAndAdsId(Integer adsId, Integer commentId);
 
     @Modifying
     @Query(value = "DELETE FROM comment WHERE id_ads=:adsId",
@@ -34,5 +34,4 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
     @Query(value = "select count(*) from comment WHERE id_ads=:adsId"
             , nativeQuery = true)
     int getCountAllByAdsId(Integer adsId);
-
 }

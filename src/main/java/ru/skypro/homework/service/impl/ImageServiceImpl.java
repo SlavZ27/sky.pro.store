@@ -34,68 +34,65 @@ public class ImageServiceImpl {
      * This method, uses method repository, update image
      * Uses {@link ImageRepository#findById(Object)}
      * Uses {@link ImageRepository#save(Object)}
-     * @param image is not null
-     * @param file is not null
+     *
+     * @param image    is not null
+     * @param file     is not null
      * @param nameFile is not null
      * @return oldImage
      */
     public Image updateImage(Image image, MultipartFile file, String nameFile) {
         if (image == null || image.getId() == null) {
-            return null;
+            throw new IllegalArgumentException();
         }
-        Image oldImage = imageRepository.findById(image.getId()).orElseThrow(() ->
-                new ImageNotFoundException(image.getId()));
-        Path pathOld = Paths.get(oldImage.getPath());
+        Path pathOld = Paths.get(image.getPath());
         Path pathNew = generatePath(file, nameFile);
         try {
             Files.write(pathNew, file.getBytes());
             if (Files.exists(pathNew)) {
-                Files.deleteIfExists(pathOld);
                 image.setPath(pathNew.toString());
-                imageRepository.save(image);
+                image = imageRepository.save(image);
+                Files.deleteIfExists(pathOld);
             }
         } catch (IOException ignored) {
             throw new ImageNotFoundException("Absent file in Image with id = " + image.getId());
         } catch (NullPointerException e) {
             throw new ImageNotFoundException("Absent path in Image with id = " + image.getId());
         }
-        return oldImage;
+        return image;
     }
 
     /**
      * This method, uses method repository, get image from data
      * Uses {@link ImageRepository#findById(Object)}
+     *
      * @param image is not null
      * @return image data
      * @throws ImageNotFoundException if passed non id comment
      */
     public Pair<byte[], String> getImageData(Image image) {
         if (image == null || image.getId() == null) {
-            return null;
+            throw new IllegalArgumentException();
         }
-        imageRepository.findById(image.getId()).orElseThrow(() ->
-                new ImageNotFoundException(image.getId()));
-        byte[] bytes;
         try {
-            bytes = Files.readAllBytes(Paths.get(image.getPath()));
+            return Pair.of(Files.readAllBytes(Paths.get(image.getPath())), MediaType.IMAGE_JPEG_VALUE);
         } catch (IOException ignored) {
             throw new ImageNotFoundException("Absent file in Image with id = " + image.getId());
         } catch (NullPointerException e) {
             throw new ImageNotFoundException("Absent path in Image with id = " + image.getId());
         }
-        return Pair.of(bytes, MediaType.IMAGE_JPEG_VALUE);
     }
 
     /**
      * This method, uses method repository, get image by id image
      * Uses {@link ImageRepository#findById(Object)}
+     *
      * @param id is not null
      * @return image
      * @throws ImageNotFoundException if passed non id comment
      */
     public Image getImage(Integer id) {
         if (id == null) {
-            return null;
+            throw new IllegalArgumentException();
         }
         return imageRepository.findById(id).orElseThrow(() ->
                 new ImageNotFoundException(id));
@@ -108,21 +105,20 @@ public class ImageServiceImpl {
      *
      * @param image is not null
      */
-    public void removeImageWithFile(Image image) {
+    public boolean removeImageWithFile(Image image) {
         Path path = Path.of(image.getPath());
         try {
             Files.deleteIfExists(path);
         } catch (IOException ignored) {
         }
         imageRepository.delete(image);
-        if (Files.exists(path) || imageRepository.findById(image.getId()).isPresent()) {
-        } else {
-        }
+        return !Files.exists(path) && imageRepository.findById(image.getId()).isEmpty();
     }
 
     /**
      * This method generate Path to file image for string.
-     * @param file is not null
+     *
+     * @param file     is not null
      * @param nameFile us not null
      * @return Patch with the specified data
      */
@@ -137,10 +133,10 @@ public class ImageServiceImpl {
     /**
      * This method, uses method repository, add image
      * Uses {@link ImageRepository#save(Object)}
-     * @param file is not null
+     *
+     * @param file     is not null
      * @param nameFile is not null
      * @return image
-     * @throws IOException
      */
     public Image addImage(MultipartFile file, String nameFile) throws IOException {
         byte[] data = file.getBytes();
@@ -148,7 +144,6 @@ public class ImageServiceImpl {
         Files.write(path, data);
         Image image = new Image();
         image.setPath(path.toString());
-        image = imageRepository.save(image);
-        return image;
+        return imageRepository.save(image);
     }
 }

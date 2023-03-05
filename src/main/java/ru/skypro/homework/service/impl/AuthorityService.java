@@ -19,24 +19,17 @@ public class AuthorityService {
 
     public void addAuthority(User user, Role role) {
         Authority tempAuthority = new Authority();
-        tempAuthority.setAuthority(role.name());
+        tempAuthority.setAuthority(role.getRole());
         tempAuthority.setUsername(user.getUsername());
         authorityRepository.save(tempAuthority);
     }
 
     public void delAuthority(User user, Role role) {
-        Authority tempAuthority = authorityRepository.findByUsernameAndAuthority(user.getUsername(), "ROLE_" + role.name())
-                .orElse(null);
-        if (tempAuthority != null) {
-            authorityRepository.delete(tempAuthority);
-        }
+        authorityRepository.findByUsernameAndAuthority(user.getUsername(), role.getRole())
+                .ifPresent(authorityRepository::delete);
     }
 
     public List<Authority> getAuthority(User user) {
         return authorityRepository.getAllByUsername(user.getUsername());
     }
-
-//    public boolean checkRoleForUsername(User user, Role role) {
-//        return authorityRepository.findByUsernameAndAuthority(user.getUsername(), "ROLE_" + role.name()).isPresent();
-//    }
 }
