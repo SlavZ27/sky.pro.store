@@ -2,7 +2,6 @@ package ru.skypro.homework.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.skypro.homework.dto.CommentDto;
 import ru.skypro.homework.entity.Ads;
@@ -10,17 +9,16 @@ import ru.skypro.homework.entity.Comment;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.AdsNotFoundException;
 import ru.skypro.homework.exception.CommentNotFoundException;
-import ru.skypro.homework.exception.ForbiddenException;
+import ru.skypro.homework.mapper.CommentMapper;
 import ru.skypro.homework.repository.AdsRepository;
 import ru.skypro.homework.repository.CommentRepository;
 
-import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
- * This class processes commands related to create comments in ads allowing users to create, update, get, delete comments.
+ * This class processes commands related to create comments
+ * in ads allowing users to create, update, get, delete comments.
  */
 @Service
 @Slf4j
@@ -28,6 +26,7 @@ import java.util.List;
 public class CommentServiceImpl {
 
     private final CommentRepository commentRepository;
+    private final CommentMapper commentMapper;
 
     /**
      * This method, used by method repository, allows you to create a new comment.
@@ -64,18 +63,19 @@ public class CommentServiceImpl {
      * @throws CommentNotFoundException if passed non id comment
      */
     public Comment updateCommentsForAds(CommentDto commentDto, Ads ads, Integer commentId) {
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> {
+        Comment newComment = commentMapper.dtoToComment(commentDto);
+        Comment oldComment = commentRepository.findByIdAndAdsId(ads.getId(), commentId).orElseThrow(() -> {
             log.error("There is not comment with id = " + commentId);
             return new CommentNotFoundException(commentId);
         });
-
-        comment.setAds(ads);
-        comment.setAuthor(ads.getAuthor());
-        comment.setText(commentDto.getText());
-
-        comment.setDateTime(LocalDateTime.parse(commentDto.getCreatedAt(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
-
-        return commentRepository.save(comment);
+        if (newComment.getAuthor() != null) {
+            oldComment.setAuthor(ads.getAuthor());
+        }
+        if (newComment.getText() != null && newComment.getText().length() > 0) {
+            oldComment.setText(newComment.getText());
+        }
+        oldComment.setDateTime(LocalDateTime.now());
+        return commentRepository.save(oldComment);
     }
 
     /**
@@ -106,7 +106,7 @@ public class CommentServiceImpl {
 
     /**
      * This method, used method repository, allows get comment by id ads and id comments
-     * Uses {@link CommentRepository#findAllByIdAndAdsId(Integer, Integer)}
+     * Uses {@link CommentRepository#findByIdAndAdsId(Integer, Integer)}
      *
      * @param adsId     is not null
      * @param commentId is not null
@@ -114,7 +114,8 @@ public class CommentServiceImpl {
      * @throws CommentNotFoundException if passed non id comment
      */
     public Comment getCommentOfAds(Integer adsId, Integer commentId) {
-        return commentRepository.findAllByIdAndAdsId(adsId, commentId).orElseThrow(() -> new CommentNotFoundException(commentId));
+        return commentRepository.findByIdAndAdsId(adsId, commentId)
+                .orElseThrow(() -> new CommentNotFoundException(commentId));
     }
 
     /**
@@ -123,7 +124,7 @@ public class CommentServiceImpl {
      *
      * @param comment is not null
      */
-    public void removeComment(Comment comment) {
+    private void removeComment(Comment comment) {
         commentRepository.delete(comment);
     }
 
@@ -139,21 +140,15 @@ public class CommentServiceImpl {
 
     /**
      * This method, used method repository, allows del comment to id Ads and id comment
-     * Uses {@link CommentRepository#findAllByIdAndAdsId(Integer, Integer)}
+     * Uses {@link CommentRepository#findByIdAndAdsId(Integer, Integer)}
      *
      * @param adPk      is not null
      * @param commentId is not null
      * @throws CommentNotFoundException if passed non id comment
      */
-    public void removeCommentForAds(Integer adPk, Integer commentId){
-        Comment comment = commentRepository.findAllByIdAndAdsId(adPk, commentId).orElseThrow(() ->
+    public void removeCommentForAds(Integer adPk, Integer commentId) {
+        Comment comment = commentRepository.findByIdAndAdsId(adPk, commentId).orElseThrow(() ->
                 new CommentNotFoundException(commentId));
-            removeComment(comment);
+        removeComment(comment);
     }
-
-//    public void removeCommentAdmin(Integer commentId) {
-//        Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
-//                new CommentNotFoundException(commentId));
-//        removeComment(comment);
-//    }
 }

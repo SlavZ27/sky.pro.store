@@ -33,7 +33,7 @@ public abstract class CommentMapper {
 
     User dtoToUser(CommentDto commentDto) {
         if (commentDto == null || commentDto.getAuthor() == null) {
-            throw new IllegalArgumentException();
+            return null;
         }
         User author = null;
         if (commentDto.getAuthor() != null) {

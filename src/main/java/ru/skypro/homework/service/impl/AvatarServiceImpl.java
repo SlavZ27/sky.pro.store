@@ -17,7 +17,8 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 /**
- * This class handles the command associated with creating an avatar in user, allowing users to create, update, receive, delete avatar.
+ * This class handles the command associated with creating an avatar in user,
+ * allowing users to create, update, receive, delete avatar.
  */
 @Service
 public class AvatarServiceImpl {
@@ -35,69 +36,66 @@ public class AvatarServiceImpl {
      * This method, used method repository, allows update Avatar.
      * Uses {@link AvatarRepository#findById(Object)}
      * Uses {@link AvatarRepository#save(Object)}
-     * @param avatar is not null
-     * @param file is not null
+     *
+     * @param avatar   is not null
+     * @param file     is not null
      * @param nameFile is nut null
      * @return Avatar
      * @throws AvatarNotFoundException if passed non id avatar
      */
     public Avatar updateAvatar(Avatar avatar, MultipartFile file, String nameFile) {
         if (avatar == null || avatar.getId() == null) {
-            return null;
+            throw new IllegalArgumentException();
         }
-        Avatar oldAvatar = avatarRepository.findById(avatar.getId()).orElseThrow(() ->
-                new AvatarNotFoundException(avatar.getId()));
-        Path pathOld = Paths.get(oldAvatar.getPath());
+        Path pathOld = Paths.get(avatar.getPath());
         Path pathNew = generatePath(file, nameFile);
         try {
             Files.write(pathNew, file.getBytes());
             if (Files.exists(pathNew)) {
-                Files.deleteIfExists(pathOld);
                 avatar.setPath(pathNew.toString());
-                avatarRepository.save(avatar);
+                avatar = avatarRepository.save(avatar);
+                Files.deleteIfExists(pathOld);
             }
         } catch (IOException ignored) {
             throw new AvatarNotFoundException("Absent file in Avatar with id = " + avatar.getId());
         } catch (NullPointerException e) {
             throw new AvatarNotFoundException("Absent path in Avatar with id = " + avatar.getId());
         }
-        return oldAvatar;
+        return avatar;
     }
 
     /**
      * This method, used method repository, allows get Avatar Data.
      * Uses {@link AvatarRepository#findById(Object)}
+     *
      * @param avatar is not null
      * @return Avatar
      * @throws AvatarNotFoundException if passed non id avatar
      */
     public Pair<byte[], String> getAvatarData(Avatar avatar) {
         if (avatar == null || avatar.getId() == null) {
-            return null;
+            throw new IllegalArgumentException();
         }
-        avatarRepository.findById(avatar.getId()).orElseThrow(() ->
-                new AvatarNotFoundException(avatar.getId()));
-        byte[] bytes;
         try {
-            bytes = Files.readAllBytes(Paths.get(avatar.getPath()));
+            return Pair.of(Files.readAllBytes(Paths.get(avatar.getPath())), MediaType.IMAGE_JPEG_VALUE);
         } catch (IOException ignored) {
             throw new AvatarNotFoundException("Absent file in Avatar with id = " + avatar.getId());
         } catch (NullPointerException e) {
             throw new AvatarNotFoundException("Absent path in Avatar with id = " + avatar.getId());
         }
-        return Pair.of(bytes, MediaType.IMAGE_JPEG_VALUE);
     }
 
     /**
      * This method, used method repository, allows get Image.
      * Uses {@link AvatarRepository#findById(Object)}
+     *
      * @param id is not null
      * @return Image or null
      * @throws AvatarNotFoundException if passed non id avatar
      */
     public Avatar getImage(Integer id) {
         if (id == null) {
-            return null;
+            throw new IllegalArgumentException();
         }
         return avatarRepository.findById(id).orElseThrow(() ->
                 new AvatarNotFoundException(id));
@@ -107,6 +105,7 @@ public class AvatarServiceImpl {
      * This method, used method repository, remove Avatar with file
      * Uses {@link AvatarRepository#delete(Object)}
      * Uses {@link AvatarRepository#findById(Object)}
+     *
      * @param avatar is not null
      * @return true or false
      */
@@ -117,16 +116,13 @@ public class AvatarServiceImpl {
         } catch (IOException ignored) {
         }
         avatarRepository.delete(avatar);
-        if (Files.exists(path) || avatarRepository.findById(avatar.getId()).isPresent()) {
-            return false;
-        } else {
-            return true;
-        }
+        return !Files.exists(path) && avatarRepository.findById(avatar.getId()).isEmpty();
     }
 
     /**
      * This method generate Path to file Avatar for string.
-     * @param file is not null
+     *
+     * @param file     is not null
      * @param nameFile us not null
      * @return Patch with the specified data
      */
@@ -140,10 +136,10 @@ public class AvatarServiceImpl {
 
     /**
      * This method, used method repository, add Avatar.
-     * @param file is not null
+     *
+     * @param file     is not null
      * @param nameFile is not null
      * @return Avatar
-     * @throws IOException
      */
     public Avatar addAvatar(MultipartFile file, String nameFile) throws IOException {
         byte[] data = file.getBytes();
@@ -153,22 +149,4 @@ public class AvatarServiceImpl {
         avatar.setPath(path.toString());
         return avatarRepository.save(avatar);
     }
-
-    /**
-     * This method, used method repository, get link of Avatar.
-     * {@link AvatarRepository#findById(Object)}
-     * @param avatar is not null
-     * @return lint of Avatar.
-     * @throws AvatarNotFoundException if passed non id avatar
-     */
-    public String getLinkOfAvatar(Avatar avatar) {
-        if (avatar == null || avatar.getId() == null) {
-            return null;
-        }
-        avatarRepository.findById(avatar.getId()).orElseThrow(
-                () -> new AvatarNotFoundException(avatar.getId()));
-        return "/users/me/image";
-    }
-
-
 }
