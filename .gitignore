@@ -31,8 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+/materials_test/
 /materials_test/file_for_updateImageTest1.jpg
 /materials_test/file_for_updateImageTest2.jpg
 /avatars_test/
 /materials/
-/avatars/
+/avatars_test/

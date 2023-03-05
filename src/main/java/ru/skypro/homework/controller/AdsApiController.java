@@ -14,6 +14,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -47,6 +48,7 @@ public class AdsApiController {
                             schema = @Schema(implementation = ResponseWrapperAdsDto.class)))})
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
     //      GET http://localhost:8080/ads/
+    // available for the unauthenticated
     public ResponseEntity<ResponseWrapperAdsDto> getALLAds() {
         return ResponseEntity.ok(adsServiceImpl.getALLAds());
     }
@@ -62,6 +64,8 @@ public class AdsApiController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     //      POST http://localhost:8080/ads/
+    // available only for the authenticated
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<AdsDto> addAds(
             @Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema())
             @RequestPart(value = "properties", required = false) CreateAdsDto properties,
@@ -79,6 +83,8 @@ public class AdsApiController {
     @GetMapping(value = "/{ad_pk}/comments",
             produces = {MediaType.APPLICATION_JSON_VALUE})
     //      GET http://localhost:8080/ads/{ad_pk}/comments
+    // available only for the authenticated
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<ResponseWrapperCommentDto> getComments(
             @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema())
             @PathVariable("ad_pk") Integer adPk) {
@@ -96,6 +102,8 @@ public class AdsApiController {
     @PostMapping(value = "/{ad_pk}/comments",
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
+    //  available only for the authenticated
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<CommentDto> addComments(
             @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema())
             @PathVariable("ad_pk") Integer adPk,
@@ -114,6 +122,8 @@ public class AdsApiController {
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @GetMapping(value = "{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
     //      GET http://localhost:8080/ads/{ad_pk}
+    // // available only for the authenticated
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<FullAdsDto> getAds(@PathVariable("id") Integer idAds) {
         return ResponseEntity.ok(adsServiceImpl.getAds(idAds));
     }
@@ -125,6 +135,8 @@ public class AdsApiController {
             @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Not Found")})     //was not in the specification
     @DeleteMapping(value = "{id_ads}")
+    // available only to the admin or the user who created this ad
+    @PreAuthorize("@userSecurity.isAdsAuthor(#idAds) or hasAuthority('ADMIN')")
     public ResponseEntity<Void> removeAds(@PathVariable("id_ads") Integer idAds) {
         return adsServiceImpl.removeAds(idAds);
     }
@@ -140,6 +152,8 @@ public class AdsApiController {
     @PatchMapping(value = "/{id}",
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
+//    available only to the admin or the user who created this ad
+    @PreAuthorize("@userSecurity.isAdsAuthor(#id) or hasAuthority('ADMIN')")
     public ResponseEntity<AdsDto> updateAds(
             @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("id") Integer id,
             @Parameter(in = ParameterIn.DEFAULT, description = "", required = true, schema = @Schema()) @Valid @RequestBody CreateAdsDto body) {
@@ -155,6 +169,7 @@ public class AdsApiController {
     @GetMapping(value = "/{ad_pk}/comments/{id}",
             produces = {MediaType.APPLICATION_JSON_VALUE})
     //      http://localhost:8080/ads/2/comments/4
+    // // available only for the authenticated users
     public ResponseEntity<CommentDto> getComments(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("ad_pk") Integer adPk, @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("id") Integer id) {
         return ResponseEntity.ok(adsServiceImpl.getCommentOfAds(adPk, id));
     }
@@ -166,14 +181,15 @@ public class AdsApiController {
             @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @DeleteMapping(value = "/{ad_pk}/comments/{id}")
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+//    @PreAuthorize("@userSecurity.isCommentAuthor(#id)")
+    @PreAuthorize("@userSecurity.isCommentAuthor(#id) or hasAuthority('ADMIN')")
+//    available only to the admin or the user who created this comment
     public ResponseEntity<Void> deleteComments(
             @Parameter(in = ParameterIn.PATH, description = "", required = true,
                     schema = @Schema()) @PathVariable("ad_pk") Integer adPk,
             @Parameter(in = ParameterIn.PATH, description = "", required = true,
-                    schema = @Schema()) @PathVariable("id") Integer id,
-            Authentication authentication) {
-        return adsServiceImpl.removeCommentsForAds(adPk, id, authentication.getName());
+                    schema = @Schema()) @PathVariable("id") Integer id) {
+        return adsServiceImpl.removeCommentsForAds(adPk, id);
     }
 
 
@@ -188,6 +204,8 @@ public class AdsApiController {
     @PatchMapping(value = "/{ad_pk}/comments/{id}",
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
+    //    available only to the admin or the user who created this comment
+    @PreAuthorize("@userSecurity.isCommentAuthor(#id) or hasAuthority('ADMIN')")
     public ResponseEntity<CommentDto> updateComments(
             @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema())
             @PathVariable("ad_pk") Integer adPk,
@@ -209,6 +227,7 @@ public class AdsApiController {
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @GetMapping(value = "/me", produces = {MediaType.APPLICATION_JSON_VALUE})
     //      http://localhost:8080/ads/me
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})//??
     public ResponseEntity<ResponseWrapperAdsDto> getAdsMeUsingGET(Authentication authentication) {
         return ResponseEntity.ok(adsServiceImpl.getALLAdsOfMe(authentication.getName()));
     }
@@ -223,6 +242,8 @@ public class AdsApiController {
     @PatchMapping(value = "{idAds}/image",
             produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE},
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    // available only to the admin or the user who created ad with this image
+    @PreAuthorize("@userSecurity.isAdsAuthor(#idAds) or hasAuthority('ADMIN')")
     public ResponseEntity<byte[]> updateImage(
             @PathVariable Integer idAds,
             @RequestPart MultipartFile image) throws IOException {
@@ -238,6 +259,7 @@ public class AdsApiController {
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @GetMapping(value = "{idAds}/image",
             produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
+    // available for everyone
     public ResponseEntity<byte[]> getImage(@PathVariable Integer idAds) {
         Pair<byte[], String> pair = adsServiceImpl.getImage(idAds);
         return read(pair);
@@ -255,6 +277,7 @@ public class AdsApiController {
             @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ResponseWrapperAdsDto.class)))})
+    // available for everyone
     @GetMapping(value = "/by-title", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ResponseWrapperAdsDto> findByTitleLike(@Param("title") String title) {
         return ResponseEntity.ok(adsServiceImpl.findAdsByTitle(title));
