@@ -6,6 +6,10 @@ To work, the application requires Postgresql with an empty database, and the con
 - spring.datasource.url
 - spring.datasource.username
 - spring.datasource.password
+  
+Additionally, the program has settings for two folders where it will store images of ads and avatars of users. This allows for a more dynamic and visually appealing bulletin board, where users can upload images to accompany their ads or profiles:
+- path.to.materials.folder
+- path.to.avatars.folder
 
 Technologies used:
 - Java 11
@@ -18,8 +22,9 @@ Technologies used:
 - Faker and h2 for testing purposes.
 - JUnit, Mockito
 
-This project provides a great opportunity to learn and practice Java Spring development skills, including working with databases, security, and testing frameworks.
+To check the operability of the deployed system, there is a special test(GenerateToDB->contextLoads) After the correct execution of this test, entities are generated into the database. The test validate proper storage of images in the designated folders. By running this test, developers can ensure that the system is functioning correctly and all features are working as intended.
 
+This project provides a great opportunity to learn and practice Java Spring development skills, including working with databases, security, and testing frameworks.
 
 ## Authors
 
