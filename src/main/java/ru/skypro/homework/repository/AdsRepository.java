@@ -22,7 +22,7 @@ public interface AdsRepository extends JpaRepository<Ads, Integer> {
             , nativeQuery = true)
     List<Ads> findAllByUserIdAndSortDateTime(Integer idAuthor);
 
-    @Query(value = "select a.* from ads as a, users as u where a.id_author=u.id and u.username=:username order by date_time DESC"
+    @Query(value = "select * from ads as a inner join users as u on a.id_author = u.id and u.username = :username order by date_time DESC"
             , nativeQuery = true)
     List<Ads> findAllByUsernameAndSortDateTime(String username);
 

@@ -46,7 +46,6 @@ public class UsersApiController {
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @GetMapping(value = "me",
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<UserDto> getUser1(Authentication authentication) {
         return ResponseEntity.ok(userService.getUser(authentication.getName()));
     }
@@ -59,7 +58,6 @@ public class UsersApiController {
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @GetMapping(value = "me/image",
             produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
-    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<byte[]> getAvatar(Authentication authentication) {
         Pair<byte[], String> pair = userService.getAvatarMe(authentication.getName());
         return read(pair);
@@ -101,7 +99,6 @@ public class UsersApiController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @PatchMapping(value = "/me/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<Void> updateUserImage(
             Authentication authentication,
             MultipartFile image) throws IOException {

@@ -4,7 +4,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import ru.skypro.homework.repository.UsersRepository;
 
-@Component("userSecurity")
+@Component
 public class UserSecurity {
 
     private final UsersRepository usersRepository;
