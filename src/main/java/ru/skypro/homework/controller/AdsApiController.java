@@ -63,7 +63,6 @@ public class AdsApiController {
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     //      POST http://localhost:8080/ads/
     // available only for the authenticated
-    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<AdsDto> addAds(
             @Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema())
             @RequestPart(value = "properties", required = false) CreateAdsDto properties,
@@ -83,7 +82,6 @@ public class AdsApiController {
             produces = {MediaType.APPLICATION_JSON_VALUE})
     //      GET http://localhost:8080/ads/{ad_pk}/comments
     // available only for the authenticated
-    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<ResponseWrapperCommentDto> getComments(
             @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema())
             @PathVariable("ad_pk") Integer adPk) {
@@ -102,7 +100,6 @@ public class AdsApiController {
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     //  available only for the authenticated
-    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<CommentDto> addComments(
             @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema())
             @PathVariable("ad_pk") Integer adPk,
@@ -231,7 +228,6 @@ public class AdsApiController {
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @GetMapping(value = "/me", produces = {MediaType.APPLICATION_JSON_VALUE})
     //      http://localhost:8080/ads/me
-    @Secured({"ROLE_ADMIN", "ROLE_USER"})//??
     public ResponseEntity<ResponseWrapperAdsDto> getAdsMeUsingGET(Authentication authentication) {
         return ResponseEntity.ok(adsServiceImpl.getALLAdsOfMe(authentication.getName()));
     }
