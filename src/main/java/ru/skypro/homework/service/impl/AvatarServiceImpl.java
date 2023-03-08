@@ -1,5 +1,6 @@
 package ru.skypro.homework.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
@@ -21,6 +22,7 @@ import java.util.Optional;
  * allowing users to create, update, receive, delete avatar.
  */
 @Service
+@Slf4j
 public class AvatarServiceImpl {
     private final String dirForAvatars;
     private final AvatarRepository avatarRepository;
@@ -45,20 +47,25 @@ public class AvatarServiceImpl {
      */
     public Avatar updateAvatar(Avatar avatar, MultipartFile file, String nameFile) {
         if (avatar == null || avatar.getId() == null) {
+            log.error("An exception occurred! Cause: avatar=null or avatar.Id=null", new IllegalArgumentException());
             throw new IllegalArgumentException();
         }
         Path pathOld = Paths.get(avatar.getPath());
         Path pathNew = generatePath(file, nameFile);
         try {
+            log.info("Try to write file by new path: {}", pathNew);
             Files.write(pathNew, file.getBytes());
             if (Files.exists(pathNew)) {
                 avatar.setPath(pathNew.toString());
                 avatar = avatarRepository.save(avatar);
+                log.info("Avatar with ID: {} has been updated", avatar.getId());
                 Files.deleteIfExists(pathOld);
             }
         } catch (IOException ignored) {
+            log.error("Absent file in Avatar with id: {}", avatar.getId(), ignored);
             throw new AvatarNotFoundException("Absent file in Avatar with id = " + avatar.getId());
         } catch (NullPointerException e) {
+            log.error("Absent path in Avatar with id: {}", avatar.getId(), e);
             throw new AvatarNotFoundException("Absent path in Avatar with id = " + avatar.getId());
         }
         return avatar;
@@ -74,13 +81,17 @@ public class AvatarServiceImpl {
      */
     public Pair<byte[], String> getAvatarData(Avatar avatar) {
         if (avatar == null || avatar.getId() == null) {
+            log.error("An exception occurred! Cause: avatar=null or avatar.Id=null", new IllegalArgumentException());
             throw new IllegalArgumentException();
         }
         try {
+            log.info("Try to read bytes by path: {}", avatar.getPath());
             return Pair.of(Files.readAllBytes(Paths.get(avatar.getPath())), MediaType.IMAGE_JPEG_VALUE);
         } catch (IOException ignored) {
+            log.error("Absent file in Avatar with id: {}", avatar.getId(), ignored);
             throw new AvatarNotFoundException("Absent file in Avatar with id = " + avatar.getId());
         } catch (NullPointerException e) {
+            log.error("Absent path in Avatar with id: {}", avatar.getId(), e);
             throw new AvatarNotFoundException("Absent path in Avatar with id = " + avatar.getId());
         }
     }
@@ -95,10 +106,13 @@ public class AvatarServiceImpl {
      */
     public Avatar getImage(Integer id) {
         if (id == null) {
+            log.error("An exception occurred! Cause: avatar.Id=null", new IllegalArgumentException());
             throw new IllegalArgumentException();
         }
-        return avatarRepository.findById(id).orElseThrow(() ->
-                new AvatarNotFoundException(id));
+        return avatarRepository.findById(id).orElseThrow(() -> {
+            log.error("Avatar with ID: {} not found", id);
+            return new AvatarNotFoundException(id);
+        });
     }
 
     /**
@@ -113,9 +127,12 @@ public class AvatarServiceImpl {
         Path path = Path.of(avatar.getPath());
         try {
             Files.deleteIfExists(path);
+            log.info("Try to delete path = {} if exists", path);
         } catch (IOException ignored) {
+            log.error("Something wrong with avatar path!", ignored);
         }
         avatarRepository.delete(avatar);
+        log.info("Avatar with ID: {} have been deleted", avatar.getId());
         return !Files.exists(path) && avatarRepository.findById(avatar.getId()).isEmpty();
     }
 
@@ -147,6 +164,8 @@ public class AvatarServiceImpl {
         Files.write(path, data);
         Avatar avatar = new Avatar();
         avatar.setPath(path.toString());
-        return avatarRepository.save(avatar);
+        Avatar newAvatar = avatarRepository.save(avatar);
+        log.info("New avatar with ID: {} has been added", newAvatar.getId());
+        return newAvatar;
     }
 }

@@ -1,5 +1,6 @@
 package ru.skypro.homework.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
@@ -20,6 +21,7 @@ import java.util.Optional;
  * This class processes commands related create Image allowing users to create, update, get, delete ads.
  */
 @Service
+@Slf4j
 public class ImageServiceImpl {
     private final String dirForImages;
     private final ImageRepository imageRepository;
@@ -42,20 +44,25 @@ public class ImageServiceImpl {
      */
     public Image updateImage(Image image, MultipartFile file, String nameFile) {
         if (image == null || image.getId() == null) {
+            log.error("An exception occurred! Cause: image=null or image.Id=null", new IllegalArgumentException());
             throw new IllegalArgumentException();
         }
         Path pathOld = Paths.get(image.getPath());
         Path pathNew = generatePath(file, nameFile);
         try {
+            log.info("Try to write file by new path: {}", pathNew);
             Files.write(pathNew, file.getBytes());
             if (Files.exists(pathNew)) {
                 image.setPath(pathNew.toString());
                 image = imageRepository.save(image);
+                log.info("Image with ID: {} has been updated", image.getId());
                 Files.deleteIfExists(pathOld);
             }
         } catch (IOException ignored) {
+            log.error("Absent file in Avatar with id: {}", image.getId(), ignored);
             throw new ImageNotFoundException("Absent file in Image with id = " + image.getId());
         } catch (NullPointerException e) {
+            log.error("Absent path in Avatar with id: {}", image.getId(), e);
             throw new ImageNotFoundException("Absent path in Image with id = " + image.getId());
         }
         return image;
@@ -71,13 +78,17 @@ public class ImageServiceImpl {
      */
     public Pair<byte[], String> getImageData(Image image) {
         if (image == null || image.getId() == null) {
+            log.error("An exception occurred! Cause: image=null or image.Id=null", new IllegalArgumentException());
             throw new IllegalArgumentException();
         }
         try {
+            log.info("Try to read bytes by path: {}", image.getPath());
             return Pair.of(Files.readAllBytes(Paths.get(image.getPath())), MediaType.IMAGE_JPEG_VALUE);
         } catch (IOException ignored) {
+            log.error("Absent file in Image with id: {}", image.getId(), ignored);
             throw new ImageNotFoundException("Absent file in Image with id = " + image.getId());
         } catch (NullPointerException e) {
+            log.error("Absent path in Image with id: {}", image.getId(), e);
             throw new ImageNotFoundException("Absent path in Image with id = " + image.getId());
         }
     }
@@ -92,10 +103,13 @@ public class ImageServiceImpl {
      */
     public Image getImage(Integer id) {
         if (id == null) {
+            log.error("An exception occurred! Cause: image.Id=null", new IllegalArgumentException());
             throw new IllegalArgumentException();
         }
-        return imageRepository.findById(id).orElseThrow(() ->
-                new ImageNotFoundException(id));
+        return imageRepository.findById(id).orElseThrow(() -> {
+            log.error("Image with ID: {} not found", id);
+            return new ImageNotFoundException(id);
+        });
     }
 
     /**
@@ -109,9 +123,12 @@ public class ImageServiceImpl {
         Path path = Path.of(image.getPath());
         try {
             Files.deleteIfExists(path);
+            log.info("Try to delete path = {} if exists", path);
         } catch (IOException ignored) {
+            log.error("Something wrong with image path!", ignored);
         }
         imageRepository.delete(image);
+        log.info("Image with ID: {} have been deleted", image.getId());
         return !Files.exists(path) && imageRepository.findById(image.getId()).isEmpty();
     }
 
@@ -144,6 +161,8 @@ public class ImageServiceImpl {
         Files.write(path, data);
         Image image = new Image();
         image.setPath(path.toString());
-        return imageRepository.save(image);
+        Image newImage = imageRepository.save(image);
+        log.info("New image with ID: {} has been added", newImage.getId());
+        return newImage;
     }
 }

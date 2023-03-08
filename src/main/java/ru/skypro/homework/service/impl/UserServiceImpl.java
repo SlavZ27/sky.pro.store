@@ -31,8 +31,10 @@ public class UserServiceImpl {
     }
 
     public User getUserByUserName(String userName) {
-        return usersRepository.findByUsername(userName).orElseThrow(() ->
-                new UserNotFoundException(userName));
+        return usersRepository.findByUsername(userName).orElseThrow(() -> {
+            log.error("User with userName: {} not found", userName);
+            return new UserNotFoundException(userName);
+        });
     }
 
     public UserDto updateUser(String username, UserDto body) {
@@ -51,6 +53,7 @@ public class UserServiceImpl {
             oldUser.setLastName(newUser.getLastName());
         }
         oldUser = usersRepository.save(oldUser);
+        log.info("User with ID: {} has been updated", oldUser.getId());
         return userMapper.userToDto(oldUser);
     }
 
@@ -62,29 +65,34 @@ public class UserServiceImpl {
         User user = getUserByUserName(username);
         updateImageOfUser(user, image);
         usersRepository.save(user);
+        log.info("User with ID: {} has been updated", user.getId());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     private void updateImageOfUser(User user, MultipartFile image) throws IOException {
         if (user.getAvatar() == null) {
             user.setAvatar(avatarService.addAvatar(image, getNameFileForAvatar(user)));
+            log.info("New avatar has been added for 'user' with ID:{}", user.getId());
         } else {
             user.setAvatar(avatarService.updateAvatar(user.getAvatar(), image, getNameFileForAvatar(user)));
+            log.info("Avatar with ID: {} has been updated for 'user' with ID:{}", user.getAvatar().getId(), user.getId());
         }
     }
 
     private Pair<byte[], String> getAvatarDataOfUser(User user) {
         if (user.getAvatar() == null) {
+            log.error("An exception occurred! Cause: avatar=null or avatar.Id=null", new AvatarNotFoundException("User with id = " + user.getId() + "don't have avatar"));
             throw new AvatarNotFoundException("User with id = " + user.getId() + "don't have avatar");
         }
         return avatarService.getAvatarData(user.getAvatar());
     }
 
 
-
     public Pair<byte[], String> getAvatarOfUser(Integer idUser) {
-        User user = usersRepository.findById(idUser).orElseThrow(() ->
-                new UserNotFoundException(idUser));
+        User user = usersRepository.findById(idUser).orElseThrow(() -> {
+            log.error("User with ID: {} not found", idUser);
+            return new UserNotFoundException(idUser);
+        });
         return getAvatarDataOfUser(user);
     }
 
