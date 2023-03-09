@@ -81,7 +81,7 @@ public class UserServiceImpl {
 
     private Pair<byte[], String> getAvatarDataOfUser(User user) {
         if (user.getAvatar() == null) {
-            log.error("An exception occurred! Cause: avatar=null or avatar.Id=null", new AvatarNotFoundException("User with id = " + user.getId() + "don't have avatar"));
+            log.error("An exception occurred! Cause: avatar=null or avatar.Id=null");
             throw new AvatarNotFoundException("User with id = " + user.getId() + "don't have avatar");
         }
         return avatarService.getAvatarData(user.getAvatar());

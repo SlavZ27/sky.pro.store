@@ -32,13 +32,13 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public boolean login(String userName, String password) {
         if (!manager.userExists(userName)) {
-            log.error("Failed authorization attempt", new UserNotFoundException(userName));
+            log.error("Failed authorization attempt. Cause:");
+            log.warn("User with userName: {} not found", userName);
             throw new UserNotFoundException(userName);
         }
         UserDetails userDetails = manager.loadUserByUsername(userName);
         String encryptedPassword = userDetails.getPassword();
         String encryptedPasswordWithoutEncryptionType = encryptedPassword.substring(8);
-        // Так что-то не работает.
         boolean isLoggedIn = encoder.matches(password, encryptedPasswordWithoutEncryptionType);
         if (isLoggedIn) {
             log.info("User with userName: {} successfully logged in", userName);
@@ -52,8 +52,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public boolean register(RegisterReqDto registerReq) {
         if (manager.userExists(registerReq.getUsername())) {
-            // так работает
-            log.error("User with userName: {} already exists", registerReq.getUsername(), new IllegalArgumentException(registerReq.getUsername()));
+            log.error("User with userName: {} already exists", registerReq.getUsername());
             throw new IllegalArgumentException(registerReq.getUsername());
         }
         manager.createUser(

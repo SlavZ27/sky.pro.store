@@ -47,7 +47,7 @@ public class AvatarServiceImpl {
      */
     public Avatar updateAvatar(Avatar avatar, MultipartFile file, String nameFile) {
         if (avatar == null || avatar.getId() == null) {
-            log.error("An exception occurred! Cause: avatar=null or avatar.Id=null", new IllegalArgumentException());
+            log.error("An exception occurred! Cause: avatar=null or avatar.Id=null");
             throw new IllegalArgumentException();
         }
         Path pathOld = Paths.get(avatar.getPath());
@@ -81,7 +81,7 @@ public class AvatarServiceImpl {
      */
     public Pair<byte[], String> getAvatarData(Avatar avatar) {
         if (avatar == null || avatar.getId() == null) {
-            log.error("An exception occurred! Cause: avatar=null or avatar.Id=null", new IllegalArgumentException());
+            log.error("An exception occurred! Cause: avatar=null or avatar.Id=null");
             throw new IllegalArgumentException();
         }
         try {
@@ -106,7 +106,7 @@ public class AvatarServiceImpl {
      */
     public Avatar getImage(Integer id) {
         if (id == null) {
-            log.error("An exception occurred! Cause: avatar.Id=null", new IllegalArgumentException());
+            log.error("An exception occurred! Cause: avatar.Id=null");
             throw new IllegalArgumentException();
         }
         return avatarRepository.findById(id).orElseThrow(() -> {

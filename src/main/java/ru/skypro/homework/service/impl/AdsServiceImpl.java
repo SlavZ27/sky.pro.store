@@ -2,8 +2,6 @@ package ru.skypro.homework.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -85,7 +83,6 @@ public class AdsServiceImpl {
         User user = userService.getUserByUserName(username);
         Ads ads = adsRepository.findById(adsId).orElseThrow(() -> {
             log.error("Ad with ID: {} not found", adsId);
-            ;
             return new AdsNotFoundException(adsId);
         });
         Comment comment = commentMapper.dtoToComment(commentDto);
@@ -352,7 +349,7 @@ public class AdsServiceImpl {
             return new AdsNotFoundException(idAds);
         });
         if (ads.getImage() == null) {
-            log.error("Image for ads with ID: {} is null", ads.getId(), new ImageNotFoundException(ads.getId()));
+            log.error("Image for ads with ID: {} is null", ads.getId());
             throw new ImageNotFoundException("Image for ads with id = " + ads.getId() + " is absent");
         }
         return imageService.getImageData(ads.getImage());
