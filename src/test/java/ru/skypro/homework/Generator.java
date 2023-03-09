@@ -1,13 +1,15 @@
 package ru.skypro.homework;
 
 import com.github.javafaker.Faker;
-import liquibase.license.LicenseService;
-import ru.skypro.homework.dto.Role;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import ru.skypro.homework.entity.Role;
 import ru.skypro.homework.entity.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -15,14 +17,16 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 import java.util.stream.Collectors;
+
+import static org.springframework.security.core.userdetails.User.builder;
 
 public class Generator {
     private final Faker faker = new Faker();
     private final Random random = new Random();
 
+    private PasswordEncoder encoder = new BCryptPasswordEncoder();
 
     public int genInt() {
         return random.nextInt();
@@ -110,7 +114,7 @@ public class Generator {
         return tld;
     }
 
-    public User generateUserRoleAdmin(Avatar avatar) {
+    public User generateUserRoleAdmin(Avatar avatar, String pas) {
         return generateUser(
                 null,
                 null,
@@ -120,12 +124,11 @@ public class Generator {
                 null,
                 avatar,
                 null,
-                null,
-                Role.ADMIN,
+                pas,
                 true);
     }
 
-    public User generateUserRoleUser(Avatar avatar) {
+    public User generateUserRoleUser(Avatar avatar, String pas) {
         return generateUser(
                 null,
                 null,
@@ -135,8 +138,7 @@ public class Generator {
                 null,
                 avatar,
                 null,
-                null,
-                Role.USER,
+                pas,
                 true);
     }
 
@@ -150,7 +152,6 @@ public class Generator {
             Avatar avatar,
             String username,
             String password,
-            Role role,
             boolean needGenerate) {
         if (needGenerate) {
             idUser = generateIdIfEmpty(idUser);
@@ -159,9 +160,8 @@ public class Generator {
             email = generateEmailIfEmpty(email);
             phone = generatePhoneIfEmpty(phone);
             regDate = generateDate(true, LocalDate.now());
-            username = generateNameIfEmpty(username);
-            password = generateNameIfEmpty(password);
-            role = generateRoleIfEmpty(role);
+            username = generateEmailIfEmpty(email);
+            password = generatePasswordIfEmpty(password, true);
 
         }
         User user = new User();
@@ -174,8 +174,20 @@ public class Generator {
         user.setAvatar(avatar);
         user.setUsername(username);
         user.setPassword(password);
-        user.setRole(role);
+        user.setEnabled(true);
         return user;
+    }
+
+    public String generatePasswordIfEmpty(String password, boolean bcrypt) {
+        if (password == null) {
+            password = faker.internet().password();
+        }
+        if (bcrypt) {
+            CharSequence charSequence = new StringBuilder(password);
+            return "{bcrypt}" + encoder.encode(charSequence);
+        } else {
+            return password;
+        }
     }
 
     public Avatar generateAvatarIfNull(Avatar avatar, String dirForAvatars) {
@@ -318,6 +330,23 @@ public class Generator {
             return faker.name().lastName();
         }
         return name;
+    }
+
+
+    public Authority generateAuthority(User user, Role role) {
+        Authority authority = new Authority();
+        if (user == null || user.getUsername() == null) {
+            authority.setUsername(faker.name().username());
+        } else {
+            authority.setUsername(user.getUsername());
+        }
+        if (role == null) {
+            authority.setAuthority(generateRoleIfEmpty(null).toString());
+        } else {
+            authority.setAuthority(role.getRole());
+        }
+        authority.setAuthority(authority.getAuthority());
+        return authority;
     }
 
     public Role generateRoleIfEmpty(Role role) {

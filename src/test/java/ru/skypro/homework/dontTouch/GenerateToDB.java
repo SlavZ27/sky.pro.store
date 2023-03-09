@@ -5,12 +5,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.skypro.homework.Generator;
-import ru.skypro.homework.entity.Ads;
-import ru.skypro.homework.entity.Avatar;
-import ru.skypro.homework.entity.Image;
-import ru.skypro.homework.entity.User;
+import ru.skypro.homework.entity.*;
+import ru.skypro.homework.exception.UserNotFoundException;
 import ru.skypro.homework.repository.*;
 
+import javax.annotation.PostConstruct;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -31,11 +31,15 @@ public class GenerateToDB {
     private ImageRepository imageRepository;
     @Autowired
     private UsersRepository usersRepository;
+    @Autowired
+    private AuthorityRepository authorityRepository;
     private final Generator generator = new Generator();
     private final Random random = new Random();
 
 
     //Uncomment annotation and run this test for generate DB. After generate comment again
+    //user@gmail and admin@gmail and adminuser@gmail will generate without ads, comments, avatars
+    //all users generate with password = "password"
 //    @Test
     void contextLoads() {
         assertThat(adsRepository).isNotNull();
@@ -43,10 +47,12 @@ public class GenerateToDB {
         assertThat(commentRepository).isNotNull();
         assertThat(imageRepository).isNotNull();
         assertThat(usersRepository).isNotNull();
+        assertThat(authorityRepository).isNotNull();
     }
 
     @BeforeEach
     public void generateData() {
+        authorityRepository.deleteAll();
         commentRepository.deleteAll();
         adsRepository.deleteAll();
         usersRepository.deleteAll();
@@ -60,19 +66,23 @@ public class GenerateToDB {
         int countAdsUserMax = 5;
 
         int countCommentForAdsMin = 0;
-        int countCommentForAdsMax = 5;
+        int countCommentForAdsMax = 10;
 
         //generate userAdmin
         List<User> userAdminList = new ArrayList<>();
         for (int i = 0; i < countUserAdmin; i++) {
             Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(null, dirForAvatars));
-            userAdminList.add(usersRepository.save(generator.generateUserRoleAdmin(avatar)));
+            User user = usersRepository.save(generator.generateUserRoleAdmin(avatar, "password"));
+            authorityRepository.save(generator.generateAuthority(user, Role.ADMIN));
+            userAdminList.add(user);
         }
         //generate user
         List<User> userList = new ArrayList<>();
         for (int i = 0; i < countUser; i++) {
             Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(null, dirForAvatars));
-            userList.add(usersRepository.save(generator.generateUserRoleUser(avatar)));
+            User user = usersRepository.save(generator.generateUserRoleUser(avatar, "password"));
+            authorityRepository.save(generator.generateAuthority(user, Role.USER));
+            userList.add(user);
         }
         //generate ads
         List<Ads> adsList = new ArrayList<>();
@@ -94,5 +104,51 @@ public class GenerateToDB {
                         null, ads, tempUserList.get(random.nextInt(tempUserList.size()))));
             }
         }
+
+        authorityRepository.save(generator.generateAuthority(
+                usersRepository.save(generator.generateUser(
+                        null,
+                        "user@gmail",
+                        "User",
+                        "user@gmail.com",
+                        "0987654321",
+                        LocalDate.now(),
+                        null,
+                        "user@gmail.com",
+                        generator.generatePasswordIfEmpty("password", true),
+                        false
+                )),
+                Role.USER));
+
+        authorityRepository.save(generator.generateAuthority(
+                usersRepository.save(generator.generateUser(
+                        null,
+                        "admin@gmail",
+                        "Admin",
+                        "admin@gmail.com",
+                        "0987654321",
+                        LocalDate.now(),
+                        null,
+                        "admin@gmail.com",
+                        generator.generatePasswordIfEmpty("password", true),
+                        false
+                )),
+                Role.ADMIN));
+
+
+        User user = usersRepository.save(generator.generateUser(
+                null,
+                "adminuser@gmail",
+                "adminuser",
+                "adminuser@gmail.com",
+                "0987654321",
+                LocalDate.now(),
+                null,
+                "adminuser@gmail.com",
+                generator.generatePasswordIfEmpty("password", true),
+                false
+        ));
+        authorityRepository.save(generator.generateAuthority(user, Role.ADMIN));
+        authorityRepository.save(generator.generateAuthority(user, Role.USER));
     }
 }

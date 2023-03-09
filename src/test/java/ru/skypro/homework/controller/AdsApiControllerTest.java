@@ -58,6 +58,8 @@ class AdsApiControllerTest {
     @Autowired
     private ImageRepository imageRepository;
     @Autowired
+    private AuthorityRepository authorityRepository;
+    @Autowired
     private UsersRepository usersRepository;
     @Autowired
     private TestRestTemplate testRestTemplate;
@@ -77,32 +79,37 @@ class AdsApiControllerTest {
 
     @BeforeEach
     public void generateData() {
+        authorityRepository.deleteAll();
         commentRepository.deleteAll();
         adsRepository.deleteAll();
         usersRepository.deleteAll();
         imageRepository.deleteAll();
         avatarRepository.deleteAll();
 
-        int countUserAdmin = 5;
-        int countUser = 100;
+        int countUserAdmin = 0;
+        int countUser = 20;
 
         int countAdsUserMin = 0;
         int countAdsUserMax = 5;
 
         int countCommentForAdsMin = 0;
-        int countCommentForAdsMax = 20;
+        int countCommentForAdsMax = 10;
 
         //generate userAdmin
         List<User> userAdminList = new ArrayList<>();
         for (int i = 0; i < countUserAdmin; i++) {
             Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(null, dirForAvatars));
-            userAdminList.add(usersRepository.save(generator.generateUserRoleAdmin(avatar)));
+            User user = usersRepository.save(generator.generateUserRoleAdmin(avatar, "password"));
+            authorityRepository.save(generator.generateAuthority(user, Role.ADMIN));
+            userAdminList.add(user);
         }
         //generate user
         List<User> userList = new ArrayList<>();
         for (int i = 0; i < countUser; i++) {
             Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(null, dirForAvatars));
-            userList.add(usersRepository.save(generator.generateUserRoleUser(avatar)));
+            User user = usersRepository.save(generator.generateUserRoleUser(avatar, "password"));
+            authorityRepository.save(generator.generateAuthority(user, Role.USER));
+            userList.add(user);
         }
         //generate ads
         List<Ads> adsList = new ArrayList<>();
@@ -128,17 +135,19 @@ class AdsApiControllerTest {
 
     @AfterEach
     public void clearData() {
+        authorityRepository.deleteAll();
         commentRepository.deleteAll();
         adsRepository.deleteAll();
         usersRepository.deleteAll();
-        avatarRepository.deleteAll();
         imageRepository.deleteAll();
+        avatarRepository.deleteAll();
     }
 
 
     @Test
     void contextLoads() {
         assertThat(adsApiController).isNotNull();
+        assertThat(authorityRepository).isNotNull();
         assertThat(adsRepository).isNotNull();
         assertThat(avatarRepository).isNotNull();
         assertThat(commentRepository).isNotNull();

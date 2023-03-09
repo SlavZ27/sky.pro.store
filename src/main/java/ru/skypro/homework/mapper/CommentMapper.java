@@ -1,5 +1,6 @@
 package ru.skypro.homework.mapper;
 
+import org.hibernate.boot.model.naming.IllegalIdentifierException;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +33,8 @@ public abstract class CommentMapper {
 
     User dtoToUser(CommentDto commentDto) {
         if (commentDto == null || commentDto.getAuthor() == null) {
-            throw new NullPointerException();
+            return null;
         }
-
         User author = null;
         if (commentDto.getAuthor() != null) {
             author = usersRepository

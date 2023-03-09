@@ -41,7 +41,7 @@ CREATE TABLE ads
 (
     id          SERIAL  NOT NULL PRIMARY KEY,
     id_author   INTEGER NOT NULL,
-    price       NUMERIC   NOT NULL,
+    price       NUMERIC NOT NULL,
     title       TEXT    NOT NULL,
     description TEXT    NOT NULL
 );
@@ -57,15 +57,20 @@ CREATE TABLE comment
     date_time TIMESTAMP NOT NULL
 );
 -- changeSet evnag:3
-ALTER TABLE ads ALTER COLUMN price TYPE INTEGER;
-ALTER TABLE ads ALTER COLUMN price SET NOT NULL;
+ALTER TABLE ads
+    ALTER COLUMN price TYPE INTEGER;
+ALTER TABLE ads
+    ALTER COLUMN price SET NOT NULL;
 
 -- changeSet nadillustrator:4
-ALTER TABLE avatar DROP COLUMN id_author;
+ALTER TABLE avatar
+    DROP COLUMN id_author;
 
 -- changeSet nadillustrator:5
-ALTER TABLE image DROP COLUMN id_ads;
-ALTER TABLE ads ADD COLUMN id_image INTEGER;
+ALTER TABLE image
+    DROP COLUMN id_ads;
+ALTER TABLE ads
+    ADD COLUMN id_image INTEGER;
 
 -- changeSet zaytsev:6
 alter table comment
@@ -74,8 +79,45 @@ alter table comment
     add primary key (id, id_ads);
 
 -- changeSet nadillustrator:7
-ALTER TABLE ads ADD COLUMN date_time TIMESTAMP;
+ALTER TABLE ads
+    ADD COLUMN date_time TIMESTAMP;
 
+-- changeSet zaytsev:8
+alter table users
+    add column enabled boolean default true;
 
-
-
+-- changeSet zaytsev:9
+create table authorities
+(
+    id        SERIAL PRIMARY KEY,
+    username  varchar(30) not null ,
+    authority varchar(30) not null
+);
+create index users_username_index
+    on users (username);
+alter table users
+    add constraint users_pk
+        unique (username);
+-- changeSet zaytsev:10
+alter table ads
+    ADD CONSTRAINT ads_id_author FOREIGN KEY (id_author) REFERENCES users (id);
+alter table ads
+    ADD CONSTRAINT ads_id_image FOREIGN KEY (id_image) REFERENCES image (id);
+alter table comment
+    ADD CONSTRAINT comment_id_author FOREIGN KEY (id_author) REFERENCES users (id);
+alter table users
+    ADD CONSTRAINT users_id_avatar FOREIGN KEY (id_avatar) REFERENCES avatar (id);
+alter table authorities
+    ADD CONSTRAINT authorities_username FOREIGN KEY (username) REFERENCES users (username);
+-- changeSet zaytsev:11
+create index authorities_username_index
+    on authorities (username);
+alter table authorities
+    add constraint authorities_uk
+        unique (username, authority);
+-- changeSet zaytsev:12
+alter table users
+    drop column role;
+-- changeSet zaytsev:13
+alter table users
+alter column reg_date set default now();

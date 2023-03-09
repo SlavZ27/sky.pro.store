@@ -2,7 +2,6 @@ package ru.skypro.homework.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
-import ru.skypro.homework.dto.Role;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -37,11 +36,11 @@ public class User {
     private String password;
     @Column(name = "username")
     private String username;
-    @Column(name = "role")
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    @Column(name = "enabled")
+    private Boolean enabled;
 
-    public User(String email,
+    public User(Integer id,
+                String email,
                 String firstName,
                 String lastName,
                 String phone,
@@ -49,7 +48,8 @@ public class User {
                 Avatar avatar,
                 String password,
                 String username,
-                Role role) {
+                Boolean enabled) {
+        this.id = id;
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -58,7 +58,7 @@ public class User {
         this.avatar = avatar;
         this.password = password;
         this.username = username;
-        this.role = role;
+        this.enabled = enabled;
     }
 
     @Override
