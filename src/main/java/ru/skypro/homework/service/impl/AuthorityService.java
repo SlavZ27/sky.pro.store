@@ -21,12 +21,16 @@ public class AuthorityService {
         Authority tempAuthority = new Authority();
         tempAuthority.setAuthority(role.getRole());
         tempAuthority.setUsername(user.getUsername());
-        authorityRepository.save(tempAuthority);
+        Authority newAuthority = authorityRepository.save(tempAuthority);
+        log.info("New Authority has been created with name - {}", newAuthority.getAuthority());
     }
 
     public void delAuthority(User user, Role role) {
         authorityRepository.findByUsernameAndAuthority(user.getUsername(), role.getRole())
-                .ifPresent(authorityRepository::delete);
+                .ifPresent(authority -> {
+                    authorityRepository.delete(authority);
+                    log.info("Authority with ID: {} has been deleted", authority.getId());
+                });
     }
 
     public List<Authority> getAuthority(User user) {
