@@ -225,7 +225,7 @@ public class Generator {
         return faker.avatar().image().getBytes();
     }
 
-    private List<String> getPathsOfFiles(String pathDir) {
+    public List<String> getPathsOfFiles(String pathDir) {
         File dir = new File(pathDir);
         File[] files = dir.listFiles();
         assert files != null;
