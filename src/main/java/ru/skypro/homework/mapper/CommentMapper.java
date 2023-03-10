@@ -1,6 +1,5 @@
 package ru.skypro.homework.mapper;
 
-import org.hibernate.boot.model.naming.IllegalIdentifierException;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;

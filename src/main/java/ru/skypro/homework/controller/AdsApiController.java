@@ -14,7 +14,6 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -243,6 +242,7 @@ public class AdsApiController {
             produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE},
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     // available only to the admin or the user who created ad with this image
+    //PATCH http://localhost:8080/ads/{id}/image
     @PreAuthorize("@userSecurity.isAdsAuthor(#idAds) or hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<byte[]> updateImage(
             @PathVariable Integer idAds,

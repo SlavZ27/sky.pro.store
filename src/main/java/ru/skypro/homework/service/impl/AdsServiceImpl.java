@@ -184,7 +184,7 @@ public class AdsServiceImpl {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         log.error("Method removeAds(Integer idAds) with ID:{} returned null", idAds);
-        return null;
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -318,6 +318,7 @@ public class AdsServiceImpl {
             return new AdsNotFoundException(idAds);
         });
         updateImageOfAds(ads, image);
+        ads = adsRepository.save(ads);
         ads = adsRepository.save(ads);
         log.info("Ads with ID: {} has been updated", idAds);
         return imageService.getImageData(ads.getImage());
