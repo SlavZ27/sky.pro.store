@@ -129,6 +129,7 @@ public class AdsApiController {
             @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Not Found")})     //was not in the specification
     @DeleteMapping(value = "{id_ads}")
+    // DELETE http://localhost:8080/ads/{id}
     // available only to the admin or the user who created this ad
     @PreAuthorize("@userSecurity.isAdsAuthor(#idAds) or hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Void> removeAds(@PathVariable("id_ads") Integer idAds) {
@@ -146,7 +147,8 @@ public class AdsApiController {
     @PatchMapping(value = "/{id}",
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
-//    available only to the admin or the user who created this ad
+    //PATCH http://localhost:8080/ads/{id}
+    //    available only to the admin or the user who created this ad
     @PreAuthorize("@userSecurity.isAdsAuthor(#id) or hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<AdsDto> updateAds(
             @Parameter(in = ParameterIn.PATH, description = "", required = true,
@@ -164,9 +166,9 @@ public class AdsApiController {
             @ApiResponse(responseCode = "404", description = "Not Found")})
     @GetMapping(value = "/{ad_pk}/comments/{id}",
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    //      http://localhost:8080/ads/2/comments/4
-    // // available only for the authenticated users
-    public ResponseEntity<CommentDto> getComments(
+    //      GET http://localhost:8080/ads/{idAds}/comments/{idComment}
+    // available only for the authenticated users
+    public ResponseEntity<CommentDto> getComment(
             @Parameter(in = ParameterIn.PATH, description = "", required = true,
                     schema = @Schema()) @PathVariable("ad_pk") Integer adPk,
             @Parameter(in = ParameterIn.PATH, description = "", required = true,
@@ -205,6 +207,7 @@ public class AdsApiController {
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     //    available only to the admin or the user who created this comment
+    // PATCH http://localhost:8080/ads/{id}/comments
     @PreAuthorize("@userSecurity.isCommentAuthor(#id) or hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<CommentDto> updateComments(
             @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema())

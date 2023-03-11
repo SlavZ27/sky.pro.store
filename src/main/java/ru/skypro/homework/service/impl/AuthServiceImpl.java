@@ -15,17 +15,20 @@ import ru.skypro.homework.entity.Role;
 import ru.skypro.homework.exception.UserNotFoundException;
 import ru.skypro.homework.service.AuthService;
 
+import java.time.LocalDate;
+
 @Service
 @Slf4j
 public class AuthServiceImpl implements AuthService {
 
     private final UserDetailsManager manager;
-
     private final PasswordEncoder encoder;
+    private final UserServiceImpl userService;
     private final static String PAS_PREFIX = "{bcrypt}";
 
-    public AuthServiceImpl(@Qualifier("jdbcUserDetailsManager") UserDetailsManager manager) {
+    public AuthServiceImpl(@Qualifier("jdbcUserDetailsManager") UserDetailsManager manager, UserServiceImpl userService) {
         this.manager = manager;
+        this.userService = userService;
         this.encoder = new BCryptPasswordEncoder();
     }
 
@@ -55,13 +58,7 @@ public class AuthServiceImpl implements AuthService {
             log.error("User with userName: {} already exists", registerReq.getUsername());
             throw new IllegalArgumentException(registerReq.getUsername());
         }
-        manager.createUser(
-                User.builder()
-                        .password(PAS_PREFIX + encoder.encode(registerReq.getPassword()))
-                        .username(registerReq.getUsername())
-                        .roles(Role.USER.name())
-                        .build()
-        );
+        userService.addUser(registerReq, PAS_PREFIX + encoder.encode(registerReq.getPassword()));
         log.info("New user with username: {} has been registered", registerReq.getUsername());
         return true;
     }

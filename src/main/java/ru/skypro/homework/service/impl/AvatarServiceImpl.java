@@ -62,10 +62,10 @@ public class AvatarServiceImpl {
                 Files.deleteIfExists(pathOld);
             }
         } catch (IOException ignored) {
-            log.error("Absent file in Avatar with id: {}", avatar.getId(), ignored);
+            log.error("Absent file in Avatar with id: {}", avatar.getId());
             throw new AvatarNotFoundException("Absent file in Avatar with id = " + avatar.getId());
         } catch (NullPointerException e) {
-            log.error("Absent path in Avatar with id: {}", avatar.getId(), e);
+            log.error("Absent path in Avatar with id: {}", avatar.getId());
             throw new AvatarNotFoundException("Absent path in Avatar with id = " + avatar.getId());
         }
         return avatar;
@@ -88,10 +88,10 @@ public class AvatarServiceImpl {
             log.info("Try to read bytes by path: {}", avatar.getPath());
             return Pair.of(Files.readAllBytes(Paths.get(avatar.getPath())), MediaType.IMAGE_JPEG_VALUE);
         } catch (IOException ignored) {
-            log.error("Absent file in Avatar with id: {}", avatar.getId(), ignored);
+            log.error("Absent file in Avatar with id: {}", avatar.getId());
             throw new AvatarNotFoundException("Absent file in Avatar with id = " + avatar.getId());
         } catch (NullPointerException e) {
-            log.error("Absent path in Avatar with id: {}", avatar.getId(), e);
+            log.error("Absent path in Avatar with id: {}", avatar.getId());
             throw new AvatarNotFoundException("Absent path in Avatar with id = " + avatar.getId());
         }
     }
@@ -129,7 +129,7 @@ public class AvatarServiceImpl {
             Files.deleteIfExists(path);
             log.info("Try to delete path = {} if exists", path);
         } catch (IOException ignored) {
-            log.error("Something wrong with avatar path!", ignored);
+            log.error("Something wrong with avatar path!");
         }
         avatarRepository.delete(avatar);
         log.info("Avatar with ID: {} have been deleted", avatar.getId());

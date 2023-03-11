@@ -1,9 +1,13 @@
 package ru.skypro.homework.dontTouch;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import ru.skypro.homework.Generator;
 import ru.skypro.homework.entity.*;
 import ru.skypro.homework.exception.UserNotFoundException;
@@ -18,6 +22,7 @@ import java.util.Random;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@DirtiesContext
 public class GenerateToDB {
     private final String dirForImages = "./materials_test";
     private final String dirForAvatars = "./avatars_test";
@@ -72,7 +77,7 @@ public class GenerateToDB {
         List<User> userAdminList = new ArrayList<>();
         for (int i = 0; i < countUserAdmin; i++) {
             Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(null, dirForAvatars));
-            User user = usersRepository.save(generator.generateUserRoleAdmin(avatar, "password"));
+            User user = usersRepository.save(generator.generateUser(avatar, "password"));
             authorityRepository.save(generator.generateAuthority(user, Role.ADMIN));
             userAdminList.add(user);
         }
@@ -80,7 +85,7 @@ public class GenerateToDB {
         List<User> userList = new ArrayList<>();
         for (int i = 0; i < countUser; i++) {
             Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(null, dirForAvatars));
-            User user = usersRepository.save(generator.generateUserRoleUser(avatar, "password"));
+            User user = usersRepository.save(generator.generateUser(avatar, "password"));
             authorityRepository.save(generator.generateAuthority(user, Role.USER));
             userList.add(user);
         }
