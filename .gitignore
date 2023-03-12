@@ -33,3 +33,5 @@ build/
 .vscode/
 /materials/
 /avatars/
+/logs/LogFile.log
+/logs/

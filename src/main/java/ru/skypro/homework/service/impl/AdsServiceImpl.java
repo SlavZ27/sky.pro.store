@@ -162,7 +162,7 @@ public class AdsServiceImpl {
             log.info("Try to get imageMustBeNull by imageID {}", imageForDel.getId());
         } catch (ImageNotFoundException e) {
             imageMustBeNull = null;
-            log.error("An exception occurred! Set imageMustBeNull = null", e);
+            log.error("An exception occurred! Set imageMustBeNull = null");
         }
         //checking File of Image
         boolean existFile = true;
@@ -171,7 +171,7 @@ public class AdsServiceImpl {
             log.info("Try to get getImageData(imageForDel)");
         } catch (ImageNotFoundException e) {
             existFile = false;
-            log.error("An exception occurred! Set existFile = false", e);
+            log.error("An exception occurred! Set existFile = false");
         }
         //checking comments
         int countComments = commentService.getCountByIdAds(idAds);
@@ -220,6 +220,7 @@ public class AdsServiceImpl {
         Ads ads = createAdsMapper.createAdsDtoToAds(createAdsDto);
         ads.setAuthor(user);
         ads.setDateTime(LocalDateTime.now());
+        ads.setId(null);
         ads = adsRepository.save(ads);
         log.info("Ads with ID: {} has been created", ads.getId());
         Image addedImage = imageService.addImage(image, getNameFileForImage(ads));
@@ -318,7 +319,6 @@ public class AdsServiceImpl {
             return new AdsNotFoundException(idAds);
         });
         updateImageOfAds(ads, image);
-        ads = adsRepository.save(ads);
         ads = adsRepository.save(ads);
         log.info("Ads with ID: {} has been updated", idAds);
         return imageService.getImageData(ads.getImage());

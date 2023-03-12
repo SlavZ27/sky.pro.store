@@ -44,7 +44,7 @@ public class ImageServiceImpl {
      */
     public Image updateImage(Image image, MultipartFile file, String nameFile) {
         if (image == null || image.getId() == null) {
-            log.error("An exception occurred! Cause: image=null or image.Id=null", new IllegalArgumentException());
+            log.error("An exception occurred! Cause: image=null or image.Id=null");
             throw new IllegalArgumentException();
         }
         Path pathOld = Paths.get(image.getPath());
@@ -59,10 +59,10 @@ public class ImageServiceImpl {
                 Files.deleteIfExists(pathOld);
             }
         } catch (IOException ignored) {
-            log.error("Absent file in Avatar with id: {}", image.getId(), ignored);
+            log.error("Absent file in Avatar with id: {}", image.getId());
             throw new ImageNotFoundException("Absent file in Image with id = " + image.getId());
         } catch (NullPointerException e) {
-            log.error("Absent path in Avatar with id: {}", image.getId(), e);
+            log.error("Absent path in Avatar with id: {}", image.getId());
             throw new ImageNotFoundException("Absent path in Image with id = " + image.getId());
         }
         return image;
@@ -78,17 +78,17 @@ public class ImageServiceImpl {
      */
     public Pair<byte[], String> getImageData(Image image) {
         if (image == null || image.getId() == null) {
-            log.error("An exception occurred! Cause: image=null or image.Id=null", new IllegalArgumentException());
+            log.error("An exception occurred! Cause: image=null or image.Id=null");
             throw new IllegalArgumentException();
         }
         try {
             log.info("Try to read bytes by path: {}", image.getPath());
             return Pair.of(Files.readAllBytes(Paths.get(image.getPath())), MediaType.IMAGE_JPEG_VALUE);
         } catch (IOException ignored) {
-            log.error("Absent file in Image with id: {}", image.getId(), ignored);
+            log.error("Absent file in Image with id: {}", image.getId());
             throw new ImageNotFoundException("Absent file in Image with id = " + image.getId());
         } catch (NullPointerException e) {
-            log.error("Absent path in Image with id: {}", image.getId(), e);
+            log.error("Absent path in Image with id: {}", image.getId());
             throw new ImageNotFoundException("Absent path in Image with id = " + image.getId());
         }
     }
@@ -103,7 +103,7 @@ public class ImageServiceImpl {
      */
     public Image getImage(Integer id) {
         if (id == null) {
-            log.error("An exception occurred! Cause: image.Id=null", new IllegalArgumentException());
+            log.error("An exception occurred! Cause: image.Id=null");
             throw new IllegalArgumentException();
         }
         return imageRepository.findById(id).orElseThrow(() -> {
@@ -125,7 +125,7 @@ public class ImageServiceImpl {
             Files.deleteIfExists(path);
             log.info("Try to delete path = {} if exists", path);
         } catch (IOException ignored) {
-            log.error("Something wrong with image path!", ignored);
+            log.error("Something wrong with image path!");
         }
         imageRepository.delete(image);
         log.info("Image with ID: {} have been deleted", image.getId());
@@ -141,9 +141,14 @@ public class ImageServiceImpl {
      */
     private Path generatePath(MultipartFile file, String nameFile) {
         String date = LocalDate.now().toString();
-        String extension = Optional.ofNullable(file.getOriginalFilename())
-                .map(fileName -> fileName.substring(file.getOriginalFilename().lastIndexOf('.')))
-                .orElse("");
+        String extension;
+        if (file.getOriginalFilename() == null) {
+            extension = ".jpg";
+        } else {
+            extension = Optional.ofNullable(file.getOriginalFilename())
+                    .map(fileName -> fileName.substring(file.getOriginalFilename().lastIndexOf('.')))
+                    .orElse("");
+        }
         return Paths.get(dirForImages).resolve(nameFile + "_" + date + extension);
     }
 
@@ -161,6 +166,7 @@ public class ImageServiceImpl {
         Files.write(path, data);
         Image image = new Image();
         image.setPath(path.toString());
+        image.setId(null);
         Image newImage = imageRepository.save(image);
         log.info("New image with ID: {} has been added", newImage.getId());
         return newImage;

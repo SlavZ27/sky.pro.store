@@ -114,21 +114,7 @@ public class Generator {
         return tld;
     }
 
-    public User generateUserRoleAdmin(Avatar avatar, String pas) {
-        return generateUser(
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                avatar,
-                null,
-                pas,
-                true);
-    }
-
-    public User generateUserRoleUser(Avatar avatar, String pas) {
+    public User generateUser(Avatar avatar, String pas) {
         return generateUser(
                 null,
                 null,
@@ -193,6 +179,7 @@ public class Generator {
     public Avatar generateAvatarIfNull(Avatar avatar, String dirForAvatars) {
         if (avatar == null) {
             avatar = new Avatar();
+            avatar.setId(generateIdIfEmpty(null));
             if (dirForAvatars == null || dirForAvatars.length() == 0) {
                 avatar.setPath(faker.file().fileName());
             } else {
@@ -206,6 +193,7 @@ public class Generator {
     public Image generateImageIfNull(Image image, String dirForImages) {
         if (image == null) {
             image = new Image();
+            image.setId(generateIdIfEmpty(null));
             if (dirForImages == null || dirForImages.length() == 0) {
                 image.setPath(faker.file().fileName());
             } else {
@@ -235,6 +223,7 @@ public class Generator {
     public Comment generateCommentIfNull(Comment comment, Ads ads, User user) {
         if (comment == null) {
             comment = new Comment();
+            comment.setId(generateIdIfEmpty(null));
             comment.setText(faker.chuckNorris().fact());
             comment.setDateTime(generateDateTime(true, LocalDateTime.now()));
             comment.setAds(ads);
@@ -243,9 +232,30 @@ public class Generator {
         return comment;
     }
 
+    public Ads getNewAds(Ads adsOld) {
+        Ads ads = new Ads();
+        ads.setId(adsOld.getId());
+        ads.setAuthor(adsOld.getAuthor());
+        ads.setPrice(adsOld.getPrice());
+        ads.setDescription(adsOld.getDescription());
+        ads.setImage(adsOld.getImage());
+        ads.setTitle(adsOld.getTitle());
+        ads.setDateTime(adsOld.getDateTime());
+        return ads;
+    }
+
+    public Image getNewImage(Image imageOld) {
+        Image image = new Image();
+        image.setId(generateIdIfEmpty(null));
+        image.setId(imageOld.getId());
+        image.setPath(imageOld.getPath());
+        return image;
+    }
+
     public Ads generateAdsIfNull(Ads ads, User author, Image image) {
         if (ads == null) {
             ads = new Ads();
+            ads.setId(generateIdIfEmpty(null));
             ads.setAuthor(author);
             ads.setImage(image);
             ads.setDateTime(generateDateTime(true, LocalDateTime.now()));
@@ -346,6 +356,7 @@ public class Generator {
             authority.setAuthority(role.getRole());
         }
         authority.setAuthority(authority.getAuthority());
+        authority.setId(generateIdIfEmpty(null));
         return authority;
     }
 
@@ -374,10 +385,10 @@ public class Generator {
      */
     public Integer generateIdIfEmpty(Integer id) {
         if (id == null || id < 0) {
-            Integer idTemp = -1;
+            int idTemp = -1;
             //id with <100 I leave for my needs
-            while (idTemp < 100) {
-                idTemp = faker.random().nextInt(999_999_999 - 100_000_000) + 100_000_000;
+            while (idTemp < 0) {
+                idTemp = random.nextInt();
             }
             return idTemp;
         }
