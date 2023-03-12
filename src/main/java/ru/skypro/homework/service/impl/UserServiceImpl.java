@@ -47,7 +47,6 @@ public class UserServiceImpl {
         user.setLastName(registerReq.getLastName());
         user.setPassword(pass);
         user.setPhone(registerReq.getPhone());
-        user.setEmail(registerReq.getUsername());
         user.setRegDate(LocalDate.now());
         user.setUsername(registerReq.getUsername());
         user.setEnabled(true);

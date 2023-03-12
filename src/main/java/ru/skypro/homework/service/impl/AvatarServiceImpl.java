@@ -97,46 +97,6 @@ public class AvatarServiceImpl {
     }
 
     /**
-     * This method, used method repository, allows get Image.
-     * Uses {@link AvatarRepository#findById(Object)}
-     *
-     * @param id is not null
-     * @return Image or null
-     * @throws AvatarNotFoundException if passed non id avatar
-     */
-    public Avatar getImage(Integer id) {
-        if (id == null) {
-            log.error("An exception occurred! Cause: avatar.Id=null");
-            throw new IllegalArgumentException();
-        }
-        return avatarRepository.findById(id).orElseThrow(() -> {
-            log.error("Avatar with ID: {} not found", id);
-            return new AvatarNotFoundException(id);
-        });
-    }
-
-    /**
-     * This method, used method repository, remove Avatar with file
-     * Uses {@link AvatarRepository#delete(Object)}
-     * Uses {@link AvatarRepository#findById(Object)}
-     *
-     * @param avatar is not null
-     * @return true or false
-     */
-    private boolean removeAvatarWithFile(Avatar avatar) {
-        Path path = Path.of(avatar.getPath());
-        try {
-            Files.deleteIfExists(path);
-            log.info("Try to delete path = {} if exists", path);
-        } catch (IOException ignored) {
-            log.error("Something wrong with avatar path!");
-        }
-        avatarRepository.delete(avatar);
-        log.info("Avatar with ID: {} have been deleted", avatar.getId());
-        return !Files.exists(path) && avatarRepository.findById(avatar.getId()).isEmpty();
-    }
-
-    /**
      * This method generate Path to file Avatar for string.
      *
      * @param file     is not null

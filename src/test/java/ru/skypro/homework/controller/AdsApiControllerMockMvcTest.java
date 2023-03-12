@@ -115,10 +115,6 @@ class AdsApiControllerMockMvcTest {
         when(userSecurity.isCommentAuthor(any())).thenReturn(true);
     }
 
-    @AfterAll
-    public static void cleanContext() {
-    }
-
     @Test
     public void contextsLoad() {
         assertThat(adsApiController).isNotNull();
@@ -728,6 +724,7 @@ class AdsApiControllerMockMvcTest {
                 .with(csrf());
         mockMvc.perform(builder)
                 .andExpect(status().isNotFound());
+        when(usersRepository.findById(owner.getId())).thenReturn(Optional.of(owner));
         when(adsRepository.findById(ads.getId())).thenReturn(Optional.of(ads));
         when(commentRepository.findByIdAndAdsId(ads.getId(), randomInt)).thenReturn(Optional.empty());
         mockMvc.perform(builder)

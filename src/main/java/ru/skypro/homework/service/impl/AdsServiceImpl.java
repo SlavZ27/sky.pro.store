@@ -135,7 +135,6 @@ public class AdsServiceImpl {
      * Uses {@link AdsRepository#delete(Object)}
      * Uses {@link ImageServiceImpl#removeImageWithFile(Image)}
      * Uses {@link ImageServiceImpl#getImageData(Image)}
-     * Uses {@link CommentServiceImpl#getAllByIdAds(Integer)}
      *
      * @param idAds is not null
      * @return HttpStatus.NO_CONTENT or null

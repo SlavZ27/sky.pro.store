@@ -32,14 +32,6 @@ public class Ads {
     @Column(name = "date_time")
     private LocalDateTime dateTime; // yyyy-MM-dd HH:mm
 
-    public Ads(User author, Integer price, String title, Image image, String description) {
-        this.author = author;
-        this.price = price;
-        this.title = title;
-        this.image = image;
-        this.description = description;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

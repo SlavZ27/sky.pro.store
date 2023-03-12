@@ -36,9 +36,8 @@ public abstract class CommentMapper {
         }
         User author = null;
         if (commentDto.getAuthor() != null) {
-            author = usersRepository
-                    .findById(commentDto.getAuthor())
-                    .orElseThrow(() -> new UserNotFoundException(String.valueOf(commentDto.getAuthor())));
+            author = usersRepository.findById(commentDto.getAuthor()).orElseThrow(() ->
+                    new UserNotFoundException(String.valueOf(commentDto.getAuthor())));
         }
         return author;
     }

@@ -47,9 +47,9 @@ public class CommentServiceImpl {
         comment.setAds(ads);
         comment.setAuthor(author);
         comment.setDateTime(LocalDateTime.now());
-        Comment newComment = commentRepository.save(comment);
+        comment = commentRepository.save(comment);
         log.info("A new comment with ID: {} has been added to ad with ID: {}", comment.getId(), ads.getId());
-        return newComment;
+        return comment;
     }
 
     /**
@@ -81,17 +81,6 @@ public class CommentServiceImpl {
         Comment updatedComment = commentRepository.save(oldComment);
         log.info("Comment with ID: {} has been updated", commentId);
         return updatedComment;
-    }
-
-    /**
-     * This method, used method repository, allows get all comment by id to ads.
-     * Uses {@link CommentRepository#findAllByIdAds(Integer)}
-     *
-     * @param idAds is not null
-     * @return Comment by id
-     */
-    public List<Comment> getAllByIdAds(Integer idAds) {
-        return commentRepository.findAllByIdAds(idAds);
     }
 
     public Integer getCountByIdAds(Integer idAds) {

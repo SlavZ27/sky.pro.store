@@ -11,38 +11,25 @@ import javax.validation.Valid;
  * Ads
  */
 @Validated
-@javax.annotation.Generated(value = "ru.skypro.homeworkcodegen.v3.generators.java.SpringCodegen", date = "2023-02-06T18:24:36.081075022Z[GMT]")
-
 
 public class AdsDto {
   @JsonProperty("author")
-  private Integer author = null;
+  private Integer author;
 
   @JsonProperty("image")
   @Valid
   private String image;
 
   @JsonProperty("pk")
-  private Integer pk = null;
+  private Integer pk;
 
   @JsonProperty("price")
-  private Integer price = null;
+  private Integer price;
 
   @JsonProperty("title")
-  private String title = null;
+  private String title;
 
-  public AdsDto author(Integer author) {
-    this.author = author;
-    return this;
-  }
-
-  /**
-   * Get author
-   * @return author
-   **/
-  @Schema(description = "")
-  
-    public Integer getAuthor() {
+  public Integer getAuthor() {
     return author;
   }
 
@@ -58,18 +45,7 @@ public class AdsDto {
     this.image = image;
   }
 
-  public AdsDto pk(Integer pk) {
-    this.pk = pk;
-    return this;
-  }
-
-  /**
-   * Get pk
-   * @return pk
-   **/
-  @Schema(description = "")
-  
-    public Integer getPk() {
+  public Integer getPk() {
     return pk;
   }
 
@@ -77,18 +53,7 @@ public class AdsDto {
     this.pk = pk;
   }
 
-  public AdsDto price(Integer price) {
-    this.price = price;
-    return this;
-  }
-
-  /**
-   * Get price
-   * @return price
-   **/
-  @Schema(description = "")
-  
-    public Integer getPrice() {
+  public Integer getPrice() {
     return price;
   }
 
@@ -96,69 +61,11 @@ public class AdsDto {
     this.price = price;
   }
 
-  public AdsDto title(String title) {
-    this.title = title;
-    return this;
-  }
-
-  /**
-   * Get title
-   * @return title
-   **/
-  @Schema(description = "")
-  
-    public String getTitle() {
+  public String getTitle() {
     return title;
   }
 
   public void setTitle(String title) {
     this.title = title;
-  }
-
-
-  @Override
-  public boolean equals(java.lang.Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    AdsDto ads = (AdsDto) o;
-    return Objects.equals(this.author, ads.author) &&
-        Objects.equals(this.image, ads.image) &&
-        Objects.equals(this.pk, ads.pk) &&
-        Objects.equals(this.price, ads.price) &&
-        Objects.equals(this.title, ads.title);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(author, image, pk, price, title);
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class Ads {\n");
-    
-    sb.append("    author: ").append(toIndentedString(author)).append("\n");
-    sb.append("    image: ").append(toIndentedString(image)).append("\n");
-    sb.append("    pk: ").append(toIndentedString(pk)).append("\n");
-    sb.append("    price: ").append(toIndentedString(price)).append("\n");
-    sb.append("    title: ").append(toIndentedString(title)).append("\n");
-    sb.append("}");
-    return sb.toString();
-  }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(java.lang.Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
   }
 }

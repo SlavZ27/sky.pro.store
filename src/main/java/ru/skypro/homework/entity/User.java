@@ -39,28 +39,6 @@ public class User {
     @Column(name = "enabled")
     private Boolean enabled;
 
-    public User(Integer id,
-                String email,
-                String firstName,
-                String lastName,
-                String phone,
-                LocalDate regDate,
-                Avatar avatar,
-                String password,
-                String username,
-                Boolean enabled) {
-        this.id = id;
-        this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.phone = phone;
-        this.regDate = regDate;
-        this.avatar = avatar;
-        this.password = password;
-        this.username = username;
-        this.enabled = enabled;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
