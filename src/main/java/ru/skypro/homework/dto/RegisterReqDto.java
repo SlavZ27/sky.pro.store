@@ -4,9 +4,15 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.validation.annotation.Validated;
+import ru.skypro.homework.validate.ValidPhone;
+
+import javax.validation.constraints.Email;
 
 @Validated
+@ValidPhone
 public class RegisterReqDto {
+    @Email(message = "Username has invalid format: ${validatedValue}",
+            regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$")
     @JsonProperty("username")
     private String username;
 

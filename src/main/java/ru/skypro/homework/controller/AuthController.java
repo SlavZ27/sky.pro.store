@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +20,8 @@ import ru.skypro.homework.dto.NewPasswordDto;
 import ru.skypro.homework.dto.RegisterReqDto;
 import ru.skypro.homework.exception.UserNotFoundException;
 import ru.skypro.homework.service.AuthService;
+
+import javax.validation.Valid;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
@@ -59,7 +62,7 @@ public class AuthController {
             @ApiResponse(responseCode = "409", description = "Conflict")})
     @PostMapping(value = "/register",
             consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<Void> register(@RequestBody RegisterReqDto req) {
+    public ResponseEntity<Void> register(@RequestBody @Validated RegisterReqDto req) {
         if (authService.register(req)) {
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } else {

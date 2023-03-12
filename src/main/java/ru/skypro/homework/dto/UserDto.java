@@ -4,27 +4,32 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.validation.annotation.Validated;
+import ru.skypro.homework.validate.ValidPhone;
+
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Past;
+import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.Positive;
 
 @Validated
+@ValidPhone
 public class UserDto {
+    @Email(message = "Email address has invalid format: ${validatedValue}",
+            regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$")
     @JsonProperty("email")
     private String email;
-
     @JsonProperty("firstName")
     private String firstName;
-
+    @Positive
     @JsonProperty("id")
     private Integer id;
-
     @JsonProperty("lastName")
     private String lastName;
-
     @JsonProperty("phone")
     private String phone;
-
+    @PastOrPresent
     @JsonProperty("regDate")
     private String regDate;
-
     @JsonProperty("image")
     private String image;
 
