@@ -17,15 +17,11 @@ public class ValidPhoneValidator implements ConstraintValidator<ValidPhone, Stri
         if (phone == null) {
             return true;
         }
-        if (!phone.startsWith("+79")) {
-            return false;
-        }
-        phone = phone.substring(3);
-        if (phone.length() != 9) {
+        if (!phone.startsWith("+79") || phone.length() != 12) {
             return false;
         }
         try {
-            Integer.parseInt(phone);
+            Integer.parseInt(phone.substring(3));
         } catch (NumberFormatException e) {
             return false;
         }

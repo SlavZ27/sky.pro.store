@@ -3,6 +3,7 @@ package ru.skypro.homework.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.validation.annotation.Validated;
 import ru.skypro.homework.validate.ValidPhone;
+import ru.skypro.homework.validate.ValidRole;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
@@ -27,7 +28,7 @@ public class RegisterReqDto {
     @JsonProperty("phone")
     @ValidPhone
     private String phone;
-
+    @ValidRole
     private String role;
 
     public String getUsername() {
