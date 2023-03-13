@@ -12,14 +12,11 @@ import javax.validation.Valid;
 /**
  * ResponseWrapperAds
  */
-@Validated
-
 public class ResponseWrapperAdsDto {
   @JsonProperty("count")
   private Integer count;
 
   @JsonProperty("results")
-  @Valid
   private List<AdsDto> results;
 
   public Integer getCount() {

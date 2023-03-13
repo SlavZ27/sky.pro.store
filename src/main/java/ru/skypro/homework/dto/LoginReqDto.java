@@ -4,12 +4,19 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
+
 @Validated
 public class LoginReqDto {
     @JsonProperty("password")
+    @NotNull
     private String password;
 
     @JsonProperty("username")
+    @Email
+    @NotNull
     private String username;
 
     public String getPassword() {

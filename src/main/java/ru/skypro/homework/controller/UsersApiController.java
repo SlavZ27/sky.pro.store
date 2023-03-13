@@ -26,7 +26,6 @@ import java.io.IOException;
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
-@Validated
 @RequestMapping(value = "users")
 public class UsersApiController {
     private final UserServiceImpl userService;
@@ -89,7 +88,7 @@ public class UsersApiController {
     public ResponseEntity<UserDto> updateUser(
             Authentication authentication,
             @Parameter(in = ParameterIn.DEFAULT, description = "", required = true,
-                    schema = @Schema()) @Valid @RequestBody UserDto body) {
+                    schema = @Schema()) @Validated @RequestBody UserDto body) {
         return ResponseEntity.ok(userService.updateUser(authentication.getName(), body));
     }
 

@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.*;
@@ -30,6 +31,7 @@ import java.io.IOException;
 @RestController
 @CrossOrigin(value = "http://localhost:3000")
 @RequestMapping(value = "ads")
+@Validated
 public class AdsApiController {
 
     private final AdsServiceImpl adsServiceImpl;
@@ -64,7 +66,7 @@ public class AdsApiController {
     // available only for the authenticated
     public ResponseEntity<AdsDto> addAds(
             @Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema())
-            @RequestPart(value = "properties", required = false) CreateAdsDto properties,
+            @RequestPart(value = "properties", required = false) @Validated CreateAdsDto properties,
             @Parameter(description = "file detail")
             @RequestPart("image") MultipartFile image,
             Authentication authentication) throws IOException {
@@ -103,7 +105,7 @@ public class AdsApiController {
             @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema())
             @PathVariable("ad_pk") Integer adPk,
             @Parameter(in = ParameterIn.DEFAULT, description = "", required = true, schema = @Schema())
-            @Valid @RequestBody CommentDto body,
+            @RequestBody @Validated CommentDto body,
             Authentication authentication) {
         CommentDto commentDto = adsServiceImpl.addCommentsToAds(adPk, body, authentication.getName());
         return ResponseEntity.ok(commentDto);
@@ -154,7 +156,7 @@ public class AdsApiController {
             @Parameter(in = ParameterIn.PATH, description = "", required = true,
                     schema = @Schema()) @PathVariable("id") Integer id,
             @Parameter(in = ParameterIn.DEFAULT, description = "", required = true,
-                    schema = @Schema()) @Valid @RequestBody CreateAdsDto body) {
+                    schema = @Schema()) @RequestBody @Validated CreateAdsDto body) {
         return ResponseEntity.ok(adsServiceImpl.updateAds(id, body));
     }
 
@@ -215,7 +217,7 @@ public class AdsApiController {
             @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema())
             @PathVariable("id") Integer id,
             @Parameter(in = ParameterIn.DEFAULT, description = "", required = true, schema = @Schema())
-            @Valid @RequestBody CommentDto body) {
+            @RequestBody @Validated CommentDto body) {
         CommentDto commentDto = adsServiceImpl.updateCommentsForAds(adPk, id, body);
         return ResponseEntity.ok(commentDto);
     }

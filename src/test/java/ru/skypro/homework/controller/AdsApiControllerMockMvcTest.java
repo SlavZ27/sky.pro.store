@@ -139,16 +139,19 @@ class AdsApiControllerMockMvcTest {
         assertThat(mockMvc).isNotNull();
     }
 
-
     @Test
     @DisplayName("PATCH http://localhost:8080/ads/{id}/image 200")
     @WithMockUser(username = "1", authorities = {"ROLE_USER"})
     void updateImageTest() throws Exception {
+        //get List of Files into dirForImages
+        List<String> files = generator.getPathsOfFiles(dirForImages);
+        //create user
         User user = generator.generateUser(null, null);
-        Image image = generator.generateImageIfNull(null, dirForImages);
+        //create image
+        Image image = new Image();
+        image.setId(1);
+        //create ads
         Ads ads = generator.generateAdsIfNull(null, user, image);
-        Path newPathFile = generatePath("ads_" + ads.getId());
-
         //need min 2 image in dirForImages
         assertThat(generator.getPathsOfFiles(dirForImages).size() >= 2).isTrue();
         //get 2 different images
@@ -164,17 +167,20 @@ class AdsApiControllerMockMvcTest {
         if (!Files.exists(path1)) {
             Files.write(path1, data1);
         }
+        //fix path of image
         image.setPath(pathStr1);
-
+        //create file
+        MockMultipartFile mockMultipartFile = new MockMultipartFile(
+                "image",
+                "image.jpg",
+                MediaType.IMAGE_JPEG_VALUE,
+                data2);
+        //create mock
         when(adsRepository.save(ads)).thenReturn(ads);
         when(adsRepository.findById(ads.getId())).thenReturn(Optional.of(ads));
         when(imageRepository.findById(image.getId())).thenReturn(Optional.of(image));
         when(imageRepository.save(image)).thenReturn(image);
-        //check with standard parameters  (ads exist, image exist)
-
-        MockMultipartFile mockMultipartFile = new MockMultipartFile("image", "image.jpg",
-                MediaType.IMAGE_JPEG_VALUE, data2);
-
+        //config request
         MockHttpServletRequestBuilder builder = MockMvcRequestBuilders
                 .multipart(
                         HttpMethod.PATCH,
@@ -183,37 +189,53 @@ class AdsApiControllerMockMvcTest {
                 .file(mockMultipartFile)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .with(csrf());
+        //check with standard parameters  (ads exist, image exist)
         MvcResult mvcResult = mockMvc.perform(builder)
                 .andExpect(status().isOk())
                 .andReturn();
+        //check data2 was return
         assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(data2);
-
-        assertThat(Files.readAllBytes(newPathFile)).isEqualTo(data2);
+        //check +1 new file
+        List<String> filesNew = generator.getPathsOfFiles(dirForImages);
+        assertThat(files.size() + 1).isEqualTo(filesNew.size());
+        //get one new element
+        String newFile = filesNew.stream()
+                .filter(s -> !files.contains(s))
+                .findAny().orElse(null);
+        assert newFile != null;
+        Path newPath = Path.of(newFile);
+        //check data2 was saved to newPath
+        assertThat(Files.readAllBytes(newPath)).isEqualTo(data2);
+        //check old file was del
         assertThat(Files.exists(path1)).isFalse();
+        //clean
         Files.deleteIfExists(path1);
-        Files.deleteIfExists(newPathFile);
-
+        Files.deleteIfExists(newPath);
         //check with standard parameters  (ads exist, image non-exist)
-        ads.setImage(null);
+        Ads adsWithoutImage = generator.generateNewAdsFromAds(ads);
+        adsWithoutImage.setImage(null);
+        when(adsRepository.findById(ads.getId())).thenReturn(Optional.of(adsWithoutImage));
+        when(adsRepository.save(any(Ads.class))).thenReturn(ads);
         when(imageRepository.save(any(Image.class))).thenReturn(image);
-        mockMultipartFile = new MockMultipartFile("image", "image.jpg",
-                MediaType.IMAGE_JPEG_VALUE, data2);
-        builder = MockMvcRequestBuilders
-                .multipart(
-                        HttpMethod.PATCH,
-                        "http://localhost:8080/ads/" + ads.getId() + "/image"
-                )
-                .file(mockMultipartFile)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .with(csrf());
         mvcResult = mockMvc.perform(builder)
                 .andExpect(status().isOk())
                 .andReturn();
+        //check data2 was return
         assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(data2);
-        assertThat(Files.readAllBytes(newPathFile)).isEqualTo(data2);
-        assertThat(Files.exists(path1)).isFalse();
+        //check +1 new file
+        filesNew = generator.getPathsOfFiles(dirForImages);
+        assertThat(files.size() + 1).isEqualTo(filesNew.size());
+        //get one new element
+        newFile = filesNew.stream()
+                .filter(s -> !files.contains(s))
+                .findAny().orElse(null);
+        assert newFile != null;
+        newPath = Path.of(newFile);
+        //check data2 was saved to newPath
+        assertThat(Files.readAllBytes(newPath)).isEqualTo(data2);
+        //clean
         Files.deleteIfExists(path1);
-        Files.deleteIfExists(newPathFile);
+        Files.deleteIfExists(newPath);
     }
 
     @Test
@@ -484,8 +506,6 @@ class AdsApiControllerMockMvcTest {
         String username = "1";
         User user = generator.generateUser(null, null);
         user.setUsername(username);
-        //create image
-        Image image = generator.generateImageIfNull(null, dirForImages);
         //create ads
         Ads ads = generator.generateAdsIfNull(null, user, null);
         //create createAdsDto
@@ -504,24 +524,28 @@ class AdsApiControllerMockMvcTest {
         assertThat(generator.getPathsOfFiles(dirForImages).size() >= 1).isTrue();
         //get images data
         byte[] data = generator.generateDataFileOfImageFromDir(dirForImages);
-        //create picture from data for actualImage
+        //create picture from data for Image
         String pathStr = dirForImages + "/" + "file_for_addAdsTest" + ".jpg";
         Path path = Path.of(pathStr);
         if (!Files.exists(path)) {
             Files.write(path, data);
         }
-        image.setPath(generatePath("ads_" + ads.getId()).toString());
-
-        when(usersRepository.findByUsername(username)).thenReturn(Optional.of(user));
-        when(adsRepository.save(any(Ads.class))).thenReturn(ads);
-        when(imageRepository.save(any(Image.class))).thenReturn(image);
-
+        //create Mock file and JSON
         MockMultipartFile mockMultipartFile =
                 new MockMultipartFile("image", "image.jpg",
                         MediaType.IMAGE_JPEG_VALUE, data);
         MockMultipartFile JSON =
                 new MockMultipartFile("properties", null,
                         MediaType.APPLICATION_JSON_VALUE, objectWriter.writeValueAsString(createAdsDto).getBytes());
+        //create image
+        Image image = new Image();
+        image.setId(1);
+        image.setPath(imageService.generatePath(mockMultipartFile, "ads_" + ads.getId()).toString());
+        //create mock
+        when(usersRepository.findByUsername(username)).thenReturn(Optional.of(user));
+        when(adsRepository.save(any(Ads.class))).thenReturn(ads);
+        when(imageRepository.save(any(Image.class))).thenReturn(image);
+
         MockHttpServletRequestBuilder builder = MockMvcRequestBuilders
                 .multipart(
                         HttpMethod.POST,
@@ -648,7 +672,7 @@ class AdsApiControllerMockMvcTest {
     }
 
     @Test
-    @DisplayName("GET http://localhost:8080/ads/by-title?title={} 200")
+    @DisplayName("GET http://localhost:8080/ads/by-title?title={\"title\"} 200")
     @WithMockUser(username = "1", authorities = "ROLE_USER")
     void findByTitleLikeTest() throws Exception {
         String title = "title";
@@ -688,7 +712,6 @@ class AdsApiControllerMockMvcTest {
         //create commentDto
         CommentDto commentDtoOld = commentMapper.commentToDto(commentOld);
         CommentDto commentDtoNew = commentMapper.commentToDto(commentNew);
-
 
         when(adsRepository.findById(ads.getId())).thenReturn(Optional.of(ads));
         when(commentRepository.findByIdAndAdsId(ads.getId(), commentOld.getId())).thenReturn(Optional.of(commentOld));
@@ -827,12 +850,6 @@ class AdsApiControllerMockMvcTest {
                 .with(csrf());
         mockMvc.perform(builder)
                 .andExpect(status().isNotFound());
-    }
-
-    private Path generatePath(String nameFile) {
-        String date = LocalDate.now().toString();
-        String extension = ".jpg";
-        return Paths.get(dirForImages).resolve(nameFile + "_" + date + extension);
     }
 }
 

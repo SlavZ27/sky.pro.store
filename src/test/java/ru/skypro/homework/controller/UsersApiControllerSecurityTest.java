@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test1")
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestMethodOrder(MethodOrderer.DisplayName.MethodName.class)
-class UsersApiControllerWebMvcIntegrationTest {
+class UsersApiControllerSecurityTest {
     @InjectMocks
     private UsersApiController usersApiController;
     private MockMvc mockMvc;

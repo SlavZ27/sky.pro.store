@@ -21,7 +21,6 @@ import ru.skypro.homework.dto.RegisterReqDto;
 import ru.skypro.homework.exception.UserNotFoundException;
 import ru.skypro.homework.service.AuthService;
 
-import javax.validation.Valid;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
@@ -41,7 +40,7 @@ public class AuthController {
     @PostMapping(value = "/login",
             produces = {"*/*"},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<Void> login(@RequestBody LoginReqDto req) {
+    public ResponseEntity<Void> login(@RequestBody @Validated LoginReqDto req) {
         try {
             if (authService.login(req.getUsername(), req.getPassword())) {
                 return ResponseEntity.ok().build();
@@ -81,7 +80,7 @@ public class AuthController {
     @PostMapping(value = "/users/set_password",
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<NewPasswordDto> setPassword(@RequestBody NewPasswordDto body) {
+    public ResponseEntity<NewPasswordDto> setPassword(@RequestBody @Validated NewPasswordDto body) {
         if (authService.changePassword(body)) {
             return ResponseEntity.ok(body);
         } else {

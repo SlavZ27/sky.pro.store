@@ -6,27 +6,31 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 /**
  * Ads
  */
 @Validated
-
 public class AdsDto {
   @JsonProperty("author")
+  @NotNull
   private Integer author;
 
   @JsonProperty("image")
-  @Valid
   private String image;
 
   @JsonProperty("pk")
   private Integer pk;
 
   @JsonProperty("price")
+  @NotNull
+  @Positive
   private Integer price;
 
   @JsonProperty("title")
+  @NotNull
   private String title;
 
   public Integer getAuthor() {

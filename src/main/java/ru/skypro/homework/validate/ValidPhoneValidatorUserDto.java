@@ -1,14 +1,15 @@
 package ru.skypro.homework.validate;
 
-import ru.skypro.homework.dto.RegisterReqDto;
 import ru.skypro.homework.dto.UserDto;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class ValidPhoneValidatorUserDto implements ConstraintValidator<ValidPhone, UserDto> {
+public class ValidPhoneValidatorUserDto implements ConstraintValidator<ValidPhoneUserDto, UserDto> {
+
+
     @Override
-    public void initialize(ValidPhone constraintAnnotation) {
+    public void initialize(ValidPhoneUserDto constraintAnnotation) {
         ConstraintValidator.super.initialize(constraintAnnotation);
     }
 

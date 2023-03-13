@@ -6,14 +6,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 /**
  * FullAds
  */
 @Validated
-@javax.annotation.Generated(value = "ru.skypro.homeworkcodegen.v3.generators.java.SpringCodegen", date = "2023-02-06T18:24:36.081075022Z[GMT]")
-
-
 public class FullAdsDto {
   @JsonProperty("authorFirstName")
   private String authorFirstName;
@@ -22,13 +21,13 @@ public class FullAdsDto {
   private String authorLastName;
 
   @JsonProperty("description")
+  @NotNull
   private String description;
 
   @JsonProperty("email")
   private String email;
 
   @JsonProperty("image")
-  @Valid
   private String image;
 
   @JsonProperty("phone")
@@ -38,9 +37,12 @@ public class FullAdsDto {
   private Integer pk;
 
   @JsonProperty("price")
+  @NotNull
+  @Positive
   private Integer price;
 
   @JsonProperty("title")
+  @NotNull
   private String title;
 
   public String getAuthorFirstName() {

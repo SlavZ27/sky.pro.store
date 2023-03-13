@@ -12,14 +12,11 @@ import javax.validation.Valid;
 /**
  * ResponseWrapperComment
  */
-@Validated
-
 public class ResponseWrapperCommentDto {
   @JsonProperty("count")
   private Integer count;
 
   @JsonProperty("results")
-  @Valid
   private List<CommentDto> results;
 
   public Integer getCount() {

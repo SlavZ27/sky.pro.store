@@ -9,8 +9,8 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = ValidPhoneValidatorRegisterReqDto.class)
-public @interface  ValidPhone {
+@Constraint(validatedBy = ValidPhoneValidatorUser.class)
+public @interface ValidPhoneUser {
     String message() default "Phone number is not valid";
 
     Class<?>[] groups() default {};

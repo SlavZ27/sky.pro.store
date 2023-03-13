@@ -2,8 +2,14 @@ package ru.skypro.homework.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.springframework.validation.annotation.Validated;
+import ru.skypro.homework.validate.ValidPhoneRegisterReqDto;
+import ru.skypro.homework.validate.ValidPhoneUser;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -13,6 +19,8 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Entity
 @Table(name = "users")
+@ValidPhoneUser
+@Validated
 public class User {
 
     @Id
@@ -20,6 +28,7 @@ public class User {
     @Column(name = "id", nullable = false)
     private Integer id;
     @Column(name = "email")
+    @Email(message = "Username has invalid format: ${validatedValue}")
     private String email;
     @Column(name = "first_name")
     private String firstName;
@@ -28,15 +37,21 @@ public class User {
     @Column(name = "phone")
     private String phone;
     @Column(name = "reg_date")
+    @PastOrPresent
+    @NotNull
     private LocalDate regDate;
     @OneToOne
     @JoinColumn(name = "id_avatar")
     private Avatar avatar;
     @Column(name = "password")
+    @NotNull
     private String password;
+    @Email(message = "Username has invalid format: ${validatedValue}")
     @Column(name = "username")
+    @NotNull
     private String username;
     @Column(name = "enabled")
+    @NotNull
     private Boolean enabled;
 
     @Override

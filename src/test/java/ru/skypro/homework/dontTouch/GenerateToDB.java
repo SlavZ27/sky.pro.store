@@ -22,7 +22,6 @@ import java.util.Random;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DirtiesContext
 public class GenerateToDB {
     private final String dirForImages = "./materials_test";
     private final String dirForAvatars = "./avatars_test";
@@ -116,7 +115,7 @@ public class GenerateToDB {
                         "user@gmail",
                         "User",
                         "user@gmail.com",
-                        "0987654321",
+                        "+79123789012",
                         LocalDate.now(),
                         null,
                         "user@gmail.com",
@@ -131,7 +130,7 @@ public class GenerateToDB {
                         "admin@gmail",
                         "Admin",
                         "admin@gmail.com",
-                        "0987654321",
+                        "+79123789012",
                         LocalDate.now(),
                         null,
                         "admin@gmail.com",
@@ -146,7 +145,7 @@ public class GenerateToDB {
                 "adminuser@gmail",
                 "adminuser",
                 "adminuser@gmail.com",
-                "0987654321",
+                "+79123789012",
                 LocalDate.now(),
                 null,
                 "adminuser@gmail.com",

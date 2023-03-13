@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
@@ -103,12 +104,8 @@ public class AvatarServiceImpl {
      * @param nameFile us not null
      * @return Patch with the specified data
      */
-    private Path generatePath(MultipartFile file, String nameFile) {
-        String date = LocalDate.now().toString();
-        String extension = Optional.ofNullable(file.getOriginalFilename())
-                .map(fileName -> fileName.substring(file.getOriginalFilename().lastIndexOf('.')))
-                .orElse("");
-        return Paths.get(dirForAvatars).resolve(nameFile + "_" + date + extension);
+    public Path generatePath(MultipartFile file, String nameFile) {
+        return ImageServiceImpl.generatePath(file, nameFile, dirForAvatars);
     }
 
     /**

@@ -18,6 +18,8 @@ import ru.skypro.homework.mapper.UserMapper;
 import ru.skypro.homework.repository.UsersRepository;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 
 @Service
@@ -82,9 +84,14 @@ public class UserServiceImpl {
     public ResponseEntity<Void> updateUserImage(String username, MultipartFile image) throws IOException {
         User user = getUserByUserName(username);
         updateImageOfUser(user, image);
-        usersRepository.save(user);
-        log.info("User with ID: {} has been updated", user.getId());
-        return new ResponseEntity<>(HttpStatus.OK);
+        user = usersRepository.save(user);
+        if (user.getAvatar() != null && user.getAvatar().getPath() != null
+                && Files.exists(Path.of(user.getAvatar().getPath()))) {
+            log.info("User with ID: {} has been updated", user.getId());
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     private void updateImageOfUser(User user, MultipartFile image) throws IOException {

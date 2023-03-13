@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test1")
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestMethodOrder(MethodOrderer.DisplayName.class)
-class AdsApiControllerWebMvcIntegrationTest {
+class AdsApiControllerSecurityTest {
     @InjectMocks
     private AdsApiController adsApiController;
     private MockMvc mockMvc;
@@ -314,4 +314,7 @@ class AdsApiControllerWebMvcIntegrationTest {
         resultActions
                 .andExpect(status().isForbidden());
     }
+
+
+
 }

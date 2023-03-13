@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
@@ -139,8 +140,12 @@ public class ImageServiceImpl {
      * @param nameFile us not null
      * @return Patch with the specified data
      */
-    private Path generatePath(MultipartFile file, String nameFile) {
-        String date = LocalDate.now().toString();
+    public Path generatePath(MultipartFile file, String nameFile) {
+        return generatePath(file, nameFile, dirForImages);
+    }
+
+    public static Path generatePath(MultipartFile file, String nameFile, String dirForImages) {
+        String splitter = "-";
         String extension;
         if (file.getOriginalFilename() == null) {
             extension = ".jpg";
@@ -149,7 +154,13 @@ public class ImageServiceImpl {
                     .map(fileName -> fileName.substring(file.getOriginalFilename().lastIndexOf('.')))
                     .orElse("");
         }
-        return Paths.get(dirForImages).resolve(nameFile + "_" + date + extension);
+        int count = 1;
+        Path result = Paths.get(dirForImages);
+        String way;
+        do {
+            way = nameFile + splitter + count++ + extension;
+        } while (Files.exists(result.resolve(way)));
+        return result.resolve(way);
     }
 
     /**

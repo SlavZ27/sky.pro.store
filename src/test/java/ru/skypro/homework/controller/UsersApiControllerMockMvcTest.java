@@ -34,6 +34,7 @@ import ru.skypro.homework.repository.AvatarRepository;
 import ru.skypro.homework.repository.UsersRepository;
 import ru.skypro.homework.service.impl.AuthorityService;
 import ru.skypro.homework.service.impl.AvatarServiceImpl;
+import ru.skypro.homework.service.impl.ImageServiceImpl;
 import ru.skypro.homework.service.impl.UserServiceImpl;
 
 import java.nio.file.Files;
@@ -41,6 +42,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -230,21 +232,22 @@ class UsersApiControllerMockMvcTest {
     @DisplayName("PATCH http://localhost:8080/users/me/image 200")
     @WithMockUser(username = "1", authorities = {"ROLE_USER"})
     void updateUserImageTest() throws Exception {
-        User user = generator.generateUser(null, null);
-        Avatar avatar = generator.generateAvatarIfNull(null, dirForAvatars);
+        //get List of Files into dirForAvatars
+        List<String> files = generator.getPathsOfFiles(dirForAvatars);
+        Avatar avatar = new Avatar();
+        avatar.setId(1);
+        User user = generator.generateUser(avatar, null);
         user.setUsername("1");
-        user.setAvatar(avatar);
-
-        Path newPathFile = generatePath("user_" + user.getId());
-
+        //need min 2 image in dirForImages
         assertThat(generator.getPathsOfFiles(dirForAvatars).size() >= 2).isTrue();
-
+        //get 2 different images
         byte[] data1 = new byte[0];
         byte[] data2 = data1;
         while (Arrays.equals(data1, data2)) {
             data1 = generator.generateDataFileOfImageFromDir(dirForAvatars);
             data2 = generator.generateDataFileOfImageFromDir(dirForAvatars);
         }
+        //create picture from data1 for actualImage
         String pathStr1 = dirForAvatars + "/" + "file_for_updateUserImageTest1" + ".jpg";
         Path path1 = Path.of(pathStr1);
         if (!Files.exists(path1)) {
@@ -252,16 +255,17 @@ class UsersApiControllerMockMvcTest {
         }
         avatar.setPath(pathStr1);
 
-        when(usersRepository.save(user)).thenReturn(user);
-        when(usersRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
-        when(avatarRepository.findById(avatar.getId())).thenReturn(Optional.of(avatar));
-        when(avatarRepository.save(avatar)).thenReturn(avatar);
-
         MockMultipartFile mockMultipartFile = new MockMultipartFile(
                 "image",
                 "image.jpg",
                 MediaType.IMAGE_JPEG_VALUE,
                 data2);
+
+        when(usersRepository.save(user)).thenReturn(user);
+        when(usersRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
+        when(avatarRepository.findById(avatar.getId())).thenReturn(Optional.of(avatar));
+        when(avatarRepository.save(avatar)).thenReturn(avatar);
+
         MockHttpServletRequestBuilder builder = MockMvcRequestBuilders
                 .multipart(
                         HttpMethod.PATCH,
@@ -271,36 +275,32 @@ class UsersApiControllerMockMvcTest {
                 .accept(MediaType.MULTIPART_FORM_DATA)
                 .with(csrf());
         mockMvc.perform(builder)
-                .andExpect(status().isOk())
-                .andReturn();
-
-        assertThat(Files.readAllBytes(newPathFile)).isEqualTo(data2);
+                .andExpect(status().isOk());
+        //check +1 new file
+        List<String> filesNew = generator.getPathsOfFiles(dirForAvatars);
+        assertThat(files.size() + 1).isEqualTo(filesNew.size());
+        //get one new element
+        String newFile = filesNew.stream()
+                .filter(s -> !files.contains(s))
+                .findAny().orElse(null);
+        assert newFile != null;
+        Path newPath = Path.of(newFile);
+        //check data2 was saved to newPath
+        assertThat(Files.readAllBytes(newPath)).isEqualTo(data2);
+        //check old file was del
         assertThat(Files.exists(path1)).isFalse();
+        //clean
         Files.deleteIfExists(path1);
-        Files.deleteIfExists(newPathFile);
+        Files.deleteIfExists(newPath);
 
         user.setAvatar(null);
         when(avatarRepository.save(any(Avatar.class))).thenReturn(avatar);
-        mockMultipartFile = new MockMultipartFile(
-                "image",
-                "image.jpg",
-                MediaType.IMAGE_JPEG_VALUE,
-                data2);
-        builder = MockMvcRequestBuilders
-                .multipart(
-                        HttpMethod.PATCH,
-                        "http://localhost:8080/users/me/image"
-                )
-                .file(mockMultipartFile)
-                .accept(MediaType.MULTIPART_FORM_DATA)
-                .with(csrf());
         mockMvc.perform(builder)
-                .andExpect(status().isOk())
-                .andReturn();
-        assertThat(Files.readAllBytes(newPathFile)).isEqualTo(data2);
+                .andExpect(status().isOk());
+        assertThat(Files.readAllBytes(newPath)).isEqualTo(data2);
         assertThat(Files.exists(path1)).isFalse();
         Files.deleteIfExists(path1);
-        Files.deleteIfExists(newPathFile);
+        Files.deleteIfExists(newPath);
     }
 
     @Test
@@ -323,11 +323,5 @@ class UsersApiControllerMockMvcTest {
 
         resultActions
                 .andExpect(status().isNotFound());
-    }
-
-    private Path generatePath(String nameFile) {
-        String date = LocalDate.now().toString();
-        String extension = ".jpg";
-        return Paths.get(dirForAvatars).resolve(nameFile + "_" + date + extension);
     }
 }

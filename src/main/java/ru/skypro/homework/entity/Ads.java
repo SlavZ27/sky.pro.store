@@ -2,7 +2,12 @@ package ru.skypro.homework.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.springframework.validation.annotation.Validated;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -11,6 +16,7 @@ import java.util.Objects;
 @ToString
 @RequiredArgsConstructor
 @Entity
+@Validated
 public class Ads {
 
     @Id
@@ -19,17 +25,24 @@ public class Ads {
     private Integer id;
     @OneToOne
     @JoinColumn(name = "id_author")
+    @NotNull
     private User author;
     @Column(name = "price")
+    @Positive
+    @NotNull
     private Integer price;
     @Column(name = "title")
+    @NotNull
     private String title;
     @OneToOne
     @JoinColumn(name = "id_image")
     private Image image;
     @Column(name = "description")
+    @NotNull
     private String description;
     @Column(name = "date_time")
+    @PastOrPresent
+    @NotNull
     private LocalDateTime dateTime; // yyyy-MM-dd HH:mm
 
     @Override

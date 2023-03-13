@@ -2,8 +2,10 @@ package ru.skypro.homework.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Getter
@@ -11,12 +13,14 @@ import java.util.Objects;
 @ToString
 @RequiredArgsConstructor
 @Entity
+@Validated
 public class Avatar {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
     @Column(name = "path")
+    @NotNull
     private String path;
 
     public Avatar(String path) {

@@ -10,15 +10,18 @@ import javax.validation.constraints.*;
  * CreateAds
  */
 @Validated
-
 public class CreateAdsDto {
   @JsonProperty("description")
+  @NotNull
   private String description;
 
   @JsonProperty("price")
+  @NotNull
+  @Positive
   private Integer price;
 
   @JsonProperty("title")
+  @NotNull
   private String title;
 
   public String getDescription() {

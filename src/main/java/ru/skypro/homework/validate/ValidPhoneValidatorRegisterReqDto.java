@@ -5,9 +5,10 @@ import ru.skypro.homework.dto.RegisterReqDto;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class ValidPhoneValidatorRegisterReqDto implements ConstraintValidator<ValidPhone, RegisterReqDto> {
+public class ValidPhoneValidatorRegisterReqDto implements ConstraintValidator<ValidPhoneRegisterReqDto, RegisterReqDto> {
+
     @Override
-    public void initialize(ValidPhone constraintAnnotation) {
+    public void initialize(ValidPhoneRegisterReqDto constraintAnnotation) {
         ConstraintValidator.super.initialize(constraintAnnotation);
     }
 
