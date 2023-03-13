@@ -5,9 +5,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
+import ru.skypro.homework.validate.ValidPhone;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
 /**
  * FullAds
@@ -31,6 +34,7 @@ public class FullAdsDto {
   private String image;
 
   @JsonProperty("phone")
+  @ValidPhone
   private String phone;
 
   @JsonProperty("pk")
@@ -38,7 +42,7 @@ public class FullAdsDto {
 
   @JsonProperty("price")
   @NotNull
-  @Positive
+  @PositiveOrZero
   private Integer price;
 
   @JsonProperty("title")

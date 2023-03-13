@@ -17,7 +17,7 @@ public class CreateAdsDto {
 
   @JsonProperty("price")
   @NotNull
-  @Positive
+  @PositiveOrZero
   private Integer price;
 
   @JsonProperty("title")

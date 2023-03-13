@@ -8,6 +8,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -28,7 +29,7 @@ public class Ads {
     @NotNull
     private User author;
     @Column(name = "price")
-    @Positive
+    @PositiveOrZero
     @NotNull
     private Integer price;
     @Column(name = "title")

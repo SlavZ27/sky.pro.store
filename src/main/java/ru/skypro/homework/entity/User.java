@@ -3,8 +3,7 @@ package ru.skypro.homework.entity;
 import lombok.*;
 import org.hibernate.Hibernate;
 import org.springframework.validation.annotation.Validated;
-import ru.skypro.homework.validate.ValidPhoneRegisterReqDto;
-import ru.skypro.homework.validate.ValidPhoneUser;
+import ru.skypro.homework.validate.ValidPhone;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -19,7 +18,6 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Entity
 @Table(name = "users")
-@ValidPhoneUser
 @Validated
 public class User {
 
@@ -35,6 +33,7 @@ public class User {
     @Column(name = "last_name")
     private String lastName;
     @Column(name = "phone")
+    @ValidPhone
     private String phone;
     @Column(name = "reg_date")
     @PastOrPresent
