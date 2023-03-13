@@ -32,6 +32,7 @@ import org.springframework.web.context.WebApplicationContext;
 import ru.skypro.homework.Generator;
 import ru.skypro.homework.component.UserSecurity;
 import ru.skypro.homework.entity.Ads;
+import ru.skypro.homework.entity.Comment;
 import ru.skypro.homework.entity.Image;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.mapper.*;
@@ -116,8 +117,8 @@ class AdsApiControllerWebMvcIntegrationTest {
                 .webAppContextSetup(context)
                 .apply(springSecurity())
                 .build();
-        when(userSecurity.isAdsAuthor(any())).thenReturn(true);
-        when(userSecurity.isCommentAuthor(any())).thenReturn(true);
+//        when(userSecurity.isAdsAuthor(any())).thenReturn(true);
+//        when(userSecurity.isCommentAuthor(any())).thenReturn(true);
     }
 
     @AfterAll
@@ -153,12 +154,10 @@ class AdsApiControllerWebMvcIntegrationTest {
     void removeAdsWhenUserIsAuthorTest() throws Exception {
         User author = generator.generateUser(null, null);
         Image image = generator.generateImageIfNull(null, dirForImages);
-
         Ads ads = generator.generateAdsIfNull(null, author, image);
         int indexAds = ads.getId();
 
         when(adsRepository.findById(indexAds)).thenReturn(Optional.of(ads)).thenReturn(Optional.empty());
-
 
         MockHttpServletRequestBuilder builder = MockMvcRequestBuilders
                 .delete("http://localhost:8080/ads/" + indexAds)
@@ -197,6 +196,71 @@ class AdsApiControllerWebMvcIntegrationTest {
 
         MockHttpServletRequestBuilder builder = MockMvcRequestBuilders
                 .delete("http://localhost:8080/ads/" + index);
+        ResultActions resultActions = mockMvc.perform(builder);
+        resultActions
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("DELETE http://localhost:8080/ads/{idAds}/comments/{idComments} 403")
+    @WithMockUser(username = "notAuthor")
+    void deleteCommentsWhenNotAuthorTest() throws Exception {
+        int index = random.nextInt();
+
+        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders
+                .delete("http://localhost:8080/ads/" + index + "/comments/" + index);
+        ResultActions resultActions = mockMvc.perform(builder);
+        resultActions
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("DELETE http://localhost:8080/ads/{idAds}/comments/{idComments} 403")
+    @WithMockUser(username = "notAuthor")
+    void deleteCommentsWhenUserIsAdminTest() throws Exception {
+        int index = random.nextInt();
+
+        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders
+                .delete("http://localhost:8080/ads/" + index + "/comments/" + index);
+        ResultActions resultActions = mockMvc.perform(builder);
+        resultActions
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("PATCH http://localhost:8080/ads/{id} 403")
+    @WithMockUser(username = "notAuthor")
+    void updateAdsTestWhenUserNotAuthor() throws Exception {
+        int index = random.nextInt();
+
+        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders
+                .patch("http://localhost:8080/ads/" + index);
+        ResultActions resultActions = mockMvc.perform(builder);
+        resultActions
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("PATCH http://localhost:8080/ads/{id}/comments/{id} 403")
+    @WithMockUser(username = "notAuthor")
+    void updateCommentsWhenUserNotAuthorTest() throws Exception {
+        int index = random.nextInt();
+
+        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders
+                .patch("http://localhost:8080/ads/" + index + "/comments/" + index);
+        ResultActions resultActions = mockMvc.perform(builder);
+        resultActions
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("PATCH http://localhost:8080/ads/{id}/image 403")
+    @WithMockUser(username = "notAuthor")
+    void updateImageWhenUserNotAuthorTest() throws Exception {
+        int index = random.nextInt();
+
+        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders
+                .patch("http://localhost:8080/ads/" + index + "/image");
         ResultActions resultActions = mockMvc.perform(builder);
         resultActions
                 .andExpect(status().isForbidden());
