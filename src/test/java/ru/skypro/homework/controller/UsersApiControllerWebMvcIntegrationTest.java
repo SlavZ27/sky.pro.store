@@ -95,7 +95,7 @@ class UsersApiControllerWebMvcIntegrationTest {
                 .with(csrf());
         MvcResult mvcResult = mockMvc.perform(builder)
                 .andReturn();
-        assertThat(mvcResult.getResponse().getStatus()).isNotEqualTo(status().isNoContent());
+        assertThat(mvcResult.getResponse().getStatus()).isNotEqualTo(status().isForbidden());
     }
 
     @Test
@@ -107,7 +107,7 @@ class UsersApiControllerWebMvcIntegrationTest {
                 .with(csrf());
         MvcResult mvcResult = mockMvc.perform(builder)
                 .andReturn();
-        assertThat(mvcResult.getResponse().getStatus()).isNotEqualTo(status().isNoContent());
+        assertThat(mvcResult.getResponse().getStatus()).isNotEqualTo(status().isForbidden());
     }
 
     @Test
@@ -130,7 +130,7 @@ class UsersApiControllerWebMvcIntegrationTest {
                 .with(csrf());
         MvcResult mvcResult = mockMvc.perform(builder)
                 .andReturn();
-        assertThat(mvcResult.getResponse().getStatus()).isNotEqualTo(status().isNoContent());
+        assertThat(mvcResult.getResponse().getStatus()).isNotEqualTo(status().isForbidden());
     }
 
     @Test
@@ -142,7 +142,7 @@ class UsersApiControllerWebMvcIntegrationTest {
                 .with(csrf());
         MvcResult mvcResult = mockMvc.perform(builder)
                 .andReturn();
-        assertThat(mvcResult.getResponse().getStatus()).isNotEqualTo(status().isNoContent());
+        assertThat(mvcResult.getResponse().getStatus()).isNotEqualTo(status().isForbidden());
     }
 
     @Test
