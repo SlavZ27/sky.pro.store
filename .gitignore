@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+/materials/
+/avatars/
+/logs/LogFile.log
+/logs/
