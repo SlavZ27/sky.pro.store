@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true">
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{50}.%M\(%line\) - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <property name="LOG_FILE" value="LogFile"/>
+    <property name="LOG_DIR" value="logs"/>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/${LOG_FILE}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--
+            В начале каждого месяца текущий LogFile.log сжимается и сохраняется в директорию соответствующего года и месяца.
+            Создается новый LogFile.log
+             -->
+            <fileNamePattern>${LOG_DIR}/%d{yyyy/MM}/${LOG_FILE}.gz</fileNamePattern>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <!--            <pattern>%-4relative [%thread] %-5level %{35} - %msg%n</pattern>-->
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{35}.%M\(%line\) - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!--    <logger name="ru.skypro.homework" level="INFO" additivity="false"/> // так логгирвать только один уровень-->
+    <logger name="ru.skypro.homework" level="INFO">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <root level="debug">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>

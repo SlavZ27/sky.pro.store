@@ -41,12 +41,15 @@ public class CommentServiceImpl {
      */
     public Comment addCommentsToAds(Ads ads, Comment comment, User author) {
         if (comment == null) {
+            log.error("Attempt to add a comment with null value");
             throw new IllegalArgumentException();
         }
         comment.setAds(ads);
         comment.setAuthor(author);
         comment.setDateTime(LocalDateTime.now());
-        return commentRepository.save(comment);
+        Comment newComment = commentRepository.save(comment);
+        log.info("A new comment with ID: {} has been added to ad with ID: {}", comment.getId(), ads.getId());
+        return newComment;
     }
 
     /**
@@ -65,7 +68,7 @@ public class CommentServiceImpl {
     public Comment updateCommentsForAds(CommentDto commentDto, Ads ads, Integer commentId) {
         Comment newComment = commentMapper.dtoToComment(commentDto);
         Comment oldComment = commentRepository.findByIdAndAdsId(ads.getId(), commentId).orElseThrow(() -> {
-            log.error("There is not comment with id = " + commentId);
+            log.error("Comment with ID: {} not found", commentId);
             return new CommentNotFoundException(commentId);
         });
         if (newComment.getAuthor() != null) {
@@ -75,7 +78,9 @@ public class CommentServiceImpl {
             oldComment.setText(newComment.getText());
         }
         oldComment.setDateTime(LocalDateTime.now());
-        return commentRepository.save(oldComment);
+        Comment updatedComment = commentRepository.save(oldComment);
+        log.info("Comment with ID: {} has been updated", commentId);
+        return updatedComment;
     }
 
     /**
@@ -115,7 +120,10 @@ public class CommentServiceImpl {
      */
     public Comment getCommentOfAds(Integer adsId, Integer commentId) {
         return commentRepository.findByIdAndAdsId(adsId, commentId)
-                .orElseThrow(() -> new CommentNotFoundException(commentId));
+                .orElseThrow(() -> {
+                    log.error("Comment with ID: {} not found", commentId);
+                    return new CommentNotFoundException(commentId);
+                });
     }
 
     /**
@@ -126,6 +134,7 @@ public class CommentServiceImpl {
      */
     private void removeComment(Comment comment) {
         commentRepository.delete(comment);
+        log.info("Comment with ID: {} has been deleted", comment.getId());
     }
 
     /**
@@ -136,6 +145,7 @@ public class CommentServiceImpl {
      */
     public void removeAllCommentsOfAds(Integer idAds) {
         commentRepository.deleteAllByAdsId(idAds);
+        log.info("All comments for the 'ads' with ID: {} have been deleted", idAds);
     }
 
     /**
@@ -147,8 +157,11 @@ public class CommentServiceImpl {
      * @throws CommentNotFoundException if passed non id comment
      */
     public void removeCommentForAds(Integer adPk, Integer commentId) {
-        Comment comment = commentRepository.findByIdAndAdsId(adPk, commentId).orElseThrow(() ->
-                new CommentNotFoundException(commentId));
+        Comment comment = commentRepository.findByIdAndAdsId(adPk, commentId).orElseThrow(() -> {
+            log.error("Comment with ID: {} not found", commentId);
+            return new CommentNotFoundException(commentId);
+        });
         removeComment(comment);
+        log.info("Comment with ID: {} and AdsId: {} have been deleted", commentId, adPk);
     }
 }

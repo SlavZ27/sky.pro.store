@@ -1,5 +1,6 @@
 package ru.skypro.homework.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -14,42 +15,51 @@ import ru.skypro.homework.entity.Role;
 import ru.skypro.homework.exception.UserNotFoundException;
 import ru.skypro.homework.service.AuthService;
 
+import java.time.LocalDate;
+
 @Service
+@Slf4j
 public class AuthServiceImpl implements AuthService {
 
     private final UserDetailsManager manager;
-
     private final PasswordEncoder encoder;
+    private final UserServiceImpl userService;
     private final static String PAS_PREFIX = "{bcrypt}";
 
-    public AuthServiceImpl(@Qualifier("jdbcUserDetailsManager") UserDetailsManager manager) {
+    public AuthServiceImpl(@Qualifier("jdbcUserDetailsManager") UserDetailsManager manager, UserServiceImpl userService) {
         this.manager = manager;
+        this.userService = userService;
         this.encoder = new BCryptPasswordEncoder();
     }
 
     @Override
     public boolean login(String userName, String password) {
         if (!manager.userExists(userName)) {
+            log.error("Failed authorization attempt. Cause:");
+            log.warn("User with userName: {} not found", userName);
             throw new UserNotFoundException(userName);
         }
         UserDetails userDetails = manager.loadUserByUsername(userName);
         String encryptedPassword = userDetails.getPassword();
         String encryptedPasswordWithoutEncryptionType = encryptedPassword.substring(8);
-        return encoder.matches(password, encryptedPasswordWithoutEncryptionType);
+        boolean isLoggedIn = encoder.matches(password, encryptedPasswordWithoutEncryptionType);
+        if (isLoggedIn) {
+            log.info("User with userName: {} successfully logged in", userName);
+        } else {
+            log.warn("Failed authorization attempt.  Cause:");
+            log.warn("Attempt to enter an incorrect password by userName:{}", userName);
+        }
+        return isLoggedIn;
     }
 
     @Override
     public boolean register(RegisterReqDto registerReq) {
         if (manager.userExists(registerReq.getUsername())) {
+            log.error("User with userName: {} already exists", registerReq.getUsername());
             throw new IllegalArgumentException(registerReq.getUsername());
         }
-        manager.createUser(
-                User.builder()
-                        .password(PAS_PREFIX + encoder.encode(registerReq.getPassword()))
-                        .username(registerReq.getUsername())
-                        .roles(Role.USER.name())
-                        .build()
-        );
+        userService.addUser(registerReq, PAS_PREFIX + encoder.encode(registerReq.getPassword()));
+        log.info("New user with username: {} has been registered", registerReq.getUsername());
         return true;
     }
 
@@ -62,6 +72,14 @@ public class AuthServiceImpl implements AuthService {
                 manager.loadUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
         String encryptedPassword = userDetails.getPassword();
         String encryptedPasswordWithoutEncryptionType = encryptedPassword.substring(8);
-        return encoder.matches(body.getNewPassword(), encryptedPasswordWithoutEncryptionType);
+
+        boolean isChangedPassword = encoder.matches(body.getNewPassword(), encryptedPasswordWithoutEncryptionType);
+        if (isChangedPassword) {
+            log.info("User with userName: {} has been successfully changed password", userDetails.getUsername());
+        } else {
+            log.warn("Failed change password attempt. Cause: ");
+            log.warn("Attempt to enter an incorrect password by userName:{}", userDetails.getUsername());
+        }
+        return isChangedPassword;
     }
 }
