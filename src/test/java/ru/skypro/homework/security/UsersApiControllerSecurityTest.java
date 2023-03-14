@@ -1,4 +1,4 @@
-package ru.skypro.homework.controller;
+package ru.skypro.homework.security;
 
 import org.junit.jupiter.api.*;
 import org.junit.runner.RunWith;
@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import ru.skypro.homework.component.UserSecurity;
+import ru.skypro.homework.controller.UsersApiController;
 import ru.skypro.homework.mapper.UserMapperImpl;
 import ru.skypro.homework.repository.AuthorityRepository;
 import ru.skypro.homework.repository.AvatarRepository;

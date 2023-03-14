@@ -1,4 +1,4 @@
-package ru.skypro.homework.controller;
+package ru.skypro.homework.security;
 
 import org.junit.jupiter.api.*;
 import org.junit.runner.RunWith;
@@ -22,6 +22,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 
 import org.springframework.web.context.WebApplicationContext;
 import ru.skypro.homework.component.UserSecurity;
+import ru.skypro.homework.controller.AdsApiController;
 import ru.skypro.homework.mapper.*;
 import ru.skypro.homework.repository.*;
 import ru.skypro.homework.service.impl.*;
