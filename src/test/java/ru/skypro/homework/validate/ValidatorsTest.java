@@ -48,7 +48,7 @@ public class ValidatorsTest {
 
     public static Stream<Arguments> paramForValidRoleValidatorTest() {
         return Stream.of(
-                Arguments.of(false, null),
+                Arguments.of(true, null),
                 Arguments.of(true, Role.USER.name()),
                 Arguments.of(true, Role.ADMIN.name()),
                 Arguments.of(false, Role.USER.getRole()),

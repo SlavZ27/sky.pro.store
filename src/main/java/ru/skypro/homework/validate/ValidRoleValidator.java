@@ -15,7 +15,7 @@ public class ValidRoleValidator implements ConstraintValidator<ValidRole, String
     @Override
     public boolean isValid(String role, ConstraintValidatorContext constraintValidatorContext) {
         if (role == null) {
-            return false;
+            return true;
         }
         try {
             Role.valueOf(role);
