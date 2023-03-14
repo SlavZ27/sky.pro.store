@@ -22,7 +22,7 @@ import ru.skypro.homework.mapper.UserMapperImpl;
 import ru.skypro.homework.repository.AuthorityRepository;
 import ru.skypro.homework.repository.AvatarRepository;
 import ru.skypro.homework.repository.UsersRepository;
-import ru.skypro.homework.service.impl.AuthorityService;
+import ru.skypro.homework.service.impl.AuthorityServiceImpl;
 import ru.skypro.homework.service.impl.AvatarServiceImpl;
 import ru.skypro.homework.service.impl.UserServiceImpl;
 
@@ -57,7 +57,7 @@ class UsersApiControllerSecurityTest {
     @SpyBean
     private AvatarServiceImpl avatarService;
     @SpyBean
-    private AuthorityService authorityService;
+    private AuthorityServiceImpl authorityService;
 
 
     @BeforeEach

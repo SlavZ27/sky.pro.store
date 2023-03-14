@@ -1,6 +1,7 @@
 package ru.skypro.homework.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -30,7 +31,10 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @Operation(summary = "login user", description = "", tags = {"Авторизация"})
+    @Operation(
+            summary = "login user",
+            description = "for login users with account",
+            tags = {"Авторизация"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "*/*",
                     schema = @Schema(implementation = Object.class))),
@@ -40,7 +44,9 @@ public class AuthController {
     @PostMapping(value = "/login",
             produces = {"*/*"},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<Void> login(@RequestBody @Validated LoginReqDto req) {
+    public ResponseEntity<Void> login(
+            @Parameter(description = "JSON for login users")
+            @RequestBody @Validated LoginReqDto req) {
         try {
             if (authService.login(req.getUsername(), req.getPassword())) {
                 return ResponseEntity.ok().build();
@@ -52,7 +58,10 @@ public class AuthController {
     }
 
 
-    @Operation(summary = "register user", description = "", tags = {"Авторизация"})
+    @Operation(
+            summary = "register user",
+            description = "for register users without account",
+            tags = {"Авторизация"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Created"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
@@ -61,7 +70,9 @@ public class AuthController {
             @ApiResponse(responseCode = "409", description = "Conflict")})
     @PostMapping(value = "/register",
             consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<Void> register(@RequestBody @Validated RegisterReqDto req) {
+    public ResponseEntity<Void> register(
+            @Parameter(description = "JSON for register users")
+            @RequestBody @Validated RegisterReqDto req) {
         if (authService.register(req)) {
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } else {
@@ -69,7 +80,10 @@ public class AuthController {
         }
     }
 
-    @Operation(summary = "setPassword", description = "", tags = {"Пользователи"})
+    @Operation(
+            summary = "setPassword",
+            description = "for change password account",
+            tags = {"Пользователи"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(
                     mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -80,7 +94,9 @@ public class AuthController {
     @PostMapping(value = "/users/set_password",
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<NewPasswordDto> setPassword(@RequestBody @Validated NewPasswordDto body) {
+    public ResponseEntity<NewPasswordDto> setPassword(
+            @Parameter(description = "JSON for change password")
+            @RequestBody @Validated NewPasswordDto body) {
         if (authService.changePassword(body)) {
             return ResponseEntity.ok(body);
         } else {

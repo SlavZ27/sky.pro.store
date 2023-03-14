@@ -2,6 +2,7 @@ package ru.skypro.homework.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import ru.skypro.homework.dto.RegisterReqDto;
 import ru.skypro.homework.dto.UserDto;
 import ru.skypro.homework.entity.User;
 
@@ -25,6 +26,13 @@ public abstract class UserMapper {
     @Mapping(target = "phone", source = "userDto.phone")
     @Mapping(target = "regDate", source = "userDto.regDate", dateFormat = "d/MM/yyyy")
     public abstract User userDtoToUser(UserDto userDto);
+
+    @Mapping(target = "username", source = "registerReq.username")
+    @Mapping(target = "password", source = "pass")
+    @Mapping(target = "firstName", source = "registerReq.firstName")
+    @Mapping(target = "lastName", source = "registerReq.lastName")
+    @Mapping(target = "phone", source = "registerReq.phone")
+    public abstract User registerReqToUser(RegisterReqDto registerReq, String pass);
 
     String mapImageToString(User user) {
         if (user.getAvatar() == null || user.getAvatar().getId() == null) {

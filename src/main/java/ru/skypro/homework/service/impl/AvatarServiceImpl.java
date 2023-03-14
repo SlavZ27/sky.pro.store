@@ -9,14 +9,12 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.entity.Avatar;
 import ru.skypro.homework.exception.AvatarNotFoundException;
 import ru.skypro.homework.repository.AvatarRepository;
+import ru.skypro.homework.service.AvatarService;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 /**
  * This class handles the command associated with creating an avatar in user,
@@ -24,7 +22,7 @@ import java.util.Optional;
  */
 @Service
 @Slf4j
-public class AvatarServiceImpl {
+public class AvatarServiceImpl implements AvatarService {
     private final String dirForAvatars;
     private final AvatarRepository avatarRepository;
 
@@ -46,6 +44,7 @@ public class AvatarServiceImpl {
      * @return Avatar
      * @throws AvatarNotFoundException if passed non id avatar
      */
+    @Override
     public Avatar updateAvatar(Avatar avatar, MultipartFile file, String nameFile) {
         if (avatar == null || avatar.getId() == null) {
             log.error("An exception occurred! Cause: avatar=null or avatar.Id=null");
@@ -80,6 +79,7 @@ public class AvatarServiceImpl {
      * @return Avatar
      * @throws AvatarNotFoundException if passed non id avatar
      */
+    @Override
     public Pair<byte[], String> getAvatarData(Avatar avatar) {
         if (avatar == null || avatar.getId() == null) {
             log.error("An exception occurred! Cause: avatar=null or avatar.Id=null");
@@ -104,6 +104,7 @@ public class AvatarServiceImpl {
      * @param nameFile us not null
      * @return Patch with the specified data
      */
+    @Override
     public Path generatePath(MultipartFile file, String nameFile) {
         return ImageServiceImpl.generatePath(file, nameFile, dirForAvatars);
     }
@@ -115,6 +116,7 @@ public class AvatarServiceImpl {
      * @param nameFile is not null
      * @return Avatar
      */
+    @Override
     public Avatar addAvatar(MultipartFile file, String nameFile) throws IOException {
         byte[] data = file.getBytes();
         Path path = generatePath(file, nameFile);

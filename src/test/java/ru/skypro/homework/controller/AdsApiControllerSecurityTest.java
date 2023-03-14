@@ -63,7 +63,7 @@ class AdsApiControllerSecurityTest {
     @SpyBean
     private UserMapperImpl userMapper;
     @SpyBean
-    private AuthorityService authorityService;
+    private AuthorityServiceImpl authorityService;
     @SpyBean
     private CreateAdsMapperImpl createAdsMapper;
     @SpyBean

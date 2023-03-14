@@ -35,8 +35,6 @@ import ru.skypro.homework.service.impl.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -80,7 +78,7 @@ class AdsApiControllerMockMvcTest {
     @SpyBean
     private UserMapperImpl userMapper;
     @SpyBean
-    private AuthorityService authorityService;
+    private AuthorityServiceImpl authorityService;
     @SpyBean
     private CreateAdsMapperImpl createAdsMapper;
     @SpyBean

@@ -32,15 +32,12 @@ import ru.skypro.homework.mapper.UserMapperImpl;
 import ru.skypro.homework.repository.AuthorityRepository;
 import ru.skypro.homework.repository.AvatarRepository;
 import ru.skypro.homework.repository.UsersRepository;
-import ru.skypro.homework.service.impl.AuthorityService;
+import ru.skypro.homework.service.impl.AuthorityServiceImpl;
 import ru.skypro.homework.service.impl.AvatarServiceImpl;
-import ru.skypro.homework.service.impl.ImageServiceImpl;
 import ru.skypro.homework.service.impl.UserServiceImpl;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -79,7 +76,7 @@ class UsersApiControllerMockMvcTest {
     @SpyBean
     private AvatarServiceImpl avatarService;
     @SpyBean
-    private AuthorityService authorityService;
+    private AuthorityServiceImpl authorityService;
     private final Generator generator = new Generator();
     private final ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
 

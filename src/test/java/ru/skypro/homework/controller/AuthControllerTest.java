@@ -9,13 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.skypro.homework.Generator;
 import ru.skypro.homework.dto.LoginReqDto;
 import ru.skypro.homework.dto.NewPasswordDto;
@@ -29,9 +24,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("test")
 @RunWith(SpringRunner.class)
@@ -86,7 +78,7 @@ class AuthControllerTest {
         String firstName = "FirstName";
         String lastName = "LastName";
         String phone = "+79111111111";
-        String role = Role.USER.getRole();
+        String role = Role.USER.name();
         String username = "username@gmail.com";
         String password = "password";
 
@@ -150,7 +142,7 @@ class AuthControllerTest {
         registerReqDto.setFirstName(userExistUsername.getFirstName());
         registerReqDto.setLastName(userExistUsername.getLastName());
         registerReqDto.setPhone(userExistUsername.getPhone());
-        registerReqDto.setRole(Role.USER.getRole());
+        registerReqDto.setRole(Role.USER.name());
         registerReqDto.setUsername(userExistUsername.getUsername());
         registerReqDto.setPassword("password");
 

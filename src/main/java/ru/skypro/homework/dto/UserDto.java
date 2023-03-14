@@ -5,7 +5,6 @@ import org.springframework.validation.annotation.Validated;
 import ru.skypro.homework.validate.ValidPhone;
 
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
 
 @Validated
 public class UserDto {

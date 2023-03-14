@@ -7,21 +7,23 @@ import ru.skypro.homework.entity.Authority;
 import ru.skypro.homework.entity.Role;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.repository.AuthorityRepository;
-
-import java.util.List;
+import ru.skypro.homework.service.AuthorityService;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class AuthorityService {
+public class AuthorityServiceImpl implements AuthorityService {
 
     private final AuthorityRepository authorityRepository;
 
-    public void addAuthority(User user, Role role) {
+    @Override
+    public Authority addAuthority(User user, Role role) {
         Authority tempAuthority = new Authority();
         tempAuthority.setAuthority(role.getRole());
         tempAuthority.setUsername(user.getUsername());
         Authority newAuthority = authorityRepository.save(tempAuthority);
-        log.info("New Authority has been created with name - {}", newAuthority.getAuthority());
+        log.info("New Authority {} has been created with user {}",
+                newAuthority.getAuthority(), newAuthority.getUsername());
+        return newAuthority;
     }
 }

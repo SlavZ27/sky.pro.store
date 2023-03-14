@@ -1,7 +1,5 @@
 package ru.skypro.homework.validate;
 
-import ru.skypro.homework.dto.RegisterReqDto;
-
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 

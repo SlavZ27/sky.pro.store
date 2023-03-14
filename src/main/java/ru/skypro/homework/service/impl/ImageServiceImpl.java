@@ -9,13 +9,12 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.entity.Image;
 import ru.skypro.homework.exception.ImageNotFoundException;
 import ru.skypro.homework.repository.ImageRepository;
+import ru.skypro.homework.service.ImageService;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
@@ -23,7 +22,7 @@ import java.util.Optional;
  */
 @Service
 @Slf4j
-public class ImageServiceImpl {
+public class ImageServiceImpl implements ImageService {
     private final String dirForImages;
     private final ImageRepository imageRepository;
 
@@ -43,6 +42,7 @@ public class ImageServiceImpl {
      * @param nameFile is not null
      * @return oldImage
      */
+    @Override
     public Image updateImage(Image image, MultipartFile file, String nameFile) {
         if (image == null || image.getId() == null) {
             log.error("An exception occurred! Cause: image=null or image.Id=null");
@@ -77,6 +77,7 @@ public class ImageServiceImpl {
      * @return image data
      * @throws ImageNotFoundException if passed non id comment
      */
+    @Override
     public Pair<byte[], String> getImageData(Image image) {
         if (image == null || image.getId() == null) {
             log.error("An exception occurred! Cause: image=null or image.Id=null");
@@ -102,6 +103,7 @@ public class ImageServiceImpl {
      * @return image
      * @throws ImageNotFoundException if passed non id comment
      */
+    @Override
     public Image getImage(Integer id) {
         if (id == null) {
             log.error("An exception occurred! Cause: image.Id=null");
@@ -120,6 +122,7 @@ public class ImageServiceImpl {
      *
      * @param image is not null
      */
+    @Override
     public boolean removeImageWithFile(Image image) {
         Path path = Path.of(image.getPath());
         try {
@@ -140,6 +143,7 @@ public class ImageServiceImpl {
      * @param nameFile us not null
      * @return Patch with the specified data
      */
+    @Override
     public Path generatePath(MultipartFile file, String nameFile) {
         return generatePath(file, nameFile, dirForImages);
     }
@@ -171,6 +175,7 @@ public class ImageServiceImpl {
      * @param nameFile is not null
      * @return image
      */
+    @Override
     public Image addImage(MultipartFile file, String nameFile) throws IOException {
         byte[] data = file.getBytes();
         Path path = generatePath(file, nameFile);

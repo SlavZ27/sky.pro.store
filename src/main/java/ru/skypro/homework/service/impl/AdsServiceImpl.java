@@ -2,7 +2,6 @@ package ru.skypro.homework.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.repository.query.Param;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +20,7 @@ import ru.skypro.homework.dto.*;
 import ru.skypro.homework.entity.Comment;
 import ru.skypro.homework.mapper.AdsMapper;
 import ru.skypro.homework.mapper.CommentMapper;
+import ru.skypro.homework.service.AdsService;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -33,7 +33,7 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class AdsServiceImpl {
+public class AdsServiceImpl implements AdsService {
     private final AdsRepository adsRepository;
     private final AdsMapper adsMapper;
     private final CommentMapper commentMapper;
@@ -42,7 +42,6 @@ public class AdsServiceImpl {
     private final CreateAdsMapper createAdsMapper;
     private final FullAdsMapper fullAdsMapper;
     private final UserServiceImpl userService;
-
 
     /**
      * This method, uses method repository and Mapper, allows update Ads.
@@ -54,6 +53,7 @@ public class AdsServiceImpl {
      * @return ads
      * @throws AdsNotFoundException if passed non- existent id
      */
+    @Override
     public AdsDto updateAds(Integer adsId, CreateAdsDto createAdsDto) {
         Ads newAds = createAdsMapper.createAdsDtoToAds(createAdsDto);
         Ads oldAds = adsRepository.findById(adsId).orElseThrow(() -> {
@@ -80,6 +80,7 @@ public class AdsServiceImpl {
      * @return adsId, comment
      * @throws AdsNotFoundException if passed non- existent id
      */
+    @Override
     public CommentDto addCommentsToAds(Integer adsId, CommentDto commentDto, String username) {
         User user = userService.getUserByUserName(username);
         Ads ads = adsRepository.findById(adsId).orElseThrow(() -> {
@@ -101,6 +102,7 @@ public class AdsServiceImpl {
      * @return comment
      * @throws AdsNotFoundException if passed non- existent id
      */
+    @Override
     public CommentDto updateCommentsForAds(Integer adPk, Integer commentId, CommentDto commentDto) {
         Ads ads = adsRepository.findById(adPk).orElseThrow(() -> {
             log.error("Ads with ID: {} not found", adPk);
@@ -118,6 +120,7 @@ public class AdsServiceImpl {
      * @return comment
      * @throws AdsNotFoundException if passed non- existent id
      */
+    @Override
     public ResponseWrapperCommentDto getCommentsOfAds(Integer adsId) {
         Ads ads = adsRepository.findById(adsId).orElseThrow(() -> {
             log.error("Ads with ID: {} not found", adsId);
@@ -141,6 +144,7 @@ public class AdsServiceImpl {
      * @return HttpStatus.NO_CONTENT or null
      * @throws AdsNotFoundException if passed non- existent id
      */
+    @Override
     public ResponseEntity<Void> removeAds(Integer idAds) {
         //finding
         Ads ads = adsRepository.findById(idAds).orElseThrow(() -> {
@@ -197,6 +201,7 @@ public class AdsServiceImpl {
      * @return comment
      * @throws AdsNotFoundException if passed non- existent id
      */
+    @Override
     public CommentDto getCommentOfAds(Integer adsId, Integer commentId) {
         Ads ads = adsRepository.findById(adsId).orElseThrow(() -> {
             log.error("Ad with ID: {} not found", adsId);
@@ -215,6 +220,7 @@ public class AdsServiceImpl {
      * @param image        is not null
      * @return Ads
      */
+    @Override
     public AdsDto addAds(CreateAdsDto createAdsDto, MultipartFile image, String username) throws IOException {
         User user = userService.getUserByUserName(username);
         Ads ads = createAdsMapper.createAdsDtoToAds(createAdsDto);
@@ -238,6 +244,7 @@ public class AdsServiceImpl {
      * @return ads
      * @throws AdsNotFoundException if passed non- existent id
      */
+    @Override
     public FullAdsDto getAds(Integer idAds) {
         Ads ads = adsRepository.findById(idAds).orElseThrow(() -> {
             log.error("Ad with ID: {} not found", idAds);
@@ -252,6 +259,7 @@ public class AdsServiceImpl {
      *
      * @return List<Ads>
      */
+    @Override
     public ResponseWrapperAdsDto getALLAds() {
         List<AdsDto> listDto = adsMapper.mapListOfAdsToListDTO(
                 adsRepository.findAllAndSortDateTime()
@@ -265,6 +273,7 @@ public class AdsServiceImpl {
      *
      * @return List<Ads> to default user
      */
+    @Override
     public ResponseWrapperAdsDto getALLAdsOfMe(String username) {
         List<AdsDto> listDto = adsMapper.mapListOfAdsToListDTO(
                 adsRepository.findAllByUsernameAndSortDateTime(username)
@@ -282,6 +291,7 @@ public class AdsServiceImpl {
      * @return null or HttpStatus.OK
      * @throws AdsNotFoundException if passed non- existent id
      */
+    @Override
     public ResponseEntity<Void> removeCommentsForAds(Integer adPk, Integer commentId) {
         adsRepository.findById(adPk).orElseThrow(() -> {
             log.error("Ads with ID: {} not found", adPk);
@@ -297,7 +307,8 @@ public class AdsServiceImpl {
      * @param ads is not null
      * @return Name file for image
      */
-    private String getNameFileForImage(Ads ads) {
+    @Override
+    public String getNameFileForImage(Ads ads) {
         return "ads_" + ads.getId();
     }
 
@@ -313,6 +324,7 @@ public class AdsServiceImpl {
      * @param image is not null
      * @return image for ads
      */
+    @Override
     public Pair<byte[], String> updateImageOfAds(Integer idAds, MultipartFile image) throws IOException {
         Ads ads = adsRepository.findById(idAds).orElseThrow(() -> {
             log.error("Ads with ID: {} not found", idAds);
@@ -324,7 +336,8 @@ public class AdsServiceImpl {
         return imageService.getImageData(ads.getImage());
     }
 
-    private void updateImageOfAds(Ads ads, MultipartFile image) throws IOException {
+    @Override
+    public void updateImageOfAds(Ads ads, MultipartFile image) throws IOException {
         if (ads.getImage() == null) {
             ads.setImage(imageService.addImage(image, getNameFileForImage(ads)));
             log.info("New image has been added for 'ads' with ID:{}", ads.getId());
@@ -344,6 +357,7 @@ public class AdsServiceImpl {
      * @throws AdsNotFoundException   if passed non- existent id
      * @throws ImageNotFoundException if passed existent id Ads
      */
+    @Override
     public Pair<byte[], String> getImage(Integer idAds) {
         Ads ads = adsRepository.findById(idAds).orElseThrow(() -> {
             log.error("Ads with ID: {} not found", idAds);
@@ -363,6 +377,7 @@ public class AdsServiceImpl {
      * @param title is not null
      * @return ads
      */
+    @Override
     public ResponseWrapperAdsDto findAdsByTitle(String title) {
         List<AdsDto> listDto = adsMapper.mapListOfAdsToListDTO(
                 adsRepository.findByTitleLike(title)
