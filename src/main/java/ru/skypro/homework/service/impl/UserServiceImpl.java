@@ -10,30 +10,35 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.RegisterReqDto;
 import ru.skypro.homework.dto.UserDto;
 
+import ru.skypro.homework.entity.Authority;
 import ru.skypro.homework.entity.Role;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.AvatarNotFoundException;
 import ru.skypro.homework.exception.UserNotFoundException;
 import ru.skypro.homework.mapper.UserMapper;
 import ru.skypro.homework.repository.UsersRepository;
+import ru.skypro.homework.service.UserService;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class UserServiceImpl {
+public class UserServiceImpl implements UserService {
     private final UsersRepository usersRepository;
-    private final AuthorityService authorityService;
+    private final AuthorityServiceImpl authorityService;
     private final AvatarServiceImpl avatarService;
     private final UserMapper userMapper;
 
-
+    @Override
     public UserDto getUser(String username) {
         return userMapper.userToDto(getUserByUserName(username));
     }
 
+    @Override
     public User getUserByUserName(String username) {
         return usersRepository.findByUsername(username).orElseThrow(() -> {
             log.error("User with username: {} not found", username);
@@ -41,21 +46,17 @@ public class UserServiceImpl {
         });
     }
 
-    public User addUser(RegisterReqDto registerReq, String pass) {
-        ru.skypro.homework.entity.User user = new ru.skypro.homework.entity.User();
-        user.setFirstName(registerReq.getFirstName());
-        user.setLastName(registerReq.getLastName());
-        user.setPassword(pass);
-        user.setPhone(registerReq.getPhone());
-        user.setEmail(registerReq.getUsername());
+    @Override
+    public Pair<User, Authority> addUser(RegisterReqDto registerReq, String pass) {
+        ru.skypro.homework.entity.User user = userMapper.registerReqToUser(registerReq, pass);
         user.setRegDate(LocalDate.now());
-        user.setUsername(registerReq.getUsername());
         user.setEnabled(true);
         user = usersRepository.save(user);
-        authorityService.addAuthority(user, Role.USER);
-        return user;
+        Authority authority = authorityService.addAuthority(user, Role.USER);
+        return Pair.of(user, authority);
     }
 
+    @Override
     public UserDto updateUser(String username, UserDto body) {
         User newUser = userMapper.userDtoToUser(body);
         User oldUser = getUserByUserName(username);
@@ -76,19 +77,27 @@ public class UserServiceImpl {
         return userMapper.userToDto(oldUser);
     }
 
-    private String getNameFileForAvatar(User user) {
+    @Override
+    public String getNameFileForAvatar(User user) {
         return "user_" + user.getId();
     }
 
+    @Override
     public ResponseEntity<Void> updateUserImage(String username, MultipartFile image) throws IOException {
         User user = getUserByUserName(username);
         updateImageOfUser(user, image);
-        usersRepository.save(user);
-        log.info("User with ID: {} has been updated", user.getId());
-        return new ResponseEntity<>(HttpStatus.OK);
+        user = usersRepository.save(user);
+        if (user.getAvatar() != null && user.getAvatar().getPath() != null
+                && Files.exists(Path.of(user.getAvatar().getPath()))) {
+            log.info("User with ID: {} has been updated", user.getId());
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    private void updateImageOfUser(User user, MultipartFile image) throws IOException {
+    @Override
+    public void updateImageOfUser(User user, MultipartFile image) throws IOException {
         if (user.getAvatar() == null) {
             user.setAvatar(avatarService.addAvatar(image, getNameFileForAvatar(user)));
             log.info("New avatar has been added for 'user' with ID:{}", user.getId());
@@ -98,7 +107,8 @@ public class UserServiceImpl {
         }
     }
 
-    private Pair<byte[], String> getAvatarDataOfUser(User user) {
+    @Override
+    public Pair<byte[], String> getAvatarDataOfUser(User user) {
         if (user.getAvatar() == null) {
             log.error("An exception occurred! Cause: avatar=null or avatar.Id=null");
             throw new AvatarNotFoundException("User with id = " + user.getId() + "don't have avatar");
@@ -106,7 +116,7 @@ public class UserServiceImpl {
         return avatarService.getAvatarData(user.getAvatar());
     }
 
-
+    @Override
     public Pair<byte[], String> getAvatarOfUser(Integer idUser) {
         User user = usersRepository.findById(idUser).orElseThrow(() -> {
             log.error("User with ID: {} not found", idUser);
@@ -115,6 +125,7 @@ public class UserServiceImpl {
         return getAvatarDataOfUser(user);
     }
 
+    @Override
     public Pair<byte[], String> getAvatarMe(String username) {
         return getAvatarDataOfUser(getUserByUserName(username));
     }

@@ -1,4 +1,4 @@
-package ru.skypro.homework.controller;
+package ru.skypro.homework.security;
 
 import org.junit.jupiter.api.*;
 import org.junit.runner.RunWith;
@@ -18,11 +18,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import ru.skypro.homework.component.UserSecurity;
+import ru.skypro.homework.controller.UsersApiController;
 import ru.skypro.homework.mapper.UserMapperImpl;
 import ru.skypro.homework.repository.AuthorityRepository;
 import ru.skypro.homework.repository.AvatarRepository;
 import ru.skypro.homework.repository.UsersRepository;
-import ru.skypro.homework.service.impl.AuthorityService;
+import ru.skypro.homework.service.impl.AuthorityServiceImpl;
 import ru.skypro.homework.service.impl.AvatarServiceImpl;
 import ru.skypro.homework.service.impl.UserServiceImpl;
 
@@ -36,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test1")
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestMethodOrder(MethodOrderer.DisplayName.MethodName.class)
-class UsersApiControllerWebMvcIntegrationTest {
+class UsersApiControllerSecurityTest {
     @InjectMocks
     private UsersApiController usersApiController;
     private MockMvc mockMvc;
@@ -57,7 +58,7 @@ class UsersApiControllerWebMvcIntegrationTest {
     @SpyBean
     private AvatarServiceImpl avatarService;
     @SpyBean
-    private AuthorityService authorityService;
+    private AuthorityServiceImpl authorityService;
 
 
     @BeforeEach

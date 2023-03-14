@@ -9,13 +9,12 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.entity.Avatar;
 import ru.skypro.homework.exception.AvatarNotFoundException;
 import ru.skypro.homework.repository.AvatarRepository;
+import ru.skypro.homework.service.AvatarService;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.util.Optional;
 
 /**
  * This class handles the command associated with creating an avatar in user,
@@ -23,7 +22,7 @@ import java.util.Optional;
  */
 @Service
 @Slf4j
-public class AvatarServiceImpl {
+public class AvatarServiceImpl implements AvatarService {
     private final String dirForAvatars;
     private final AvatarRepository avatarRepository;
 
@@ -45,6 +44,7 @@ public class AvatarServiceImpl {
      * @return Avatar
      * @throws AvatarNotFoundException if passed non id avatar
      */
+    @Override
     public Avatar updateAvatar(Avatar avatar, MultipartFile file, String nameFile) {
         if (avatar == null || avatar.getId() == null) {
             log.error("An exception occurred! Cause: avatar=null or avatar.Id=null");
@@ -79,6 +79,7 @@ public class AvatarServiceImpl {
      * @return Avatar
      * @throws AvatarNotFoundException if passed non id avatar
      */
+    @Override
     public Pair<byte[], String> getAvatarData(Avatar avatar) {
         if (avatar == null || avatar.getId() == null) {
             log.error("An exception occurred! Cause: avatar=null or avatar.Id=null");
@@ -97,58 +98,15 @@ public class AvatarServiceImpl {
     }
 
     /**
-     * This method, used method repository, allows get Image.
-     * Uses {@link AvatarRepository#findById(Object)}
-     *
-     * @param id is not null
-     * @return Image or null
-     * @throws AvatarNotFoundException if passed non id avatar
-     */
-    public Avatar getImage(Integer id) {
-        if (id == null) {
-            log.error("An exception occurred! Cause: avatar.Id=null");
-            throw new IllegalArgumentException();
-        }
-        return avatarRepository.findById(id).orElseThrow(() -> {
-            log.error("Avatar with ID: {} not found", id);
-            return new AvatarNotFoundException(id);
-        });
-    }
-
-    /**
-     * This method, used method repository, remove Avatar with file
-     * Uses {@link AvatarRepository#delete(Object)}
-     * Uses {@link AvatarRepository#findById(Object)}
-     *
-     * @param avatar is not null
-     * @return true or false
-     */
-    private boolean removeAvatarWithFile(Avatar avatar) {
-        Path path = Path.of(avatar.getPath());
-        try {
-            Files.deleteIfExists(path);
-            log.info("Try to delete path = {} if exists", path);
-        } catch (IOException ignored) {
-            log.error("Something wrong with avatar path!");
-        }
-        avatarRepository.delete(avatar);
-        log.info("Avatar with ID: {} have been deleted", avatar.getId());
-        return !Files.exists(path) && avatarRepository.findById(avatar.getId()).isEmpty();
-    }
-
-    /**
      * This method generate Path to file Avatar for string.
      *
      * @param file     is not null
      * @param nameFile us not null
      * @return Patch with the specified data
      */
-    private Path generatePath(MultipartFile file, String nameFile) {
-        String date = LocalDate.now().toString();
-        String extension = Optional.ofNullable(file.getOriginalFilename())
-                .map(fileName -> fileName.substring(file.getOriginalFilename().lastIndexOf('.')))
-                .orElse("");
-        return Paths.get(dirForAvatars).resolve(nameFile + "_" + date + extension);
+    @Override
+    public Path generatePath(MultipartFile file, String nameFile) {
+        return ImageServiceImpl.generatePath(file, nameFile, dirForAvatars);
     }
 
     /**
@@ -158,6 +116,7 @@ public class AvatarServiceImpl {
      * @param nameFile is not null
      * @return Avatar
      */
+    @Override
     public Avatar addAvatar(MultipartFile file, String nameFile) throws IOException {
         byte[] data = file.getBytes();
         Path path = generatePath(file, nameFile);

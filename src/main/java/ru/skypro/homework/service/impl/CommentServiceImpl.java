@@ -12,6 +12,7 @@ import ru.skypro.homework.exception.CommentNotFoundException;
 import ru.skypro.homework.mapper.CommentMapper;
 import ru.skypro.homework.repository.AdsRepository;
 import ru.skypro.homework.repository.CommentRepository;
+import ru.skypro.homework.service.CommentService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,7 +24,7 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class CommentServiceImpl {
+public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
@@ -39,6 +40,7 @@ public class CommentServiceImpl {
      * @throws AdsNotFoundException     - if passed non- existent id
      * @throws IllegalArgumentException if passed non- existent parameters
      */
+    @Override
     public Comment addCommentsToAds(Ads ads, Comment comment, User author) {
         if (comment == null) {
             log.error("Attempt to add a comment with null value");
@@ -47,9 +49,9 @@ public class CommentServiceImpl {
         comment.setAds(ads);
         comment.setAuthor(author);
         comment.setDateTime(LocalDateTime.now());
-        Comment newComment = commentRepository.save(comment);
+        comment = commentRepository.save(comment);
         log.info("A new comment with ID: {} has been added to ad with ID: {}", comment.getId(), ads.getId());
-        return newComment;
+        return comment;
     }
 
     /**
@@ -65,6 +67,7 @@ public class CommentServiceImpl {
      * @throws AdsNotFoundException     if passed non id ads
      * @throws CommentNotFoundException if passed non id comment
      */
+    @Override
     public Comment updateCommentsForAds(CommentDto commentDto, Ads ads, Integer commentId) {
         Comment newComment = commentMapper.dtoToComment(commentDto);
         Comment oldComment = commentRepository.findByIdAndAdsId(ads.getId(), commentId).orElseThrow(() -> {
@@ -83,17 +86,7 @@ public class CommentServiceImpl {
         return updatedComment;
     }
 
-    /**
-     * This method, used method repository, allows get all comment by id to ads.
-     * Uses {@link CommentRepository#findAllByIdAds(Integer)}
-     *
-     * @param idAds is not null
-     * @return Comment by id
-     */
-    public List<Comment> getAllByIdAds(Integer idAds) {
-        return commentRepository.findAllByIdAds(idAds);
-    }
-
+    @Override
     public Integer getCountByIdAds(Integer idAds) {
         return commentRepository.getCountAllByAdsId(idAds);
     }
@@ -105,6 +98,7 @@ public class CommentServiceImpl {
      * @param adsId is not null
      * @return Comment by id
      */
+    @Override
     public List<Comment> getAllByIdAdsAndSortDateTime(Integer adsId) {
         return commentRepository.findAllByIdAdsAndSortDateTime(adsId);
     }
@@ -118,6 +112,7 @@ public class CommentServiceImpl {
      * @return Comments
      * @throws CommentNotFoundException if passed non id comment
      */
+    @Override
     public Comment getCommentOfAds(Integer adsId, Integer commentId) {
         return commentRepository.findByIdAndAdsId(adsId, commentId)
                 .orElseThrow(() -> {
@@ -132,7 +127,8 @@ public class CommentServiceImpl {
      *
      * @param comment is not null
      */
-    private void removeComment(Comment comment) {
+    @Override
+    public void removeComment(Comment comment) {
         commentRepository.delete(comment);
         log.info("Comment with ID: {} has been deleted", comment.getId());
     }
@@ -143,6 +139,7 @@ public class CommentServiceImpl {
      *
      * @param idAds is not null
      */
+    @Override
     public void removeAllCommentsOfAds(Integer idAds) {
         commentRepository.deleteAllByAdsId(idAds);
         log.info("All comments for the 'ads' with ID: {} have been deleted", idAds);
@@ -156,6 +153,7 @@ public class CommentServiceImpl {
      * @param commentId is not null
      * @throws CommentNotFoundException if passed non id comment
      */
+    @Override
     public void removeCommentForAds(Integer adPk, Integer commentId) {
         Comment comment = commentRepository.findByIdAndAdsId(adPk, commentId).orElseThrow(() -> {
             log.error("Comment with ID: {} not found", commentId);
