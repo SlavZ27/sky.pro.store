@@ -30,7 +30,11 @@
         <appender-ref ref="FILE"/>
     </logger>
 
-    <root level="debug">
+    <logger name="org.springframework.web" level="WARN">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <root level="info">
         <appender-ref ref="STDOUT"/>
     </root>
 </configuration>
