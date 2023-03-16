@@ -9,7 +9,4 @@ public class CommentNotFoundException extends RuntimeException {
         super("Comment with id: " + id + " not found");
     }
 
-    public CommentNotFoundException(String id) {
-        super("Comment with id: " + id + " not found");
-    }
 }

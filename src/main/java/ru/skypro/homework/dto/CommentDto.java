@@ -1,17 +1,12 @@
 package ru.skypro.homework.dto;
 
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.v3.oas.annotations.media.Schema;
-import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * Comment
  */
-@Validated
-@javax.annotation.Generated(value = "ru.skypro.homeworkcodegen.v3.generators.java.SpringCodegen", date = "2023-02-06T18:24:36.081075022Z[GMT]")
-
-
 public class CommentDto {
   @JsonProperty("author")
   private Integer author;
@@ -23,20 +18,10 @@ public class CommentDto {
   private Integer pk;
 
   @JsonProperty("text")
+  @NotNull
   private String text;
 
-  public CommentDto author(Integer author) {
-    this.author = author;
-    return this;
-  }
-
-  /**
-   * Get author
-   * @return author
-   **/
-  @Schema(description = "")
-  
-    public Integer getAuthor() {
+  public Integer getAuthor() {
     return author;
   }
 
@@ -44,18 +29,7 @@ public class CommentDto {
     this.author = author;
   }
 
-  public CommentDto createdAt(String createdAt) {
-    this.createdAt = createdAt;
-    return this;
-  }
-
-  /**
-   * Get createdAt
-   * @return createdAt
-   **/
-  @Schema(description = "")
-  
-    public String getCreatedAt() {
+  public String getCreatedAt() {
     return createdAt;
   }
 
@@ -63,18 +37,7 @@ public class CommentDto {
     this.createdAt = createdAt;
   }
 
-  public CommentDto pk(Integer pk) {
-    this.pk = pk;
-    return this;
-  }
-
-  /**
-   * Get pk
-   * @return pk
-   **/
-  @Schema(description = "")
-  
-    public Integer getPk() {
+  public Integer getPk() {
     return pk;
   }
 
@@ -82,67 +45,11 @@ public class CommentDto {
     this.pk = pk;
   }
 
-  public CommentDto text(String text) {
-    this.text = text;
-    return this;
-  }
-
-  /**
-   * Get text
-   * @return text
-   **/
-  @Schema(description = "")
-  
-    public String getText() {
+  public String getText() {
     return text;
   }
 
   public void setText(String text) {
     this.text = text;
-  }
-
-
-  @Override
-  public boolean equals(java.lang.Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    CommentDto comment = (CommentDto) o;
-    return Objects.equals(this.author, comment.author) &&
-        Objects.equals(this.createdAt, comment.createdAt) &&
-        Objects.equals(this.pk, comment.pk) &&
-        Objects.equals(this.text, comment.text);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(author, createdAt, pk, text);
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class Comment {\n");
-    
-    sb.append("    author: ").append(toIndentedString(author)).append("\n");
-    sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
-    sb.append("    pk: ").append(toIndentedString(pk)).append("\n");
-    sb.append("    text: ").append(toIndentedString(text)).append("\n");
-    sb.append("}");
-    return sb.toString();
-  }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(java.lang.Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
   }
 }

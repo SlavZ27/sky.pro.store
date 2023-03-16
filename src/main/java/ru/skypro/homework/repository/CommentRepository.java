@@ -10,6 +10,9 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The interface Comment repository.
+ */
 @Repository
 @Transactional
 public interface CommentRepository extends JpaRepository<Comment, Integer> {

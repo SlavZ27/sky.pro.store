@@ -15,9 +15,8 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import static org.springframework.security.core.userdetails.User.builder;
@@ -56,62 +55,29 @@ public class Generator {
         return faker.avatar().image().getBytes();
     }
 
-
-    /**
-     * @param isPast
-     * @param localDateTime
-     * @return Method generates the date and time in {@link LocalDateTime} format before or after the parameter
-     */
-    public LocalDateTime generateDateTime(boolean isPast, LocalDateTime localDateTime) {
-        LocalDateTime tldt = LocalDateTime.now();
-        int year = tldt.getYear();
-        if (isPast) {
-            tldt = localDateTime.plusYears(1L);
-            while (!tldt.isBefore(localDateTime)) {
-                LocalDate localDate = LocalDate.of(
-                        genInt(year - 2, year + 1),
-                        genIntWithoutZero(12),
-                        genIntWithoutZero(25));
-                LocalTime localTime = LocalTime.of(
-                        genInt(23),
-                        genInt(59),
-                        genInt(59),
-                        0);
-                tldt = LocalDateTime.of(localDate, localTime);
-            }
-        } else {
-            tldt = localDateTime.minusYears(1L);
-            while (!tldt.isAfter(localDateTime)) {
-                LocalDate localDate = LocalDate.of(
-                        genInt(year - 2, year + 1),
-                        genIntWithoutZero(12),
-                        genIntWithoutZero(25));
-                LocalTime localTime = LocalTime.of(
-                        genInt(23),
-                        genInt(59),
-                        genInt(59),
-                        0);
-                tldt = LocalDateTime.of(localDate, localTime);
-            }
-        }
-        return tldt;
+    public LocalDate generateDate(LocalDate startInclusive, LocalDate endExclusive) {
+        long startEpochDay = startInclusive.toEpochDay();
+        long endEpochDay = endExclusive.toEpochDay();
+        long randomDay = ThreadLocalRandom
+                .current()
+                .nextLong(startEpochDay, endEpochDay);
+        return LocalDate.ofEpochDay(randomDay);
     }
 
-    public LocalDate generateDate(boolean isPast, LocalDate localDate) {
-        LocalDate tld = LocalDate.now();
-        int year = tld.getYear();
-        if (isPast) {
-            tld = localDate.plusYears(1L);
-            while (tld.isBefore(localDate)) {
-                tld = LocalDate.of(genInt(year - 2, year), genInt(12), genInt(25));
-            }
-        } else {
-            tld = localDate.minusYears(1L);
-            while (tld.isAfter(localDate)) {
-                tld = LocalDate.of(genInt(year - 2, year), genInt(12), genInt(25));
-            }
-        }
-        return tld;
+    public LocalTime generateTime(LocalTime startTime, LocalTime endTime) {
+        int startSeconds = startTime.toSecondOfDay();
+        int endSeconds = endTime.toSecondOfDay();
+        int randomTime = ThreadLocalRandom
+                .current()
+                .nextInt(startSeconds, endSeconds);
+
+        return LocalTime.ofSecondOfDay(randomTime);
+    }
+
+    public LocalDateTime generateDateTime(LocalDateTime startInclusive, LocalDateTime endExclusive) {
+        LocalDate localDate = generateDate(startInclusive.toLocalDate(), endExclusive.toLocalDate());
+        LocalTime localTime = generateTime(startInclusive.toLocalTime(), endExclusive.toLocalTime());
+        return LocalDateTime.of(localDate, localTime);
     }
 
     public User generateUser(Avatar avatar, String pas) {
@@ -145,7 +111,7 @@ public class Generator {
             lastName = generateLastNameIfEmpty(lastName);
             email = generateEmailIfEmpty(email);
             phone = generatePhoneIfEmpty(phone);
-            regDate = generateDate(true, LocalDate.now());
+            regDate = generateDate(LocalDate.now().minusYears(2), LocalDate.now());
             username = generateEmailIfEmpty(email);
             password = generatePasswordIfEmpty(password, true);
 
@@ -220,36 +186,27 @@ public class Generator {
         return Arrays.stream(files).map(file -> pathDir + "/" + file.getName()).collect(Collectors.toList());
     }
 
-    public Comment generateCommentIfNull(Comment comment, Ads ads, User user) {
+    public Comment generateCommentIfNull(Comment comment, Ads ads, User author) {
         if (comment == null) {
             comment = new Comment();
             comment.setId(generateIdIfEmpty(null));
             comment.setText(faker.chuckNorris().fact());
-            comment.setDateTime(generateDateTime(true, LocalDateTime.now()));
+            TreeSet<LocalDateTime> lDTSet = new TreeSet<>();
+            lDTSet.add(LocalDateTime.now().minusYears(2));
+            if (ads != null && ads.getDateTime() != null) {
+                lDTSet.add(ads.getDateTime());
+            }
+            if (author != null && author.getRegDate() != null) {
+                lDTSet.add(author.getRegDate().atStartOfDay());
+            }
+            comment.setDateTime(
+                    generateDateTime(
+                            lDTSet.last(),
+                            LocalDateTime.now()));
             comment.setAds(ads);
-            comment.setAuthor(user);
+            comment.setAuthor(author);
         }
         return comment;
-    }
-
-    public Ads getNewAds(Ads adsOld) {
-        Ads ads = new Ads();
-        ads.setId(adsOld.getId());
-        ads.setAuthor(adsOld.getAuthor());
-        ads.setPrice(adsOld.getPrice());
-        ads.setDescription(adsOld.getDescription());
-        ads.setImage(adsOld.getImage());
-        ads.setTitle(adsOld.getTitle());
-        ads.setDateTime(adsOld.getDateTime());
-        return ads;
-    }
-
-    public Image getNewImage(Image imageOld) {
-        Image image = new Image();
-        image.setId(generateIdIfEmpty(null));
-        image.setId(imageOld.getId());
-        image.setPath(imageOld.getPath());
-        return image;
     }
 
     public Ads generateAdsIfNull(Ads ads, User author, Image image) {
@@ -258,12 +215,36 @@ public class Generator {
             ads.setId(generateIdIfEmpty(null));
             ads.setAuthor(author);
             ads.setImage(image);
-            ads.setDateTime(generateDateTime(true, LocalDateTime.now()));
+            if (author != null && author.getRegDate() != null) {
+                ads.setDateTime(
+                        generateDateTime(
+                                LocalDateTime.of(author.getRegDate(), LocalTime.MIDNIGHT),
+                                LocalDateTime.now()));
+            } else {
+                ads.setDateTime(
+                        generateDateTime(
+                                LocalDateTime.now().minusYears(2),
+                                LocalDateTime.now()));
+            }
             ads.setTitle(faker.commerce().productName());
-            ads.setPrice(Integer.valueOf(genInt(50_000)));
+            ads.setPrice(genInt(50_000));
             ads.setDescription(faker.chuckNorris().fact());
         }
         return ads;
+    }
+
+    public Ads generateNewAdsFromAds(Ads ads) {
+        Ads ads1 = new Ads();
+        if (ads != null) {
+            ads1.setId(ads.getId());
+            ads1.setAuthor(ads.getAuthor());
+            ads1.setImage(ads.getImage());
+            ads1.setDateTime(ads.getDateTime());
+            ads1.setTitle(ads.getTitle());
+            ads1.setPrice(ads.getPrice());
+            ads1.setDescription(ads.getDescription());
+        }
+        return ads1;
     }
 
 
@@ -305,8 +286,8 @@ public class Generator {
      */
     public String generatePhoneIfEmpty(String phone) {
         if (phone == null || phone.length() == 0) {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < 10; i++) {
+            StringBuilder sb = new StringBuilder("+79");
+            for (int i = 0; i < 9; i++) {
                 sb.append(random.nextInt(10));
             }
             return sb.toString();
@@ -325,21 +306,21 @@ public class Generator {
         if (name == null || name.length() == 0) {
             return faker.name().username();
         }
-        return name;
+        return name.substring(0, 29);
     }
 
     public String generateFirstNameIfEmpty(String name) {
         if (name == null || name.length() == 0) {
             return faker.name().firstName();
         }
-        return name;
+        return name.substring(0, 29);
     }
 
     public String generateLastNameIfEmpty(String name) {
         if (name == null || name.length() == 0) {
             return faker.name().lastName();
         }
-        return name;
+        return name.substring(0, 29);
     }
 
 

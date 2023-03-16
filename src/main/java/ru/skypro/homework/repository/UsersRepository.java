@@ -7,6 +7,9 @@ import ru.skypro.homework.entity.User;
 
 import java.util.Optional;
 
+/**
+ * The interface Users repository.
+ */
 @Repository
 public interface UsersRepository extends JpaRepository<User, Integer> {
 
