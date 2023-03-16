@@ -28,12 +28,14 @@ public class ValidatorsTest {
                 Arguments.of(true, "+79123789635"),
                 //start without +79
                 Arguments.of(false, "79123789635"),
+                //start without +79
+                Arguments.of(false, "+89123789635"),
                 //start without +79 small
-                Arguments.of(false, "3789635"),
+                Arguments.of(false, "+7989635"),
                 //start without +79 long
-                Arguments.of(false, "5646546546543789635"),
-                //start without +79 long character
-                Arguments.of(false, "56465fdghfh3635"),
+                Arguments.of(false, "+79646546546543789635"),
+                //start with +79, with character
+                Arguments.of(false, "+79123s89635"),
                 //start without +79
                 Arguments.of(false, "89123789635")
         );

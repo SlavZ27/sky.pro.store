@@ -34,7 +34,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UsersApiController.class)
-@ActiveProfiles("test1")
+@ActiveProfiles("test")
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestMethodOrder(MethodOrderer.DisplayName.MethodName.class)
 class UsersApiControllerSecurityTest {
