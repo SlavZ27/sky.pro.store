@@ -26,6 +26,12 @@ public class AvatarServiceImpl implements AvatarService {
     private final String dirForAvatars;
     private final AvatarRepository avatarRepository;
 
+    /**
+     * Instantiates a new Avatar service.
+     *
+     * @param dirForImages     the dir for images
+     * @param avatarRepository the avatar repository
+     */
     public AvatarServiceImpl(
             @Value("${path.to.avatars.folder}") String dirForImages,
             AvatarRepository avatarRepository) {
@@ -34,14 +40,14 @@ public class AvatarServiceImpl implements AvatarService {
     }
 
     /**
-     * This method, used method repository, allows update Avatar.
+     * Allows update Avatar.
      * Uses {@link AvatarRepository#findById(Object)}
      * Uses {@link AvatarRepository#save(Object)}
      *
      * @param avatar   is not null
      * @param file     is not null
      * @param nameFile is nut null
-     * @return Avatar
+     * @return {@link Avatar}
      * @throws AvatarNotFoundException if passed non id avatar
      */
     @Override
@@ -72,11 +78,11 @@ public class AvatarServiceImpl implements AvatarService {
     }
 
     /**
-     * This method, used method repository, allows get Avatar Data.
+     * Allows get Avatar Data.
      * Uses {@link AvatarRepository#findById(Object)}
      *
      * @param avatar is not null
-     * @return Avatar
+     * @return the pair - avatar data
      * @throws AvatarNotFoundException if passed non id avatar
      */
     @Override
@@ -98,11 +104,11 @@ public class AvatarServiceImpl implements AvatarService {
     }
 
     /**
-     * This method generate Path to file Avatar for string.
+     * Generate Path to file Avatar for string.
      *
      * @param file     is not null
-     * @param nameFile us not null
-     * @return Patch with the specified data
+     * @param nameFile is not null
+     * @return {@link Path} with the specified data
      */
     @Override
     public Path generatePath(MultipartFile file, String nameFile) {
@@ -110,11 +116,11 @@ public class AvatarServiceImpl implements AvatarService {
     }
 
     /**
-     * This method, used method repository, add Avatar.
+     * Create a new Avatar and save it to repository
      *
      * @param file     is not null
      * @param nameFile is not null
-     * @return Avatar
+     * @return {@link Avatar}
      */
     @Override
     public Avatar addAvatar(MultipartFile file, String nameFile) throws IOException {

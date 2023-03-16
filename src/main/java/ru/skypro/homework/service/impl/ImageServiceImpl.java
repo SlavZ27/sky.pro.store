@@ -18,7 +18,8 @@ import java.nio.file.Paths;
 import java.util.Optional;
 
 /**
- * This class processes commands related create Image allowing users to create, update, get, delete ads.
+ * Provides implementations of ImageService methods
+ * @see ImageService
  */
 @Service
 @Slf4j

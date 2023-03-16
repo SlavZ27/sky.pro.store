@@ -8,6 +8,9 @@ import ru.skypro.homework.entity.Ads;
 import java.util.List;
 
 
+/**
+ * The interface Ads repository.
+ */
 @Repository
 public interface AdsRepository extends JpaRepository<Ads, Integer> {
 

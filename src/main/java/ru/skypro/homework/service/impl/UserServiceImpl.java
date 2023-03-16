@@ -24,6 +24,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 
+/**
+ * Provides implementations of UserService methods
+ * @see UserService
+ */
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -33,11 +37,24 @@ public class UserServiceImpl implements UserService {
     private final AvatarServiceImpl avatarService;
     private final UserMapper userMapper;
 
+    /**
+     * Allows to get user by username.
+     *
+     * @param username the username
+     * @return {@link UserDto}
+     */
     @Override
     public UserDto getUser(String username) {
         return userMapper.userToDto(getUserByUserName(username));
     }
 
+    /**
+     * Allows to get user by username.
+     *
+     * @param username the username
+     * @return {@link User}
+     * @throws UserNotFoundException if passed non-existent username
+     */
     @Override
     public User getUserByUserName(String username) {
         return usersRepository.findByUsername(username).orElseThrow(() -> {
@@ -46,6 +63,13 @@ public class UserServiceImpl implements UserService {
         });
     }
 
+    /**
+     * Allows to create new user and save it to repository
+     *
+     * @param registerReq the register req
+     * @param pass        the pass
+     * @return the pair - user, authority
+     */
     @Override
     public Pair<User, Authority> addUser(RegisterReqDto registerReq, String pass) {
         ru.skypro.homework.entity.User user = userMapper.registerReqToUser(registerReq, pass);
@@ -56,6 +80,13 @@ public class UserServiceImpl implements UserService {
         return Pair.of(user, authority);
     }
 
+    /**
+     * Allows to update user.
+     *
+     * @param username the username
+     * @param body     the body
+     * @return {@link UserDto}
+     */
     @Override
     public UserDto updateUser(String username, UserDto body) {
         User newUser = userMapper.userDtoToUser(body);
@@ -77,11 +108,25 @@ public class UserServiceImpl implements UserService {
         return userMapper.userToDto(oldUser);
     }
 
+    /**
+     * Gets name file for avatar.
+     *
+     * @param user the user
+     * @return String - the name file for avatar
+     */
     @Override
     public String getNameFileForAvatar(User user) {
         return "user_" + user.getId();
     }
 
+    /**
+     * Allows to update user image by username.
+     *
+     * @param username the username
+     * @param image    the image
+     * @return the response entity
+     * @throws IOException the io exception
+     */
     @Override
     public ResponseEntity<Void> updateUserImage(String username, MultipartFile image) throws IOException {
         User user = getUserByUserName(username);
@@ -96,6 +141,13 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * Allows to update image of user.
+     *
+     * @param user  the user
+     * @param image the image
+     * @throws IOException the io exception
+     */
     @Override
     public void updateImageOfUser(User user, MultipartFile image) throws IOException {
         if (user.getAvatar() == null) {
@@ -107,6 +159,12 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * Gets avatar data of user.
+     *
+     * @param user the user
+     * @return the pair - avatar data
+     */
     @Override
     public Pair<byte[], String> getAvatarDataOfUser(User user) {
         if (user.getAvatar() == null) {
@@ -116,6 +174,12 @@ public class UserServiceImpl implements UserService {
         return avatarService.getAvatarData(user.getAvatar());
     }
 
+    /**
+     * Gets avatar of user.
+     *
+     * @param idUser the id user
+     * @return the pair - avatar data
+     */
     @Override
     public Pair<byte[], String> getAvatarOfUser(Integer idUser) {
         User user = usersRepository.findById(idUser).orElseThrow(() -> {
@@ -125,6 +189,12 @@ public class UserServiceImpl implements UserService {
         return getAvatarDataOfUser(user);
     }
 
+    /**
+     * Gets avatar of me-user.
+     *
+     * @param username the username
+     * @return the pair - avatar data
+     */
     @Override
     public Pair<byte[], String> getAvatarMe(String username) {
         return getAvatarDataOfUser(getUserByUserName(username));

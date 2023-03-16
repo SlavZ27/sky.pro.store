@@ -30,13 +30,13 @@ public class CommentServiceImpl implements CommentService {
     private final CommentMapper commentMapper;
 
     /**
-     * This method, used by method repository, allows you to create a new comment.
+     * Allows to create a new comment.
      * Uses {@link AdsRepository#findById(Object)}
      * Uses {@link CommentRepository#save(Object)}
      *
      * @param ads     is not null
      * @param comment is npt null
-     * @return newComment
+     * @return {@link Comment}
      * @throws AdsNotFoundException     - if passed non- existent id
      * @throws IllegalArgumentException if passed non- existent parameters
      */
@@ -55,7 +55,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     /**
-     * This method, used method repository, allows update comment.
+     * Allows to update comment.
      * Uses {@link AdsRepository#findById(Object)}
      * Uses {@link CommentRepository#findById(Object)}
      * Uses {@link CommentRepository#save(Object)}
@@ -63,9 +63,9 @@ public class CommentServiceImpl implements CommentService {
      * @param commentDto is not null
      * @param ads        is not null
      * @param commentId  is not null
-     * @return Comment
-     * @throws AdsNotFoundException     if passed non id ads
-     * @throws CommentNotFoundException if passed non id comment
+     * @return {@link Comment}
+     * @throws AdsNotFoundException     if passed non- existent ads id
+     * @throws CommentNotFoundException if passed non- existent comment id
      */
     @Override
     public Comment updateCommentsForAds(CommentDto commentDto, Ads ads, Integer commentId) {
@@ -86,17 +86,23 @@ public class CommentServiceImpl implements CommentService {
         return updatedComment;
     }
 
+    /**
+     * Gets count by ads id
+     *
+     * @param idAds the id ads
+     * @return Integer - the count by ads id
+     */
     @Override
     public Integer getCountByIdAds(Integer idAds) {
         return commentRepository.getCountAllByAdsId(idAds);
     }
 
     /**
-     * This method, used method repository, allows get all comment by id to ads on date time
+     * Allows to get all comments by ads id, sorted by date time
      * Uses {@link CommentRepository#findAllByIdAdsAndSortDateTime(Integer)}
      *
      * @param adsId is not null
-     * @return Comment by id
+     * @return List of {@link Comment}s
      */
     @Override
     public List<Comment> getAllByIdAdsAndSortDateTime(Integer adsId) {
@@ -104,13 +110,13 @@ public class CommentServiceImpl implements CommentService {
     }
 
     /**
-     * This method, used method repository, allows get comment by id ads and id comments
+     * Allows to get comment by ads id and comment id
      * Uses {@link CommentRepository#findByIdAndAdsId(Integer, Integer)}
      *
      * @param adsId     is not null
      * @param commentId is not null
-     * @return Comments
-     * @throws CommentNotFoundException if passed non id comment
+     * @return {@link Comment}
+     * @throws CommentNotFoundException if passed non-existent id comment
      */
     @Override
     public Comment getCommentOfAds(Integer adsId, Integer commentId) {
@@ -122,7 +128,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     /**
-     * This method, used method repository, allows del comment
+     * Allows to delete comment
      * Uses {@link CommentRepository#delete(Object)}
      *
      * @param comment is not null
@@ -134,7 +140,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     /**
-     * This method, used method repository, allows del comment to idAds
+     * Allows to delete all comments by ads id
      * Uses {@link CommentRepository#deleteAllByAdsId(Integer)}
      *
      * @param idAds is not null
@@ -146,12 +152,12 @@ public class CommentServiceImpl implements CommentService {
     }
 
     /**
-     * This method, used method repository, allows del comment to id Ads and id comment
+     * Allows to delete comment by ads id and comment id
      * Uses {@link CommentRepository#findByIdAndAdsId(Integer, Integer)}
      *
      * @param adPk      is not null
      * @param commentId is not null
-     * @throws CommentNotFoundException if passed non id comment
+     * @throws CommentNotFoundException if passed non-existent id comment
      */
     @Override
     public void removeCommentForAds(Integer adPk, Integer commentId) {

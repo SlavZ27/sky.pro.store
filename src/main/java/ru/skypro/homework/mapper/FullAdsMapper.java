@@ -6,9 +6,18 @@ import ru.skypro.homework.dto.FullAdsDto;
 import ru.skypro.homework.entity.Ads;
 
 
+/**
+ * Provides methods for mapping FullAdsDto`s to Ads
+ */
 @Mapper(componentModel = "spring")
 public abstract class FullAdsMapper {
 
+    /**
+     * Map Ads to FullAdsDto
+     *
+     * @param ads the ads
+     * @return {@link FullAdsDto}
+     */
     @Mapping(target = "pk", source = "ads.id")
     @Mapping(target = "price", source = "ads.price")
     @Mapping(target = "title", source = "ads.title")
@@ -20,6 +29,12 @@ public abstract class FullAdsMapper {
     @Mapping(target = "authorLastName", expression = "java(ads.getAuthor().getLastName())")
     public abstract FullAdsDto adsToFullAdsDto(Ads ads);
 
+    /**
+     * Map image to string .
+     *
+     * @param ads the ads
+     * @return the string - path to image
+     */
     String mapImageToString(Ads ads) {
         if (ads.getImage() == null || ads.getImage().getId() == null) {
             return null;

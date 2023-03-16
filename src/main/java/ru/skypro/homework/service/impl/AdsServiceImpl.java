@@ -44,13 +44,13 @@ public class AdsServiceImpl implements AdsService {
     private final UserServiceImpl userService;
 
     /**
-     * This method, uses method repository and Mapper, allows update Ads.
+     * Allows update Ads.
      * Uses {@link AdsRepository#findById(Object)}
      * Uses {@link AdsRepository#save(Object)}
      *
      * @param adsId        is not null
      * @param createAdsDto is not null
-     * @return ads
+     * @return {@link AdsDto}
      * @throws AdsNotFoundException if passed non- existent id
      */
     @Override
@@ -70,14 +70,15 @@ public class AdsServiceImpl implements AdsService {
 
 
     /**
-     * This method uses method repository add Comments to Ads id
+     * Add Comments to Ads
      * Uses {@link AdsRepository#findById(Object)}
      * Uses {@link UserServiceImpl#getUserByUserName}
      * Uses {@link CommentServiceImpl#addCommentsToAds(Ads, Comment, User)}
      *
      * @param adsId      is not null
      * @param commentDto is not null
-     * @return adsId, comment
+     * @param username   the username
+     * @return {@link CommentDto}
      * @throws AdsNotFoundException if passed non- existent id
      */
     @Override
@@ -92,14 +93,14 @@ public class AdsServiceImpl implements AdsService {
     }
 
     /**
-     * This method uses method repository update Comments to Ads id and comment id.
+     * Update Comments for Ads by id and comment id.
      * Uses {@link AdsRepository#findById(Object)}
      * Uses {@link CommentServiceImpl#updateCommentsForAds(CommentDto, Ads, Integer)}
      *
      * @param adPk       is not null
      * @param commentId  is not null
      * @param commentDto is not null
-     * @return comment
+     * @return {@link CommentDto}
      * @throws AdsNotFoundException if passed non- existent id
      */
     @Override
@@ -112,12 +113,12 @@ public class AdsServiceImpl implements AdsService {
     }
 
     /**
-     * This method uses method repository get Comments to Ads id.
+     * Get Comments of Ads by ads id.
      * Uses {@link AdsRepository#findById(Object)}
      * Uses {@link CommentServiceImpl#getAllByIdAdsAndSortDateTime(Integer)}
      *
      * @param adsId is not null
-     * @return comment
+     * @return {@link ResponseWrapperCommentDto}
      * @throws AdsNotFoundException if passed non- existent id
      */
     @Override
@@ -133,7 +134,7 @@ public class AdsServiceImpl implements AdsService {
     }
 
     /**
-     * This method uses method repository get Ads to Ads id.
+     * Remove Ads by Ads id.
      * Uses {@link AdsRepository#findById(Object)}
      * Uses {@link CommentServiceImpl#removeAllCommentsOfAds(Integer)}
      * Uses {@link AdsRepository#delete(Object)}
@@ -192,13 +193,13 @@ public class AdsServiceImpl implements AdsService {
     }
 
     /**
-     * This method uses method repository get Comments to Ads id and comment id
+     * Get Comments of Ads by ads id and comment id
      * Uses {@link AdsRepository#findById(Object)}
      * Uses {@link CommentServiceImpl#getCommentOfAds(Integer, Integer)}
      *
      * @param adsId     is not null
      * @param commentId is not null
-     * @return comment
+     * @return CommentDto
      * @throws AdsNotFoundException if passed non- existent id
      */
     @Override
@@ -211,14 +212,16 @@ public class AdsServiceImpl implements AdsService {
     }
 
     /**
-     * This method uses method repository get Ads to CreateAdsDto
+     * Create  a new Ads and save it to repository
      * Uses {@link UserServiceImpl#getUserByUserName(String)}
      * Uses {@link AdsRepository#save(Object)}
      * Uses {@link ImageServiceImpl#addImage(MultipartFile, String)}
      *
      * @param createAdsDto is not null
      * @param image        is not null
-     * @return Ads
+     * @param username     the username
+     * @return {@link AdsDto}
+     * @throws IOException the io exception
      */
     @Override
     public AdsDto addAds(CreateAdsDto createAdsDto, MultipartFile image, String username) throws IOException {
@@ -237,11 +240,11 @@ public class AdsServiceImpl implements AdsService {
     }
 
     /**
-     * This method uses method repository get Ads to Ads id
+     * Get Ads by Ads id
      * Uses {@link AdsRepository#findById(Object)}
      *
      * @param idAds is not null
-     * @return ads
+     * @return {@link FullAdsDto}
      * @throws AdsNotFoundException if passed non- existent id
      */
     @Override
@@ -254,10 +257,10 @@ public class AdsServiceImpl implements AdsService {
     }
 
     /**
-     * This method uses method repository get all Ads
+     * Get all Ads
      * Uses {@link AdsRepository#findAllAndSortDateTime()}
      *
-     * @return List<Ads>
+     * @return {@link ResponseWrapperAdsDto}
      */
     @Override
     public ResponseWrapperAdsDto getALLAds() {
@@ -268,10 +271,11 @@ public class AdsServiceImpl implements AdsService {
     }
 
     /**
-     * This method uses method repository get Ads for Default user
+     * Get Ads for Default user
      * Uses {@link AdsRepository#findAllByUserIdAndSortDateTime(Integer)}
      *
-     * @return List<Ads> to default user
+     * @param username the username
+     * @return {@link ResponseWrapperAdsDto}
      */
     @Override
     public ResponseWrapperAdsDto getALLAdsOfMe(String username) {
@@ -302,10 +306,10 @@ public class AdsServiceImpl implements AdsService {
     }
 
     /**
-     * This method uses method repository get name file for image
+     * Get name file for image
      *
      * @param ads is not null
-     * @return Name file for image
+     * @return String - name file for image
      */
     @Override
     public String getNameFileForImage(Ads ads) {
@@ -313,7 +317,7 @@ public class AdsServiceImpl implements AdsService {
     }
 
     /**
-     * This method uses method repository update image for ads id
+     * Update image of ads by ads id
      * Uses {@link AdsRepository#findById(Object)}
      * Uses {@link ImageServiceImpl#addImage(MultipartFile, String)}
      * Uses {@link ImageServiceImpl#updateImage(Image, MultipartFile, String)}
@@ -322,7 +326,8 @@ public class AdsServiceImpl implements AdsService {
      *
      * @param idAds is not null
      * @param image is not null
-     * @return image for ads
+     * @return the pair - image data
+     * @throws IOException the io exception
      */
     @Override
     public Pair<byte[], String> updateImageOfAds(Integer idAds, MultipartFile image) throws IOException {
@@ -336,6 +341,14 @@ public class AdsServiceImpl implements AdsService {
         return imageService.getImageData(ads.getImage());
     }
 
+    /**
+     * Update image of ads.
+     * Uses {@link AdsRepository#findById(Object)}
+     *
+     * @param ads   the ads
+     * @param image the image
+     * @throws IOException the io exception
+     */
     @Override
     public void updateImageOfAds(Ads ads, MultipartFile image) throws IOException {
         if (ads.getImage() == null) {
@@ -348,14 +361,14 @@ public class AdsServiceImpl implements AdsService {
     }
 
     /**
-     * This method uses method repository get image for Ads id
+     * Get image by Ads id
      * Uses {@link AdsRepository#findById(Object)}
      * Uses {@link ImageServiceImpl#getImageData(Image)}
      *
      * @param idAds is not null
-     * @return image
-     * @throws AdsNotFoundException   if passed non- existent id
-     * @throws ImageNotFoundException if passed existent id Ads
+     * @return the pair - image data
+     * @throws AdsNotFoundException   if passed non-existent id Ads
+     * @throws ImageNotFoundException if passed image == null
      */
     @Override
     public Pair<byte[], String> getImage(Integer idAds) {
@@ -371,11 +384,11 @@ public class AdsServiceImpl implements AdsService {
     }
 
     /**
-     * This method uses method repository find Ads for Title
+     * Find Ads for Title
      * Uses {@link AdsRepository#findByTitleLike(String)}
      *
      * @param title is not null
-     * @return ads
+     * @return {@link ResponseWrapperAdsDto}
      */
     @Override
     public ResponseWrapperAdsDto findAdsByTitle(String title) {
