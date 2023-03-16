@@ -29,6 +29,10 @@ public class AuthServiceImpl implements AuthService {
     private final UserDetailsManager manager;
     private final PasswordEncoder encoder;
     private final UserServiceImpl userService;
+    /**
+     * The constant PAS_PREFIX - the prefix value for substitution to the encrypted password.
+     * Indicates which type of encoder is used.
+     */
     public final static String PAS_PREFIX = "{bcrypt}";
 
     /**
