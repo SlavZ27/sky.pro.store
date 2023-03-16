@@ -7,6 +7,9 @@ import ru.skypro.homework.entity.Authority;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The interface Authority repository.
+ */
 public interface AuthorityRepository extends JpaRepository<Authority, String> {
 
     @Query(value = "select * from authorities where username=:username and authority=:authority"
