@@ -25,7 +25,8 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 
 /**
- * The type User service.
+ * Provides implementations of UserService methods
+ * @see UserService
  */
 @Service
 @Slf4j

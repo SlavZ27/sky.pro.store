@@ -3,6 +3,10 @@ package ru.skypro.homework.validate;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+
+/**
+ * Provides implementations of {@link ConstraintValidator} methods
+ */
 public class ValidPhoneValidator implements ConstraintValidator<ValidPhone, String> {
 
     @Override
@@ -10,6 +14,13 @@ public class ValidPhoneValidator implements ConstraintValidator<ValidPhone, Stri
         ConstraintValidator.super.initialize(constraintAnnotation);
     }
 
+    /**
+     * Checks the validity of the phone
+     *
+     * @param phone                      the phone
+     * @param constraintValidatorContext the constraint validator context
+     * @return the boolean
+     */
     @Override
     public boolean isValid(String phone, ConstraintValidatorContext constraintValidatorContext) {
         if (phone == null) {
