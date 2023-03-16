@@ -52,10 +52,10 @@ class RepositoriesTest {
         int countUserAdmin = 2;
         int countUser = 5;
 
-        int countAdsUserMin = 0;
+        int countAdsUserMin = 1;
         int countAdsUserMax = 3;
 
-        int countCommentForAdsMin = 0;
+        int countCommentForAdsMin = 1;
         int countCommentForAdsMax = 10;
 
         //generate userAdmin

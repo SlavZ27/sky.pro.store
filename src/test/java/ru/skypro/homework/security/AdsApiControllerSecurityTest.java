@@ -1,4 +1,4 @@
-package ru.skypro.homework.controller;
+package ru.skypro.homework.security;
 
 import org.junit.jupiter.api.*;
 import org.junit.runner.RunWith;
@@ -22,6 +22,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 
 import org.springframework.web.context.WebApplicationContext;
 import ru.skypro.homework.component.UserSecurity;
+import ru.skypro.homework.controller.AdsApiController;
 import ru.skypro.homework.mapper.*;
 import ru.skypro.homework.repository.*;
 import ru.skypro.homework.service.impl.*;
@@ -33,10 +34,10 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AdsApiController.class)
-@ActiveProfiles("test1")
+@ActiveProfiles("test")
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestMethodOrder(MethodOrderer.DisplayName.class)
-class AdsApiControllerWebMvcIntegrationTest {
+class AdsApiControllerSecurityTest {
     @InjectMocks
     private AdsApiController adsApiController;
     private MockMvc mockMvc;
@@ -63,7 +64,7 @@ class AdsApiControllerWebMvcIntegrationTest {
     @SpyBean
     private UserMapperImpl userMapper;
     @SpyBean
-    private AuthorityService authorityService;
+    private AuthorityServiceImpl authorityService;
     @SpyBean
     private CreateAdsMapperImpl createAdsMapper;
     @SpyBean
@@ -314,4 +315,7 @@ class AdsApiControllerWebMvcIntegrationTest {
         resultActions
                 .andExpect(status().isForbidden());
     }
+
+
+
 }
