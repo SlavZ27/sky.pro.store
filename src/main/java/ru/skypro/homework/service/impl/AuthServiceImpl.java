@@ -18,21 +18,51 @@ import ru.skypro.homework.exception.UserAlreadyExists;
 import ru.skypro.homework.exception.UserNotFoundException;
 import ru.skypro.homework.service.AuthService;
 
+/**
+ * Provides implementations of AuthService methods
+ * @see AuthService
+ */
 @Service
 @Slf4j
 public class AuthServiceImpl implements AuthService {
 
+    /**
+     * The Manager.
+     */
     private final UserDetailsManager manager;
+    /**
+     * The Encoder.
+     */
     private final PasswordEncoder encoder;
+    /**
+     * The User service.
+     */
     private final UserServiceImpl userService;
+    /**
+     * The constant PAS_PREFIX.
+     */
     public final static String PAS_PREFIX = "{bcrypt}";
 
+    /**
+     * Instantiates a new Auth service.
+     *
+     * @param manager     the manager
+     * @param userService the user service
+     */
     public AuthServiceImpl(@Qualifier("jdbcUserDetailsManager") UserDetailsManager manager, UserServiceImpl userService) {
         this.manager = manager;
         this.userService = userService;
         this.encoder = new BCryptPasswordEncoder();
     }
 
+    /**
+     * Login boolean.
+     *
+     * @param userName the user name
+     * @param password the password
+     * @return the boolean
+     * @throws UserNotFoundException the user not found exception
+     */
     @Override
     public boolean login(String userName, String password) throws UserNotFoundException {
         if (!manager.userExists(userName)) {
@@ -53,6 +83,12 @@ public class AuthServiceImpl implements AuthService {
         return isLoggedIn;
     }
 
+    /**
+     * Register boolean.
+     *
+     * @param registerReq the register req
+     * @return the boolean
+     */
     @Override
     public boolean register(RegisterReqDto registerReq) {
         if (manager.userExists(registerReq.getUsername())) {
@@ -75,6 +111,12 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    /**
+     * Change password boolean.
+     *
+     * @param body the body
+     * @return the boolean
+     */
     @Override
     public boolean changePassword(NewPasswordDto body) {
         manager.changePassword(

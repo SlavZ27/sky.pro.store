@@ -322,7 +322,7 @@ public class AdsApiController {
     @Operation(
             summary = "updateAdsImage",
             description = "update image of ad",
-            tags = {"Изображения"})
+            tags = {"Images"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
                     description = "OK", content = @Content(
@@ -349,7 +349,7 @@ public class AdsApiController {
     @Operation(
             summary = "getImage",
             description = "return data of image of ad",
-            tags = {"Изображения"})
+            tags = {"Images"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
                     description = "OK",

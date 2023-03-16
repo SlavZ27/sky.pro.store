@@ -9,6 +9,10 @@ import ru.skypro.homework.entity.User;
 import ru.skypro.homework.repository.AuthorityRepository;
 import ru.skypro.homework.service.AuthorityService;
 
+/**
+ * Provides implementations of AuthorityService methods
+ *  @see AuthorityService
+ */
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -16,6 +20,13 @@ public class AuthorityServiceImpl implements AuthorityService {
 
     private final AuthorityRepository authorityRepository;
 
+    /**
+     * Create a new authority and save it to repository
+     *
+     * @param user the user
+     * @param role the role
+     * @return {@link Authority}
+     */
     @Override
     public Authority addAuthority(User user, Role role) {
         Authority tempAuthority = new Authority();
