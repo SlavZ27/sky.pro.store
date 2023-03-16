@@ -26,21 +26,9 @@ import ru.skypro.homework.service.AuthService;
 @Slf4j
 public class AuthServiceImpl implements AuthService {
 
-    /**
-     * The Manager.
-     */
     private final UserDetailsManager manager;
-    /**
-     * The Encoder.
-     */
     private final PasswordEncoder encoder;
-    /**
-     * The User service.
-     */
     private final UserServiceImpl userService;
-    /**
-     * The constant PAS_PREFIX.
-     */
     public final static String PAS_PREFIX = "{bcrypt}";
 
     /**

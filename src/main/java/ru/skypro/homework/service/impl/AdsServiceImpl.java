@@ -34,37 +34,13 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class AdsServiceImpl implements AdsService {
-    /**
-     * The Ads repository.
-     */
     private final AdsRepository adsRepository;
-    /**
-     * The Ads mapper.
-     */
     private final AdsMapper adsMapper;
-    /**
-     * The Comment mapper.
-     */
     private final CommentMapper commentMapper;
-    /**
-     * The Comment service.
-     */
     private final CommentServiceImpl commentService;
-    /**
-     * The Image service.
-     */
     private final ImageServiceImpl imageService;
-    /**
-     * The Create ads mapper.
-     */
     private final CreateAdsMapper createAdsMapper;
-    /**
-     * The Full ads mapper.
-     */
     private final FullAdsMapper fullAdsMapper;
-    /**
-     * The User service.
-     */
     private final UserServiceImpl userService;
 
     /**
