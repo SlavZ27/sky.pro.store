@@ -82,7 +82,7 @@ public class AvatarServiceImpl implements AvatarService {
      * Uses {@link AvatarRepository#findById(Object)}
      *
      * @param avatar is not null
-     * @return Pair<byte[], String> - "bytes, path"
+     * @return the pair - avatar data
      * @throws AvatarNotFoundException if passed non id avatar
      */
     @Override

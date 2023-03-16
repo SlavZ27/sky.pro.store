@@ -67,7 +67,7 @@ public class UserServiceImpl implements UserService {
      *
      * @param registerReq the register req
      * @param pass        the pass
-     * @return Pair<User, Authority>
+     * @return the pair - user, authority
      */
     @Override
     public Pair<User, Authority> addUser(RegisterReqDto registerReq, String pass) {
@@ -162,7 +162,7 @@ public class UserServiceImpl implements UserService {
      * Gets avatar data of user.
      *
      * @param user the user
-     * @return Pair<byte[], String>
+     * @return the pair - avatar data
      */
     @Override
     public Pair<byte[], String> getAvatarDataOfUser(User user) {
@@ -177,7 +177,7 @@ public class UserServiceImpl implements UserService {
      * Gets avatar of user.
      *
      * @param idUser the id user
-     * @return Pair<byte[], String>
+     * @return the pair - avatar data
      */
     @Override
     public Pair<byte[], String> getAvatarOfUser(Integer idUser) {
@@ -192,7 +192,7 @@ public class UserServiceImpl implements UserService {
      * Gets avatar of me-user.
      *
      * @param username the username
-     * @return Pair<byte[], String>
+     * @return the pair - avatar data
      */
     @Override
     public Pair<byte[], String> getAvatarMe(String username) {

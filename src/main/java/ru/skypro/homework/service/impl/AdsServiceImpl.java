@@ -167,7 +167,7 @@ public class AdsServiceImpl implements AdsService {
      *
      * @param idAds is not null
      * @return HttpStatus.NO_CONTENT or null
-     * @throws {@link AdsNotFoundException} if passed non- existent id
+     * @throws AdsNotFoundException if passed non- existent id
      */
     @Override
     public ResponseEntity<Void> removeAds(Integer idAds) {
@@ -350,7 +350,7 @@ public class AdsServiceImpl implements AdsService {
      *
      * @param idAds is not null
      * @param image is not null
-     * @return Pair<byte[], String>
+     * @return the pair - image data
      * @throws IOException the io exception
      */
     @Override
@@ -390,7 +390,7 @@ public class AdsServiceImpl implements AdsService {
      * Uses {@link ImageServiceImpl#getImageData(Image)}
      *
      * @param idAds is not null
-     * @return Pair<byte[], String> - "bytes, path"
+     * @return the pair - image data
      * @throws AdsNotFoundException   if passed non-existent id Ads
      * @throws ImageNotFoundException if passed image == null
      */
