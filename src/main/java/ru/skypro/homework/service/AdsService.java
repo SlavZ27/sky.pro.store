@@ -16,7 +16,7 @@ public interface AdsService {
      * Update ads.
      *
      * @param adsId        the ads id
-     * @param createAdsDto the create ads dto
+     * @param createAdsDto the createAds dto
      * @return {@link AdsDto}
      */
     AdsDto updateAds(Integer adsId, CreateAdsDto createAdsDto);
@@ -69,7 +69,7 @@ public interface AdsService {
     /**
      * Add ads.
      *
-     * @param createAdsDto the createadsdto
+     * @param createAdsDto the createAdsDto
      * @param image        the image
      * @param username     the username
      * @return {@link AdsDto}
