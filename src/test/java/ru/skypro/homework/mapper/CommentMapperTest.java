@@ -2,11 +2,8 @@ package ru.skypro.homework.mapper;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ContextConfiguration;
 import ru.skypro.homework.dto.CommentDto;
@@ -28,9 +25,6 @@ import static org.mockito.Mockito.when;
 })
 public class CommentMapperTest {
 
-//    @Spy
-//    private CommentMapper commentMapper = Mappers.getMapper(CommentMapper.class);
-
     @InjectMocks
     private CommentMapperImpl commentMapperTest;
 
@@ -42,7 +36,8 @@ public class CommentMapperTest {
         Comment comment = new Comment();
         comment.setId(111);
         comment.setText("Test text");
-        comment.setDateTime(LocalDateTime.parse("2023-02-11 15:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+        comment.setDateTime(LocalDateTime.parse(
+                "2023-02-11 15:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
 
         User user = new User();
         user.setId(111);
@@ -80,7 +75,8 @@ public class CommentMapperTest {
         Comment comment = commentMapperTest.dtoToComment(commentDto);
         assertEquals(comment.getId(), 111);
         assertEquals(comment.getText(), "Test text");
-        assertEquals(comment.getDateTime(), LocalDateTime.parse("2023-02-11 15:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+        assertEquals(comment.getDateTime(), LocalDateTime.parse(
+                "2023-02-11 15:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
         assertEquals(comment.getAuthor(), user);
     }
 }

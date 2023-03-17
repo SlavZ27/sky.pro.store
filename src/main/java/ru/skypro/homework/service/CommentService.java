@@ -32,7 +32,7 @@ public interface CommentService {
     Comment updateCommentsForAds(CommentDto commentDto, Ads ads, Integer commentId);
 
     /**
-     * Gets count by ads id.
+     * Gets count by ads of id.
      *
      * @param idAds the id ads
      * @return Integer - the count

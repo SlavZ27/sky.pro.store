@@ -26,6 +26,7 @@ import java.time.LocalDate;
 
 /**
  * Provides implementations of UserService methods
+ *
  * @see UserService
  */
 @Service
@@ -155,7 +156,8 @@ public class UserServiceImpl implements UserService {
             log.info("New avatar has been added for 'user' with ID:{}", user.getId());
         } else {
             user.setAvatar(avatarService.updateAvatar(user.getAvatar(), image, getNameFileForAvatar(user)));
-            log.info("Avatar with ID: {} has been updated for 'user' with ID:{}", user.getAvatar().getId(), user.getId());
+            log.info("Avatar with ID: {} has been updated for 'user' with ID:{}",
+                    user.getAvatar().getId(), user.getId());
         }
     }
 

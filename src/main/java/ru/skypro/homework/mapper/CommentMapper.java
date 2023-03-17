@@ -75,7 +75,9 @@ public abstract class CommentMapper {
      * @return {@link ResponseWrapperCommentDto}
      */
     @Mapping(target = "results", source = "commentDtoList")
-    public abstract ResponseWrapperCommentDto mapListOfCommentDtoToResponseWrapper(Integer count, List<CommentDto> commentDtoList);
+    public abstract ResponseWrapperCommentDto mapListOfCommentDtoToResponseWrapper(
+            Integer count,
+            List<CommentDto> commentDtoList);
 
     /**
      * Map list of Comment to list CommentDto.

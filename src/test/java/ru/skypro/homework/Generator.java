@@ -1,15 +1,15 @@
 package ru.skypro.homework;
 
 import com.github.javafaker.Faker;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.commons.io.FileUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.skypro.homework.entity.Role;
 import ru.skypro.homework.entity.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -19,13 +19,13 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import static org.springframework.security.core.userdetails.User.builder;
-
 public class Generator {
+
+    private final String linkToImages = "https://picsum.photos/200";
     private final Faker faker = new Faker();
     private final Random random = new Random();
 
-    private PasswordEncoder encoder = new BCryptPasswordEncoder();
+    private final PasswordEncoder encoder = new BCryptPasswordEncoder();
 
     public int genInt() {
         return random.nextInt();
@@ -42,10 +42,6 @@ public class Generator {
     /**
      * The method returns a random number between the parameters
      * Using {@link Random#nextInt(int)}
-     *
-     * @param min
-     * @param max
-     * @return
      */
     public int genInt(int min, int max) {
         return random.nextInt(max - min) + min;
@@ -142,7 +138,16 @@ public class Generator {
         }
     }
 
-    public Avatar generateAvatarIfNull(Avatar avatar, String dirForAvatars) {
+    private String getPathImageNameNotExist(String dirToCopy) {
+        String filePath;
+        do {
+            filePath = faker.file().fileName(
+                    dirToCopy, null, "jpg", null);
+        } while (Files.exists(Path.of(filePath)));
+        return filePath;
+    }
+
+    public Avatar generateAvatarIfNull(Avatar avatar, String dirForAvatars, String dirToCopyOrNull) throws IOException {
         if (avatar == null) {
             avatar = new Avatar();
             avatar.setId(generateIdIfEmpty(null));
@@ -150,22 +155,56 @@ public class Generator {
                 avatar.setPath(faker.file().fileName());
             } else {
                 List<String> pathsOfFiles = getPathsOfFiles(dirForAvatars);
-                avatar.setPath(pathsOfFiles.get(random.nextInt(pathsOfFiles.size())));
+                String pathRandom = pathsOfFiles.get(random.nextInt(pathsOfFiles.size()));
+                if (dirToCopyOrNull != null) {
+                    File file = new File(dirToCopyOrNull);
+                    if (!Files.exists(file.toPath())) {
+                        file.mkdirs();
+                    }
+                    String filePath = getPathImageNameNotExist(dirToCopyOrNull);
+                    Files.copy(Path.of(pathRandom), Path.of(filePath));
+                    avatar.setPath(filePath);
+                } else {
+                    avatar.setPath(pathRandom);
+                }
             }
         }
         return avatar;
     }
 
-    public Image generateImageIfNull(Image image, String dirForImages) {
+    public Image generateImageIfNull(Image image, String dirForImages, String dirToCopyOrNull) throws IOException {
         if (image == null) {
+            String filePath;
             image = new Image();
             image.setId(generateIdIfEmpty(null));
             if (dirForImages == null || dirForImages.length() == 0) {
-                image.setPath(faker.file().fileName());
+                if (dirToCopyOrNull != null) {
+                    File file = new File(dirToCopyOrNull);
+                    if (!Files.exists(file.toPath())) {
+                        file.mkdirs();
+                    }
+                    filePath = getPathImageNameNotExist(dirToCopyOrNull);
+                    file = new File(filePath);
+                    URL myUrl = new URL(linkToImages);
+                    FileUtils.copyURLToFile(myUrl, file);
+                } else {
+                    filePath = faker.file().fileName();
+                }
             } else {
                 List<String> pathsOfFiles = getPathsOfFiles(dirForImages);
-                image.setPath(pathsOfFiles.get(random.nextInt(pathsOfFiles.size())));
+                String pathRandom = pathsOfFiles.get(random.nextInt(pathsOfFiles.size()));
+                if (dirToCopyOrNull != null) {
+                    File file = new File(dirToCopyOrNull);
+                    if (!Files.exists(file.toPath())) {
+                        file.mkdirs();
+                    }
+                    filePath = getPathImageNameNotExist(dirToCopyOrNull);
+                    Files.copy(Path.of(pathRandom), Path.of(filePath));
+                } else {
+                    filePath = pathRandom;
+                }
             }
+            image.setPath(filePath);
         }
         return image;
     }
@@ -251,9 +290,6 @@ public class Generator {
     /**
      * The method generates a random address if it receives null or an empty string
      * Using {@link Faker#address()#streetAddress}
-     *
-     * @param address
-     * @return
      */
     public String generateAddressIfEmpty(String address) {
         if (address == null || address.length() == 0) {
@@ -265,9 +301,6 @@ public class Generator {
     /**
      * The method generates a random city if it receives null or an empty string
      * Using {@link Faker#address()#city}
-     *
-     * @param city
-     * @return
      */
     public String generateCityIfEmpty(String city) {
         if (city == null || city.length() == 0) {
@@ -280,9 +313,6 @@ public class Generator {
      * The method generates a random phone if it receives null or an empty string.
      * Limited to 15 characters due to database rules.
      * Using {@link Faker#phoneNumber()#phoneNumber()}
-     *
-     * @param phone
-     * @return
      */
     public String generatePhoneIfEmpty(String phone) {
         if (phone == null || phone.length() == 0) {
@@ -298,9 +328,6 @@ public class Generator {
     /**
      * The method generates a random name if it receives null or an empty string.
      * Using {@link Faker#name()#username()}
-     *
-     * @param name
-     * @return
      */
     public String generateNameIfEmpty(String name) {
         if (name == null || name.length() == 0) {
@@ -360,9 +387,6 @@ public class Generator {
      * The method generates a random id for telegram if it receives null or id<0.
      * Values from 100_000_000 to 999_999_999
      * Using {@link Faker#random()#nextLong()}
-     *
-     * @param id
-     * @return
      */
     public Integer generateIdIfEmpty(Integer id) {
         if (id == null || id < 0) {
@@ -379,9 +403,6 @@ public class Generator {
     /**
      * The method generates a random message for telegram if it receives null or an empty string
      * Using {@link Faker#lordOfTheRings()#character()}
-     *
-     * @param message
-     * @return
      */
     public String generateMessageIfEmpty(String message) {
         if (message == null || message.length() == 0) {

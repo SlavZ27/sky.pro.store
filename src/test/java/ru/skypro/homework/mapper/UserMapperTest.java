@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class UserMapperTest {
-    private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
+    private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
     @Test
     public void testUserToUserDto() {

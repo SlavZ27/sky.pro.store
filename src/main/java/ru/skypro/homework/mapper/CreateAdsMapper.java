@@ -21,7 +21,7 @@ public interface CreateAdsMapper {
     /**
      * Map CreateAdsDto to Ads.
      *
-     * @param createAdsDto the create ads dto
+     * @param createAdsDto the createAdsDto
      * @return {@link Ads}
      */
     @Mapping(target = "description", source = "createAdsDto.description")

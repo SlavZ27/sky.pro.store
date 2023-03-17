@@ -20,6 +20,7 @@ import ru.skypro.homework.service.AuthService;
 
 /**
  * Provides implementations of AuthService methods
+ *
  * @see AuthService
  */
 @Service
@@ -34,6 +35,7 @@ public class AuthServiceImpl implements AuthService {
      * Indicates which type of encoder is used.
      */
     public final static String PAS_PREFIX = "{bcrypt}";
+    public final static int PAS_PREFIX_COUNT = PAS_PREFIX.length();
 
     /**
      * Instantiates a new Auth service.
@@ -41,7 +43,8 @@ public class AuthServiceImpl implements AuthService {
      * @param manager     the manager
      * @param userService the user service
      */
-    public AuthServiceImpl(@Qualifier("jdbcUserDetailsManager") UserDetailsManager manager, UserServiceImpl userService) {
+    public AuthServiceImpl(
+            @Qualifier("jdbcUserDetailsManager") UserDetailsManager manager, UserServiceImpl userService) {
         this.manager = manager;
         this.userService = userService;
         this.encoder = new BCryptPasswordEncoder();
@@ -50,7 +53,7 @@ public class AuthServiceImpl implements AuthService {
     /**
      * Login boolean.
      *
-     * @param userName the user name
+     * @param userName the username
      * @param password the password
      * @return the boolean
      * @throws UserNotFoundException the user not found exception
@@ -64,7 +67,7 @@ public class AuthServiceImpl implements AuthService {
         }
         UserDetails userDetails = manager.loadUserByUsername(userName);
         String encryptedPassword = userDetails.getPassword();
-        String encryptedPasswordWithoutEncryptionType = encryptedPassword.substring(8);
+        String encryptedPasswordWithoutEncryptionType = encryptedPassword.substring(PAS_PREFIX_COUNT);
         boolean isLoggedIn = encoder.matches(password, encryptedPasswordWithoutEncryptionType);
         if (isLoggedIn) {
             log.info("User with userName: {} successfully logged in", userName);
@@ -83,6 +86,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public boolean register(RegisterReqDto registerReq) {
+        registerReq.setUsername(registerReq.getUsername());
         if (manager.userExists(registerReq.getUsername())) {
             log.error("User with userName: {} already exists", registerReq.getUsername());
             throw new UserAlreadyExists(registerReq.getUsername());
@@ -117,7 +121,7 @@ public class AuthServiceImpl implements AuthService {
         UserDetails userDetails =
                 manager.loadUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
         String encryptedPassword = userDetails.getPassword();
-        String encryptedPasswordWithoutEncryptionType = encryptedPassword.substring(8);
+        String encryptedPasswordWithoutEncryptionType = encryptedPassword.substring(PAS_PREFIX_COUNT);
         boolean isChangedPassword = encoder.matches(body.getNewPassword(), encryptedPasswordWithoutEncryptionType);
         if (isChangedPassword) {
             log.info("User with userName: {} has been successfully changed password", userDetails.getUsername());
