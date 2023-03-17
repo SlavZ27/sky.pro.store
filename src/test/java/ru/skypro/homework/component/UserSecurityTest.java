@@ -10,6 +10,7 @@ import ru.skypro.homework.Generator;
 import ru.skypro.homework.entity.*;
 import ru.skypro.homework.repository.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -42,7 +43,7 @@ class UserSecurityTest {
     private final Random random = new Random();
 
     @BeforeEach
-    public void generateData() {
+    public void generateData() throws IOException {
         authorityRepository.deleteAll();
         commentRepository.deleteAll();
         adsRepository.deleteAll();
@@ -62,7 +63,8 @@ class UserSecurityTest {
         //generate userAdmin
         List<User> userAdminList = new ArrayList<>();
         for (int i = 0; i < countUserAdmin; i++) {
-            Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(null, dirForAvatars));
+            Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(
+                    null, dirForAvatars, null));
             User user = usersRepository.save(generator.generateUser(avatar, "password"));
             authorityRepository.save(generator.generateAuthority(user, Role.ADMIN));
             userAdminList.add(user);
@@ -70,7 +72,8 @@ class UserSecurityTest {
         //generate user
         List<User> userList = new ArrayList<>();
         for (int i = 0; i < countUser; i++) {
-            Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(null, dirForAvatars));
+            Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(
+                    null, dirForAvatars, null));
             User user = usersRepository.save(generator.generateUser(avatar, "password"));
             authorityRepository.save(generator.generateAuthority(user, Role.USER));
             userList.add(user);
@@ -80,7 +83,8 @@ class UserSecurityTest {
         for (User user : userList) {
             int countAds = generator.genInt(countAdsUserMin, countAdsUserMax);
             for (int i = 0; i < countAds; i++) {
-                Image image = imageRepository.save(generator.generateImageIfNull(null, dirForImages));
+                Image image = imageRepository.save(generator.generateImageIfNull(
+                        null, dirForImages, null));
                 Ads ads = adsRepository.save(generator.generateAdsIfNull(null, user, image));
                 adsList.add(ads);
             }

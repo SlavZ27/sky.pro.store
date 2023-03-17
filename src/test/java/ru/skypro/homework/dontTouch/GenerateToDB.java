@@ -1,19 +1,14 @@
 package ru.skypro.homework.dontTouch;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
 import ru.skypro.homework.Generator;
 import ru.skypro.homework.entity.*;
-import ru.skypro.homework.exception.UserNotFoundException;
 import ru.skypro.homework.repository.*;
 
-import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +18,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class GenerateToDB {
-    private final String dirForImages = "./materials_test";
+    private final String dirForImages = "";// = "./materials_test";
     private final String dirForAvatars = "./avatars_test";
+    private final String dirForAvatarsNotTest = "./avatars";
+    private final String dirForImagesNotTest = "./materials";
     @Autowired
     private AdsRepository adsRepository;
     @Autowired
@@ -44,7 +41,10 @@ public class GenerateToDB {
     //Uncomment annotation and run this test for generate DB. After generate comment again
     //user@gmail and admin@gmail and adminuser@gmail will generate without ads, comments, avatars
     //all users generate with password = "password"
-//    @Test
+    //Image files can be copied to folders: dirForAvatarsNotTest dirForImagesNotTest if not null.
+    //else files will remain untouched in the folders: dirForAvatars dirForImages
+    //if dirForImages == null and dirForImagesNotTest !=null then images be downloaded from internet
+    @Test
     void contextLoads() {
         assertThat(adsRepository).isNotNull();
         assertThat(avatarRepository).isNotNull();
@@ -55,7 +55,7 @@ public class GenerateToDB {
     }
 
     @BeforeEach
-    public void generateData() {
+    public void generateData() throws IOException {
         authorityRepository.deleteAll();
         commentRepository.deleteAll();
         adsRepository.deleteAll();
@@ -75,7 +75,8 @@ public class GenerateToDB {
         //generate userAdmin
         List<User> userAdminList = new ArrayList<>();
         for (int i = 0; i < countUserAdmin; i++) {
-            Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(null, dirForAvatars));
+            Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(
+                    null, dirForAvatars, dirForAvatarsNotTest));
             User user = usersRepository.save(generator.generateUser(avatar, "password"));
             authorityRepository.save(generator.generateAuthority(user, Role.ADMIN));
             userAdminList.add(user);
@@ -83,7 +84,8 @@ public class GenerateToDB {
         //generate user
         List<User> userList = new ArrayList<>();
         for (int i = 0; i < countUser; i++) {
-            Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(null, dirForAvatars));
+            Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(
+                    null, dirForAvatars, dirForAvatarsNotTest));
             User user = usersRepository.save(generator.generateUser(avatar, "password"));
             authorityRepository.save(generator.generateAuthority(user, Role.USER));
             userList.add(user);
@@ -93,7 +95,8 @@ public class GenerateToDB {
         for (User user : userList) {
             int countAds = generator.genInt(countAdsUserMin, countAdsUserMax);
             for (int i = 0; i < countAds; i++) {
-                Image image = imageRepository.save(generator.generateImageIfNull(null, dirForImages));
+                Image image = imageRepository.save(generator.generateImageIfNull(
+                        null, dirForImages, dirForImagesNotTest));
                 Ads ads = adsRepository.save(generator.generateAdsIfNull(null, user, image));
                 adsList.add(ads);
             }

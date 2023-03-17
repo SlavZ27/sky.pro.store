@@ -8,7 +8,7 @@ import ru.skypro.homework.entity.Ads;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CreateAdsMapperTest {
-    private CreateAdsMapper createAdsMapper = Mappers.getMapper(CreateAdsMapper.class);
+    private final CreateAdsMapper createAdsMapper = Mappers.getMapper(CreateAdsMapper.class);
 
     @Test
     public void testCreateAdsDtoToAds() {

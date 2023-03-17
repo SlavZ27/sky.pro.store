@@ -126,7 +126,7 @@ class AuthControllerTest {
         assertThat(
                 passwordEncoder.matches(
                         password,
-                        userList.get(0).getPassword().substring(8)))
+                        userList.get(0).getPassword().substring(AuthServiceImpl.PAS_PREFIX_COUNT)))
                 .isTrue();
         assertThat(authorityList.size()).isEqualTo(1);
         assertThat(authorityList.get(0).getAuthority()).isEqualTo(Role.USER.getRole());
@@ -210,7 +210,7 @@ class AuthControllerTest {
         assertThat(
                 passwordEncoder.matches(
                         passwordNew,
-                        users.get(0).getPassword().substring(8)))
+                        users.get(0).getPassword().substring(AuthServiceImpl.PAS_PREFIX_COUNT)))
                 .isTrue();
     }
 }

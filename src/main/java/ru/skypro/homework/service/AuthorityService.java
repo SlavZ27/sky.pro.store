@@ -10,7 +10,7 @@ import ru.skypro.homework.entity.User;
 public interface AuthorityService {
 
     /**
-     * Add authority authority.
+     * Add authority.
      *
      * @param user the user
      * @param role the role
