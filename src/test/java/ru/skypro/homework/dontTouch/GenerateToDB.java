@@ -44,7 +44,7 @@ public class GenerateToDB {
     //Image files can be copied to folders: dirForAvatarsNotTest dirForImagesNotTest if not null.
     //else files will remain untouched in the folders: dirForAvatars dirForImages
     //if dirForImages == null and dirForImagesNotTest !=null then images be downloaded from internet
-    @Test
+    //@Test
     void contextLoads() {
         assertThat(adsRepository).isNotNull();
         assertThat(avatarRepository).isNotNull();
