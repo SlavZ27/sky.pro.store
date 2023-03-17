@@ -21,11 +21,23 @@ public interface UsersRepository extends JpaRepository<User, Integer> {
             , nativeQuery = true)
     int getCount();
 
-    @Query(value = "SELECT CASE WHEN EXISTS(select * from ads as a inner join users as u on a.id = :idAds and a.id_author = u.id and u.username = :username)THEN TRUE ELSE FALSE END"
+    @Query(value = "SELECT CASE WHEN EXISTS(" +
+            "select * from ads as a " +
+            "inner join users as u " +
+            "on a.id = :idAds " +
+            "and a.id_author = u.id " +
+            "and u.username = :username" +
+            ")THEN TRUE ELSE FALSE END"
             , nativeQuery = true)
     boolean isAdsAuthor(Integer idAds, String username);
 
-    @Query(value = "SELECT CASE WHEN EXISTS(select * from comment as c inner join users as u on c.id = :idComment and c.id_author = u.id and u.username = :username)THEN TRUE ELSE FALSE END"
+    @Query(value = "SELECT CASE WHEN EXISTS(" +
+            "select * from comment as c " +
+            "inner join users as u " +
+            "on c.id = :idComment " +
+            "and c.id_author = u.id " +
+            "and u.username = :username" +
+            ")THEN TRUE ELSE FALSE END"
             , nativeQuery = true)
     boolean isCommentAuthor(Integer idComment, String username);
 }

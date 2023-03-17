@@ -113,7 +113,7 @@ public class AdsServiceImpl implements AdsService {
     }
 
     /**
-     * Get Comments of Ads by ads id.
+     * Get Comments of Ads by ads of id.
      * Uses {@link AdsRepository#findById(Object)}
      * Uses {@link CommentServiceImpl#getAllByIdAdsAndSortDateTime(Integer)}
      *

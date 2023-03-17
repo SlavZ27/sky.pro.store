@@ -7,13 +7,10 @@ import ru.skypro.homework.entity.Ads;
 import ru.skypro.homework.entity.Image;
 import ru.skypro.homework.entity.User;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FullAdsMapperTest {
-    private FullAdsMapper fullAdsMapper = Mappers.getMapper(FullAdsMapper.class);
+    private final FullAdsMapper fullAdsMapper = Mappers.getMapper(FullAdsMapper.class);
 
     @Test
     public void testAdsToFullAdsDto() {
