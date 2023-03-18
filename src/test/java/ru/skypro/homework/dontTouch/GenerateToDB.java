@@ -38,13 +38,18 @@ public class GenerateToDB {
     private final Random random = new Random();
 
 
-    //Uncomment annotation and run this test for generate DB. After generate comment again
-    //user@gmail and admin@gmail and adminuser@gmail will generate without ads, comments, avatars
-    //all users generate with password = "password"
-    //Image files can be copied to folders: dirForAvatarsNotTest dirForImagesNotTest if not null.
-    //else files will remain untouched in the folders: dirForAvatars dirForImages
-    //if dirForImages == null and dirForImagesNotTest !=null then images be downloaded from internet
-    //@Test
+
+
+    /**
+     *    Uncomment annotation and run this test for generate DB. After generate comment again
+     *     user@gmail and admin@gmail and adminuser@gmail will generate without ads, comments, avatars
+     *     all users generate with password = "password"
+     *     Image files can be copied to folders: dirForAvatarsNotTest dirForImagesNotTest if not null.
+     *     else files will remain untouched in the folders: dirForAvatars dirForImages
+     *     if dirForImages == null and dirForImagesNotTest !=null then images be downloaded from internet
+     */
+
+//    @Test
     void contextLoads() {
         assertThat(adsRepository).isNotNull();
         assertThat(avatarRepository).isNotNull();
@@ -66,10 +71,10 @@ public class GenerateToDB {
         int countUserAdmin = 0;
         int countUser = 20;
 
-        int countAdsUserMin = 0;
+        int countAdsUserMin = 1;
         int countAdsUserMax = 5;
 
-        int countCommentForAdsMin = 0;
+        int countCommentForAdsMin = 1;
         int countCommentForAdsMax = 10;
 
         //generate userAdmin

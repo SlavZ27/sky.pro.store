@@ -235,6 +235,7 @@ class AdsApiControllerMockMvcTest {
         Files.deleteIfExists(path1);
         Files.deleteIfExists(newPath);
         verify(imageRepository, times(1)).save(image);
+        verify(imageRepository, times(2)).save(any(Image.class));
         verify(adsRepository, times(2)).save(ads);
     }
 
@@ -563,7 +564,7 @@ class AdsApiControllerMockMvcTest {
         Files.deleteIfExists(path);
         Files.deleteIfExists(Path.of(image.getPath()));
         verify(adsRepository, times(1)).save(ads);
-//        verify(imageRepository, times(1)).save(image);
+        verify(imageRepository, times(1)).save(any(Image.class));
     }
 
     @Test

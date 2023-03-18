@@ -59,7 +59,7 @@ public class AvatarServiceImpl implements AvatarService {
         Path pathOld = Paths.get(avatar.getPath());
         Path pathNew = generatePath(file, nameFile);
         try {
-            log.info("Try to write file by new path: {}", pathNew);
+            log.debug("Try to write file by new path: {}", pathNew);
             Files.write(pathNew, file.getBytes());
             if (Files.exists(pathNew)) {
                 avatar.setPath(pathNew.toString());
@@ -92,7 +92,7 @@ public class AvatarServiceImpl implements AvatarService {
             throw new IllegalArgumentException();
         }
         try {
-            log.info("Try to read bytes by path: {}", avatar.getPath());
+            log.debug("Try to read bytes by path: {}", avatar.getPath());
             return Pair.of(Files.readAllBytes(Paths.get(avatar.getPath())), MediaType.IMAGE_JPEG_VALUE);
         } catch (IOException ignored) {
             log.error("Absent file in Avatar with id: {}", avatar.getId());

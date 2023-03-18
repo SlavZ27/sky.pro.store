@@ -135,7 +135,7 @@ public class UserServiceImpl implements UserService {
         user = usersRepository.save(user);
         if (user.getAvatar() != null && user.getAvatar().getPath() != null
                 && Files.exists(Path.of(user.getAvatar().getPath()))) {
-            log.info("User with ID: {} has been updated", user.getId());
+            log.info("Image of user with ID: {} has been updated", user.getId());
             return new ResponseEntity<>(HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -153,10 +153,10 @@ public class UserServiceImpl implements UserService {
     public void updateImageOfUser(User user, MultipartFile image) throws IOException {
         if (user.getAvatar() == null) {
             user.setAvatar(avatarService.addAvatar(image, getNameFileForAvatar(user)));
-            log.info("New avatar has been added for 'user' with ID:{}", user.getId());
+            log.debug("New avatar has been added for 'user' with ID:{}", user.getId());
         } else {
             user.setAvatar(avatarService.updateAvatar(user.getAvatar(), image, getNameFileForAvatar(user)));
-            log.info("Avatar with ID: {} has been updated for 'user' with ID:{}",
+            log.debug("Avatar with ID: {} has been updated for 'user' with ID:{}",
                     user.getAvatar().getId(), user.getId());
         }
     }
