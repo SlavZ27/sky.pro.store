@@ -57,7 +57,7 @@ public class AdsServiceImpl implements AdsService {
     public AdsDto updateAds(Integer adsId, CreateAdsDto createAdsDto) {
         Ads newAds = createAdsMapper.createAdsDtoToAds(createAdsDto);
         Ads oldAds = adsRepository.findById(adsId).orElseThrow(() -> {
-            log.error("Ad with ID: {} not found", adsId);
+            log.debug("Ad with ID: {} not found", adsId);
             return new AdsNotFoundException(adsId);
         });
         oldAds.setDescription(newAds.getDescription());
@@ -85,7 +85,7 @@ public class AdsServiceImpl implements AdsService {
     public CommentDto addCommentsToAds(Integer adsId, CommentDto commentDto, String username) {
         User user = userService.getUserByUserName(username);
         Ads ads = adsRepository.findById(adsId).orElseThrow(() -> {
-            log.error("Ad with ID: {} not found", adsId);
+            log.debug("Ad with ID: {} not found", adsId);
             return new AdsNotFoundException(adsId);
         });
         Comment comment = commentMapper.dtoToComment(commentDto);
@@ -106,7 +106,7 @@ public class AdsServiceImpl implements AdsService {
     @Override
     public CommentDto updateCommentsForAds(Integer adPk, Integer commentId, CommentDto commentDto) {
         Ads ads = adsRepository.findById(adPk).orElseThrow(() -> {
-            log.error("Ads with ID: {} not found", adPk);
+            log.debug("Ads with ID: {} not found", adPk);
             return new AdsNotFoundException(adPk);
         });
         return commentMapper.commentToDto(commentService.updateCommentsForAds(commentDto, ads, commentId));
@@ -124,7 +124,7 @@ public class AdsServiceImpl implements AdsService {
     @Override
     public ResponseWrapperCommentDto getCommentsOfAds(Integer adsId) {
         Ads ads = adsRepository.findById(adsId).orElseThrow(() -> {
-            log.error("Ads with ID: {} not found", adsId);
+            log.debug("Ads with ID: {} not found", adsId);
             return new AdsNotFoundException(adsId);
         });
         List<CommentDto> commentList = commentMapper.mapListOfCommentToListDto(
@@ -149,7 +149,7 @@ public class AdsServiceImpl implements AdsService {
     public ResponseEntity<Void> removeAds(Integer idAds) {
         //finding
         Ads ads = adsRepository.findById(idAds).orElseThrow(() -> {
-            log.error("Ads with ID: {} not found", idAds);
+            log.debug("Ads with ID: {} not found", idAds);
             return new AdsNotFoundException(idAds);
         });
         //deleting
@@ -163,32 +163,39 @@ public class AdsServiceImpl implements AdsService {
         //checking Image
         Image imageMustBeNull;
         try {
+            log.debug("Try to get image by ID = {}", imageForDel.getId());
             imageMustBeNull = imageService.getImage(imageForDel.getId());
-            log.info("Try to get imageMustBeNull by imageID {}", imageForDel.getId());
+            log.error("Image with ID = {} don't deleted", imageForDel.getId());
         } catch (ImageNotFoundException e) {
             imageMustBeNull = null;
-            log.error("An exception occurred! Set imageMustBeNull = null");
+            log.info("Image by ID = {} not found", imageForDel.getId());
         }
         //checking File of Image
         boolean existFile = true;
         try {
+            log.debug("Try to get data of image with id = {}", imageForDel.getId());
             imageService.getImageData(imageForDel);
-            log.info("Try to get getImageData(imageForDel)");
+            log.error("Data of image with ID = {} don't deleted", imageForDel.getId());
         } catch (ImageNotFoundException e) {
             existFile = false;
-            log.error("An exception occurred! Set existFile = false");
+            log.info("Data of image by ID = {} not found", imageForDel.getId());
         }
         //checking comments
         int countComments = commentService.getCountByIdAds(idAds);
+        if (countComments == 0) {
+            log.info("Comments of ads by ID = {} not found", ads.getId());
+        } else {
+            log.error("Comments of ads with ID = {} don't deleted", ads.getId());
+        }
         //checking finish
         if (adsMustBeNull == null &&
                 imageMustBeNull == null &&
                 !existFile &&
                 countComments == 0) {
-            log.info("Ads with ID: {} has been successfully deleted", idAds);
+            log.info("Ads with ID: {} has been successfully deleted", ads.getId());
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-        log.error("Method removeAds(Integer idAds) with ID:{} returned null", idAds);
+        log.error("The ad with the ID: {} was not deleted correctly", ads.getId());
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -205,7 +212,7 @@ public class AdsServiceImpl implements AdsService {
     @Override
     public CommentDto getCommentOfAds(Integer adsId, Integer commentId) {
         Ads ads = adsRepository.findById(adsId).orElseThrow(() -> {
-            log.error("Ad with ID: {} not found", adsId);
+            log.debug("Ad with ID: {} not found", adsId);
             return new AdsNotFoundException(adsId);
         });
         return commentMapper.commentToDto(commentService.getCommentOfAds(ads.getId(), commentId));
@@ -250,7 +257,7 @@ public class AdsServiceImpl implements AdsService {
     @Override
     public FullAdsDto getAds(Integer idAds) {
         Ads ads = adsRepository.findById(idAds).orElseThrow(() -> {
-            log.error("Ad with ID: {} not found", idAds);
+            log.debug("Ad with ID: {} not found", idAds);
             return new AdsNotFoundException(idAds);
         });
         return fullAdsMapper.adsToFullAdsDto(ads);
@@ -298,7 +305,7 @@ public class AdsServiceImpl implements AdsService {
     @Override
     public ResponseEntity<Void> removeCommentsForAds(Integer adPk, Integer commentId) {
         adsRepository.findById(adPk).orElseThrow(() -> {
-            log.error("Ads with ID: {} not found", adPk);
+            log.debug("Ads with ID: {} not found", adPk);
             return new AdsNotFoundException(adPk);
         });
         commentService.removeCommentForAds(adPk, commentId);
@@ -332,7 +339,7 @@ public class AdsServiceImpl implements AdsService {
     @Override
     public Pair<byte[], String> updateImageOfAds(Integer idAds, MultipartFile image) throws IOException {
         Ads ads = adsRepository.findById(idAds).orElseThrow(() -> {
-            log.error("Ads with ID: {} not found", idAds);
+            log.debug("Ads with ID: {} not found", idAds);
             return new AdsNotFoundException(idAds);
         });
         updateImageOfAds(ads, image);
@@ -353,10 +360,10 @@ public class AdsServiceImpl implements AdsService {
     public void updateImageOfAds(Ads ads, MultipartFile image) throws IOException {
         if (ads.getImage() == null) {
             ads.setImage(imageService.addImage(image, getNameFileForImage(ads)));
-            log.info("New image has been added for 'ads' with ID:{}", ads.getId());
+            log.debug("New image has been added for 'ads' with ID:{}", ads.getId());
         } else {
             ads.setImage(imageService.updateImage(ads.getImage(), image, getNameFileForImage(ads)));
-            log.info("Image with ID: {} has been updated for 'ads' with ID:{}", ads.getImage().getId(), ads.getId());
+            log.debug("Image with ID: {} has been updated for 'ads' with ID:{}", ads.getImage().getId(), ads.getId());
         }
     }
 
@@ -373,7 +380,7 @@ public class AdsServiceImpl implements AdsService {
     @Override
     public Pair<byte[], String> getImage(Integer idAds) {
         Ads ads = adsRepository.findById(idAds).orElseThrow(() -> {
-            log.error("Ads with ID: {} not found", idAds);
+            log.debug("Ads with ID: {} not found", idAds);
             return new AdsNotFoundException(idAds);
         });
         if (ads.getImage() == null) {
