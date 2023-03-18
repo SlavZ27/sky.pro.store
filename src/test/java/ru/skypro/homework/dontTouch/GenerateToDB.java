@@ -39,7 +39,6 @@ public class GenerateToDB {
 
 
 
-
     /**
      *    Uncomment annotation and run this test for generate DB. After generate comment again
      *     user@gmail and admin@gmail and adminuser@gmail will generate without ads, comments, avatars
