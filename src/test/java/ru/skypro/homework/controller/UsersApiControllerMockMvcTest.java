@@ -301,6 +301,7 @@ class UsersApiControllerMockMvcTest {
         Files.deleteIfExists(path1);
         Files.deleteIfExists(newPath);
         verify(avatarRepository, times(1)).save(avatar);
+        verify(avatarRepository, times(2)).save(any(Avatar.class));
         verify(usersRepository, times(2)).save(user);
     }
 
