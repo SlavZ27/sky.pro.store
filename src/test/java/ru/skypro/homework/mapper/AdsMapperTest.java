@@ -1,25 +1,16 @@
 package ru.skypro.homework.mapper;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import ru.skypro.homework.dto.AdsDto;
 import ru.skypro.homework.entity.Ads;
 import ru.skypro.homework.entity.Image;
 import ru.skypro.homework.entity.User;
-import ru.skypro.homework.service.impl.ImageServiceImpl;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
 
 public class AdsMapperTest {
-    private AdsMapper adsMapper = Mappers.getMapper(AdsMapper.class);
+    private final AdsMapper adsMapper = Mappers.getMapper(AdsMapper.class);
     @Test
     public void testAdsToAdsDto() {
 

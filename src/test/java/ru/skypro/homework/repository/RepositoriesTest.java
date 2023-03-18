@@ -8,6 +8,7 @@ import org.springframework.test.context.ActiveProfiles;
 import ru.skypro.homework.Generator;
 import ru.skypro.homework.entity.*;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -41,7 +42,7 @@ class RepositoriesTest {
             = Comparator.comparing(Comment::getDateTime);
 
     @BeforeEach
-    public void generateData() {
+    public void generateData() throws IOException {
         authorityRepository.deleteAll();
         commentRepository.deleteAll();
         adsRepository.deleteAll();
@@ -61,7 +62,8 @@ class RepositoriesTest {
         //generate userAdmin
         List<User> userAdminList = new ArrayList<>();
         for (int i = 0; i < countUserAdmin; i++) {
-            Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(null, dirForAvatars));
+            Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(
+                    null, dirForAvatars, null));
             User user = usersRepository.save(generator.generateUser(avatar, "password"));
             authorityRepository.save(generator.generateAuthority(user, Role.ADMIN));
             userAdminList.add(user);
@@ -69,7 +71,8 @@ class RepositoriesTest {
         //generate user
         List<User> userList = new ArrayList<>();
         for (int i = 0; i < countUser; i++) {
-            Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(null, dirForAvatars));
+            Avatar avatar = avatarRepository.save(generator.generateAvatarIfNull(
+                    null, dirForAvatars, null));
             User user = usersRepository.save(generator.generateUser(avatar, "password"));
             authorityRepository.save(generator.generateAuthority(user, Role.USER));
             userList.add(user);
@@ -79,7 +82,8 @@ class RepositoriesTest {
         for (User user : userList) {
             int countAds = generator.genInt(countAdsUserMin, countAdsUserMax);
             for (int i = 0; i < countAds; i++) {
-                Image image = imageRepository.save(generator.generateImageIfNull(null, dirForImages));
+                Image image = imageRepository.save(generator.generateImageIfNull(
+                        null, dirForImages, null));
                 Ads ads = adsRepository.save(generator.generateAdsIfNull(null, user, image));
                 adsList.add(ads);
             }

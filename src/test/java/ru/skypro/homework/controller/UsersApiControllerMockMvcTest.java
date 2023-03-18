@@ -138,7 +138,7 @@ class UsersApiControllerMockMvcTest {
     @WithMockUser(username = "1", authorities = {"ROLE_USER"})
     void getAvatarTest() throws Exception {
         String username = "1";
-        Avatar avatar = generator.generateAvatarIfNull(null, dirForAvatars);
+        Avatar avatar = generator.generateAvatarIfNull(null, dirForAvatars, null);
         avatar.setId(111);
         User user = generator.generateUser(avatar, null);
 
@@ -159,7 +159,7 @@ class UsersApiControllerMockMvcTest {
     @DisplayName("GET http://localhost:8080/users/{idUser}/image 200")
     @WithMockUser(username = "1", authorities = {"ROLE_USER"})
     void getAvatarOfUserTest() throws Exception {
-        Avatar avatar = generator.generateAvatarIfNull(null, dirForAvatars);
+        Avatar avatar = generator.generateAvatarIfNull(null, dirForAvatars, null);
         avatar.setId(222);
         User user = generator.generateUser(null, null);
         user.setId(111);

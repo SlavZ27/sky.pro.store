@@ -64,8 +64,8 @@ public class CommentServiceImpl implements CommentService {
      * @param ads        is not null
      * @param commentId  is not null
      * @return {@link Comment}
-     * @throws AdsNotFoundException     if passed non- existent ads id
-     * @throws CommentNotFoundException if passed non- existent comment id
+     * @throws AdsNotFoundException     if passed non-existent ads id
+     * @throws CommentNotFoundException if passed non-existent comment id
      */
     @Override
     public Comment updateCommentsForAds(CommentDto commentDto, Ads ads, Integer commentId) {
@@ -98,7 +98,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     /**
-     * Allows to get all comments by ads id, sorted by date time
+     * Allows to get all comments by ads of id, sorted by date time
      * Uses {@link CommentRepository#findAllByIdAdsAndSortDateTime(Integer)}
      *
      * @param adsId is not null

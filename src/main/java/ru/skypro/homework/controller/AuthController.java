@@ -76,7 +76,7 @@ public class AuthController {
         if (authService.register(req)) {
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 

@@ -10,7 +10,7 @@ public interface AuthService {
     /**
      * Login.
      *
-     * @param userName the user name
+     * @param userName the username
      * @param password the password
      * @return the boolean
      */

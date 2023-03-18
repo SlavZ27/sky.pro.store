@@ -328,7 +328,7 @@ class AdsApiControllerMockMvcTest {
     void getAdsTest() throws Exception {
         int index = random.nextInt();
         User user = generator.generateUser(null, null);
-        Image image = generator.generateImageIfNull(null, dirForImages);
+        Image image = generator.generateImageIfNull(null, dirForImages, null);
         Ads adsWithImage = generator.generateAdsIfNull(null, user, image);
         Ads adsWithoutImage = generator.generateAdsIfNull(null, user, null);
 
@@ -448,7 +448,7 @@ class AdsApiControllerMockMvcTest {
     @WithMockUser(username = "1", authorities = {"ROLE_USER"})
     void getImageTest() throws Exception {
         User user = generator.generateUser(null, null);
-        Image image = generator.generateImageIfNull(null, dirForImages);
+        Image image = generator.generateImageIfNull(null, dirForImages, null);
         Ads ads = generator.generateAdsIfNull(null, user, image);
 
         when(adsRepository.findById(ads.getId())).thenReturn(Optional.of(ads));
@@ -470,7 +470,7 @@ class AdsApiControllerMockMvcTest {
     void removeAdsTest() throws Exception {
         //create user image ads
         User owner = generator.generateUser(null, null);
-        Image image = generator.generateImageIfNull(null, dirForImages);
+        Image image = generator.generateImageIfNull(null, dirForImages, null);
         int indexImage = image.getId();
         Ads ads = generator.generateAdsIfNull(null, owner, image);
         int indexAds = ads.getId();
@@ -802,7 +802,7 @@ class AdsApiControllerMockMvcTest {
     @WithMockUser(username = "1", authorities = {"ROLE_USER"})
     void updateAdsTest() throws Exception {
         User user = generator.generateUser(null, null);
-        Image image = generator.generateImageIfNull(null, dirForImages);
+        Image image = generator.generateImageIfNull(null, dirForImages, null);
         Ads ads = generator.generateAdsIfNull(null, user, image);
         //create createAdsDto
         CreateAdsDto createAdsDto = new CreateAdsDto();
@@ -837,7 +837,7 @@ class AdsApiControllerMockMvcTest {
     @WithMockUser(username = "1", authorities = {"ROLE_USER"})
     void updateAdsNegativeTest() throws Exception {
         User user = generator.generateUser(null, null);
-        Image image = generator.generateImageIfNull(null, dirForImages);
+        Image image = generator.generateImageIfNull(null, dirForImages, null);
         Ads ads = generator.generateAdsIfNull(null, user, image);
         //create createAdsDto
         CreateAdsDto createAdsDto = new CreateAdsDto();
