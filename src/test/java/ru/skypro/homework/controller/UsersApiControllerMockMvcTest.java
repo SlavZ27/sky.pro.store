@@ -44,7 +44,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -204,6 +204,7 @@ class UsersApiControllerMockMvcTest {
         mockMvc.perform(builder)
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectWriter.writeValueAsString(newUserDto)));
+        verify(usersRepository, times(1)).save(userNew);
     }
 
     @Test
@@ -291,6 +292,7 @@ class UsersApiControllerMockMvcTest {
         Files.deleteIfExists(newPath);
 
         user.setAvatar(null);
+        when(usersRepository.save(user)).thenReturn(user);
         when(avatarRepository.save(any(Avatar.class))).thenReturn(avatar);
         mockMvc.perform(builder)
                 .andExpect(status().isOk());
@@ -298,6 +300,8 @@ class UsersApiControllerMockMvcTest {
         assertThat(Files.exists(path1)).isFalse();
         Files.deleteIfExists(path1);
         Files.deleteIfExists(newPath);
+        verify(avatarRepository, times(1)).save(avatar);
+        verify(usersRepository, times(2)).save(user);
     }
 
     @Test

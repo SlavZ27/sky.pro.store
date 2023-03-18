@@ -234,6 +234,8 @@ class AdsApiControllerMockMvcTest {
         //clean
         Files.deleteIfExists(path1);
         Files.deleteIfExists(newPath);
+        verify(imageRepository, times(1)).save(image);
+        verify(adsRepository, times(2)).save(ads);
     }
 
     @Test
@@ -560,6 +562,8 @@ class AdsApiControllerMockMvcTest {
         assertThat(Files.readAllBytes(Path.of(image.getPath()))).isEqualTo(data);
         Files.deleteIfExists(path);
         Files.deleteIfExists(Path.of(image.getPath()));
+        verify(adsRepository, times(1)).save(ads);
+//        verify(imageRepository, times(1)).save(image);
     }
 
     @Test
@@ -595,6 +599,7 @@ class AdsApiControllerMockMvcTest {
         mockMvc.perform(builder)
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectWriter.writeValueAsString(commentDto)));
+        verify(commentRepository, times(1)).save(comment);
     }
 
     @Test
@@ -725,6 +730,7 @@ class AdsApiControllerMockMvcTest {
         mockMvc.perform(builder)
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectWriter.writeValueAsString(commentDtoNew)));
+        verify(commentRepository, times(1)).save(commentNew);
     }
 
     @Test
@@ -823,6 +829,7 @@ class AdsApiControllerMockMvcTest {
         mockMvc.perform(builder)
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectWriter.writeValueAsString(adsDto)));
+        verify(adsRepository, times(1)).save(ads);
     }
 
     @Test
