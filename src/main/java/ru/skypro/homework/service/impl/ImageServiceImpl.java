@@ -52,7 +52,7 @@ public class ImageServiceImpl implements ImageService {
         Path pathOld = Paths.get(image.getPath());
         Path pathNew = generatePath(file, nameFile);
         try {
-            log.info("Try to write file by new path: {}", pathNew);
+            log.debug("Try to write file by new path: {}", pathNew);
             Files.write(pathNew, file.getBytes());
             if (Files.exists(pathNew)) {
                 image.setPath(pathNew.toString());
@@ -85,13 +85,13 @@ public class ImageServiceImpl implements ImageService {
             throw new IllegalArgumentException();
         }
         try {
-            log.info("Try to read bytes by path: {}", image.getPath());
+            log.debug("Try to read bytes by path: {}", image.getPath());
             return Pair.of(Files.readAllBytes(Paths.get(image.getPath())), MediaType.IMAGE_JPEG_VALUE);
         } catch (IOException ignored) {
-            log.error("Absent file in Image with id: {}", image.getId());
+            log.debug("Absent file in Image with id: {}", image.getId());
             throw new ImageNotFoundException("Absent file in Image with id = " + image.getId());
         } catch (NullPointerException e) {
-            log.error("Absent path in Image with id: {}", image.getId());
+            log.debug("Absent path in Image with id: {}", image.getId());
             throw new ImageNotFoundException("Absent path in Image with id = " + image.getId());
         }
     }
@@ -111,7 +111,7 @@ public class ImageServiceImpl implements ImageService {
             throw new IllegalArgumentException();
         }
         return imageRepository.findById(id).orElseThrow(() -> {
-            log.error("Image with ID: {} not found", id);
+            log.debug("Image with ID: {} not found", id);
             return new ImageNotFoundException(id);
         });
     }
