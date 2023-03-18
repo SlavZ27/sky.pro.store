@@ -71,7 +71,7 @@ public class CommentServiceImpl implements CommentService {
     public Comment updateCommentsForAds(CommentDto commentDto, Ads ads, Integer commentId) {
         Comment newComment = commentMapper.dtoToComment(commentDto);
         Comment oldComment = commentRepository.findByIdAndAdsId(ads.getId(), commentId).orElseThrow(() -> {
-            log.error("Comment with ID: {} not found", commentId);
+            log.debug("Comment with ID: {} not found", commentId);
             return new CommentNotFoundException(commentId);
         });
         if (newComment.getAuthor() != null) {
@@ -122,7 +122,7 @@ public class CommentServiceImpl implements CommentService {
     public Comment getCommentOfAds(Integer adsId, Integer commentId) {
         return commentRepository.findByIdAndAdsId(adsId, commentId)
                 .orElseThrow(() -> {
-                    log.error("Comment with ID: {} not found", commentId);
+                    log.debug("Comment with ID: {} not found", commentId);
                     return new CommentNotFoundException(commentId);
                 });
     }
@@ -162,7 +162,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void removeCommentForAds(Integer adPk, Integer commentId) {
         Comment comment = commentRepository.findByIdAndAdsId(adPk, commentId).orElseThrow(() -> {
-            log.error("Comment with ID: {} not found", commentId);
+            log.debug("Comment with ID: {} not found", commentId);
             return new CommentNotFoundException(commentId);
         });
         removeComment(comment);

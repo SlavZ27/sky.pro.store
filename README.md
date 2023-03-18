@@ -22,7 +22,7 @@ Technologies used:
 - Faker and h2 for testing purposes.
 - JUnit, Mockito
 
-To check the operability of the deployed system, there is a special test(GenerateToDB->contextLoads) After the correct execution of this test, entities are generated into the database. The test validate proper storage of images in the designated folders. By running this test, developers can ensure that the system is functioning correctly and all features are working as intended.
+To check the operability of the deployed system, there is a special test(GenerateToDB->contextLoads) After the correct execution of this test, entities are generated into the database. The test validate proper storage of images in the designated folders. By running this test, developers can ensure that the system is functioning correctly and all features are working as intended. The remaining tests serve as a test of the written methods, include integration and unit tests. Tests cover code by about 88%.
 
 The project has an [openapi.yaml](openapi.yaml) file that contains a list of endpoints that users can access. These endpoints include authentication, user registration, and various actions that can be performed by authenticated users. The team ensured that all endpoints were secure and followed best practices for web application development.
 
