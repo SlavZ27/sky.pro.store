@@ -6,6 +6,7 @@ To work, the application requires Postgresql with an empty database, and the con
 - spring.datasource.url
 - spring.datasource.username
 - spring.datasource.password
+- spring.datasource.driver
   
 Additionally, the program has settings for two folders where it will store images of ads and avatars of users. This allows for a more dynamic and visually appealing bulletin board, where users can upload images to accompany their ads or profiles:
 - path.to.materials.folder
